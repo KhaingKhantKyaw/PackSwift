@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#00A8B5"><meta name="description" content="Create a PackSwift account for saved trips and community participation."><meta name="robots" content="noindex"><title>Sign Up — PackSwift</title><link rel="stylesheet" href="/css/styles.css"><script src="/js/app.js" defer></script><script src="/js/auth-forms.js" defer></script>
+  </head>
+  <body data-page="signup">
+    <a class="skip-link" href="#main-content">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a><nav class="desktop-nav" aria-label="Primary navigation"></nav><a class="header-action" href="/login">Login</a></div></header>
+    <main id="main-content" class="page-shell auth-shell">
+      <section class="auth-intro"><p class="eyebrow">Join PackSwift</p><h1>Keep every idea <span>close at hand.</span></h1><p>Create your account to connect trip ideas, itineraries, and preparation progress.</p><div class="auth-benefit"><strong>Made for thoughtful travellers</strong><span>Private account · Personal plans · Smart preparation</span></div></section>
+      <form id="signup-form" class="panel form-panel auth-panel" data-auth-form="signup" novalidate>
+        <h2 class="panel-title">Create your account</h2><p class="panel-copy">All fields are required.</p>
+        <div class="form-grid auth-form-grid">
+          <div class="form-section-heading"><h3>Personal details</h3><p>Tell us how your name and account should appear.</p></div>
+          <div class="form-field form-field-wide"><label class="form-label" for="signup-name">Full name</label><input class="field-control" id="signup-name" name="fullName" type="text" maxlength="100" autocomplete="name" placeholder="e.g. Adrian Smith" required></div>
+          <div class="form-field form-field-wide"><label class="form-label" for="signup-username">Username</label><input class="field-control" id="signup-username" name="username" type="text" maxlength="50" pattern="[A-Za-z0-9._-]+" data-pattern-message="Use letters, numbers, dots, underscores, or hyphens." autocomplete="username" placeholder="e.g. adrian.travels" required></div>
+          <div class="form-field form-field-wide"><label class="form-label" for="signup-email">Email address</label><input class="field-control" id="signup-email" name="email" type="email" maxlength="255" autocomplete="email" placeholder="e.g. adrian@example.com" required></div>
+          <div class="form-section-heading"><h3>Security &amp; password</h3><p>Create a password that is difficult to guess.</p></div>
+          <div class="form-field form-field-wide"><label class="form-label" for="signup-password">Password</label><input class="field-control" id="signup-password" name="password" type="password" minlength="10" maxlength="128" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{10,128}" data-pattern-message="Password must contain at least 10 characters, an uppercase letter, a lowercase letter, a number, and a special character." autocomplete="new-password" aria-describedby="password-hint" required><span id="password-hint" class="field-hint">At least 10 characters with uppercase, lowercase, a number, and a special character.</span></div>
+        </div>
+        <div class="form-actions"><button class="button button-primary" type="submit">Create account <span aria-hidden="true">→</span></button></div><p class="form-feedback" data-auth-feedback role="alert"></p><p class="auth-switch">Already have an account? <a href="/login">Login</a></p>
+      </form>
+    </main>
+    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Your password is protected with strong one-way hashing.</span></div></footer><nav class="mobile-nav" aria-label="Mobile navigation"></nav>
+  </body>
+</html>

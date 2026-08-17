@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#00A8B5">
+    <meta name="description" content="Prepare every essential item for a saved PackSwift trip.">
+    <title>Assist My Trip — PackSwift</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/vendor/lucide.min.js" defer></script>
+    <script src="/js/app.js" defer></script>
+    <script src="/js/trip-tools-widget.js" defer></script>
+    <script src="/js/assist-trip.js" defer></script>
+  </head>
+  <body data-page="trips" class="readiness-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header"><div class="header-inner">
+      <a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"></nav>
+      <a class="header-action" href="/my-trips">My Trips <span aria-hidden="true">↗</span></a>
+    </div></header>
+
+    <main id="main-content" class="ready-shell">
+      <section class="ready-hero">
+        <a class="ready-back-link" href="/my-trips"><span aria-hidden="true">←</span> My Trips</a>
+        <div class="ready-hero-grid">
+          <div>
+            <p class="eyebrow">Trip readiness assistant</p>
+            <h1>Things Might Need to Carry on This Trip</h1>
+            <p id="ready-summary">Loading your saved trip and preparation checklist…</p>
+          </div>
+          <div class="ready-trip-card">
+            <span id="ready-trip-code" aria-hidden="true">TRP</span>
+            <div><small>Your active trip</small><strong id="ready-destination">Saved destination</strong><p id="ready-dates">Travel dates</p></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="ecosystem-layout">
+        <div class="ecosystem-main">
+          <section class="ready-progress-card" aria-labelledby="ready-progress-title">
+            <div><p class="eyebrow">Preparation progress</p><h2 id="ready-progress-title"><span id="ready-completed">0</span> of <span id="ready-total">0</span> prepared</h2></div>
+            <div class="ready-progress-track" aria-hidden="true"><span id="ready-progress-bar"></span></div>
+            <strong id="ready-percentage">0% Completed</strong>
+          </section>
+
+          <nav id="ready-category-tabs" class="ready-category-tabs" aria-label="Checklist categories"></nav>
+          <p id="ready-status" class="status-banner" role="status">Preparing your checklist…</p>
+          <section id="ready-list" class="ready-list ready-category-list" aria-live="polite"></section>
+        </div>
+        <aside class="ecosystem-sidebar">
+          <section class="trip-quick-actions glass-card">
+            <p class="eyebrow">Connected trip tools</p>
+            <h2>Keep every detail together</h2>
+            <a id="ready-itinerary-link" class="ecosystem-link" href="/trip-itinerary"><i data-lucide="route"></i><span><strong>Interactive itinerary</strong><small>Review each day and transit route</small></span></a>
+            <a id="ready-visa-link" class="ecosystem-link" href="/assist-visa"><i data-lucide="stamp"></i><span><strong>Visa & insurance</strong><small>Check entry rules and protection</small></span></a>
+            <a id="ready-expenses-link" class="ecosystem-link" href="/trip-expenses"><i data-lucide="receipt-text"></i><span><strong>Expense tracker</strong><small>Log and split group spending</small></span></a>
+          </section>
+          <section class="trip-tools-widget glass-card" data-trip-tools>
+            <div class="widget-loading"><i data-lucide="loader-circle"></i> Loading live trip tools…</div>
+          </section>
+        </aside>
+      </div>
+    </main>
+
+    <dialog id="manual-assist-dialog" class="login-required-dialog" aria-labelledby="manual-assist-title">
+      <form method="dialog" class="login-required-card">
+        <button class="login-required-close" type="submit" value="cancel" aria-label="Close">×</button>
+        <span class="login-required-icon" aria-hidden="true">✓</span>
+        <p class="eyebrow">PackSwift guidance</p>
+        <h2 id="manual-assist-title">Prepare this item</h2>
+        <p id="manual-assist-copy"></p>
+        <div class="manual-assist-tips" id="manual-assist-tips"></div>
+        <div class="login-required-actions">
+          <button class="button button-quiet" type="submit" value="cancel">Not yet</button>
+          <button id="manual-mark-ready" class="button button-primary" type="button">Mark as prepared</button>
+        </div>
+      </form>
+    </dialog>
+
+    <button id="trip-ready-banner" class="trip-ready-banner" type="button" hidden>
+      <span><small>Everything is checked</small><strong>Your Trip Is Ready!</strong></span>
+      <span aria-hidden="true">→</span>
+    </button>
+
+    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Your preparation progress is saved to your account.</span></div></footer>
+    <nav class="mobile-nav" aria-label="Mobile navigation"></nav>
+  </body>
+</html>

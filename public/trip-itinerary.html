@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#00A8B5">
+    <meta name="description" content="Build and export a connected day-by-day PackSwift itinerary.">
+    <title>Interactive Itinerary — PackSwift</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/vendor/lucide.min.js" defer></script>
+    <script src="/js/app.js" defer></script>
+    <script src="/js/trip-tools-widget.js" defer></script>
+    <script src="/js/trip-itinerary.js" defer></script>
+  </head>
+  <body data-page="trips" class="ecosystem-page itinerary-page">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header"><div class="header-inner">
+      <a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"></nav><a class="header-action" href="/profile">Profile</a>
+    </div></header>
+    <main id="main-content" class="ecosystem-shell">
+      <section class="ecosystem-hero glass-card">
+        <div><a id="itinerary-back" class="ready-back-link" href="/assist-trip"><i data-lucide="arrow-left"></i> Readiness checklist</a><p class="eyebrow">Interactive itinerary builder</p><h1 id="itinerary-title">Your trip, organised day by day.</h1><p id="itinerary-summary">Loading the connected travel timeline…</p></div>
+        <div class="ecosystem-action-bar"><button id="add-activity-button" class="button button-secondary" type="button"><i data-lucide="plus"></i> Add Activity</button><button id="export-itinerary" class="button button-primary" type="button"><i data-lucide="download"></i> Export Itinerary as PDF</button></div>
+      </section>
+      <p id="itinerary-status" class="status-banner" role="status">Preparing your itinerary…</p>
+      <div class="ecosystem-layout">
+        <section class="ecosystem-main">
+          <nav id="day-selector" class="day-selector" aria-label="Itinerary days"></nav>
+          <div id="itinerary-timeline" class="itinerary-timeline" aria-live="polite"></div>
+        </section>
+        <aside class="ecosystem-sidebar"><section class="trip-tools-widget glass-card" data-trip-tools><div class="widget-loading"><i data-lucide="loader-circle"></i> Loading live trip tools…</div></section></aside>
+      </div>
+    </main>
+    <dialog id="activity-dialog" class="ecosystem-dialog">
+      <form id="activity-form" class="ecosystem-form">
+        <button class="dialog-close" type="button" data-close-dialog aria-label="Close"><i data-lucide="x"></i></button>
+        <p class="eyebrow">Add to itinerary</p><h2>Plan another activity</h2>
+        <div class="form-grid two-column"><label>Day<select name="day" id="activity-day" required></select></label><label>Time period<select name="period" required><option value="morning">Morning</option><option value="afternoon">Afternoon</option><option value="evening">Evening</option><option value="nightlife">Nightlife</option></select></label></div>
+        <div class="form-grid two-column"><label>Start time<input type="time" name="startTime" value="09:00" required></label><label>Duration (minutes)<input type="number" name="durationMinutes" min="15" max="720" value="90" required></label></div>
+        <label>Place name<input name="placeName" maxlength="180" required></label>
+        <div class="form-grid two-column"><label>Category<select name="category"><option>Activity</option><option>Culture</option><option>Food</option><option>Shopping</option><option>Outdoor</option></select></label><label>Estimated cost<input type="number" name="estimatedCost" min="0" step="0.01" value="0" required></label></div>
+        <label>Description<textarea name="description" maxlength="1000" rows="3"></textarea></label>
+        <div class="form-grid three-column"><label>Transit mode<select name="transitMode"><option value="">None</option><option>Walk</option><option>Car</option><option>Train</option><option>Boat</option></select></label><label>Transit minutes<input type="number" name="transitMinutes" min="1" max="240"></label><label>Distance km<input type="number" name="transitDistanceKm" min="0" max="1000" step="0.1"></label></div>
+        <button class="button button-primary" type="submit"><i data-lucide="plus"></i> Add Activity</button>
+      </form>
+    </dialog>
+    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Your itinerary stays connected to the active trip.</span></div></footer><nav class="mobile-nav" aria-label="Mobile navigation"></nav>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PackSwift: Install packages",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PackSwift: Create XAMPP database",
+      "type": "shell",
+      "command": "npm run db:init",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PackSwift: Add sample data",
+      "type": "shell",
+      "command": "npm run db:seed",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "PackSwift: Start development server",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "problemMatcher": [
+        {
+          "owner": "packswift",
+          "pattern": {
+            "regexp": "^(?!.*)$"
+          },
+          "background": {
+            "activeOnStart": true,
+            "beginsPattern": "Restarting|PackSwift is available",
+            "endsPattern": "PackSwift is available"
+          }
+        }
+      ]
+    }
+  ]
+}

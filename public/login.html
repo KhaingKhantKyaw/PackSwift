@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#00A8B5"><meta name="description" content="Sign in to PackSwift to manage trips, itineraries, and preparation."><meta name="robots" content="noindex"><title>Login — PackSwift</title><link rel="stylesheet" href="/css/styles.css"><script src="/js/app.js" defer></script><script src="/js/auth-forms.js" defer></script>
+  </head>
+  <body data-page="login">
+    <a class="skip-link" href="#main-content">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a><nav class="desktop-nav" aria-label="Primary navigation"></nav><a class="header-action" href="/signup">Sign Up</a></div></header>
+    <main id="main-content" class="page-shell auth-shell">
+      <section class="auth-intro"><p class="eyebrow">Welcome back</p><h1>Continue planning <span>your way.</span></h1><p>Return to saved trips, itineraries, and preparation checklists in one place.</p><div class="auth-benefit"><strong>Your account connects</strong><span>Saved trips · Preparation progress · Account settings</span></div></section>
+      <form id="login-form" class="panel form-panel auth-panel" data-auth-form="login" novalidate>
+        <h2 class="panel-title">Sign in</h2><p class="panel-copy">Use your email address or username.</p>
+        <div class="form-grid auth-form-grid">
+          <div class="form-section-heading"><h3>Account details</h3><p>Enter the details connected to your PackSwift account.</p></div>
+          <div class="form-field form-field-wide"><label class="form-label" for="login-identity">Email or username</label><input class="field-control" id="login-identity" name="identity" type="text" maxlength="255" autocomplete="username" placeholder="e.g. adrian or adrian@example.com" required></div>
+          <div class="form-field form-field-wide"><label class="form-label" for="login-password">Password</label><input class="field-control" id="login-password" name="password" type="password" maxlength="128" autocomplete="current-password" required></div>
+        </div>
+        <div class="form-actions"><button class="button button-primary" type="submit">Sign in <span aria-hidden="true">→</span></button></div><p class="form-feedback" data-auth-feedback role="alert"></p><p class="auth-switch">New to PackSwift? <a href="/signup">Create an account</a></p>
+      </form>
+    </main>
+    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Your account is protected with secure sign-in.</span></div></footer><nav class="mobile-nav" aria-label="Mobile navigation"></nav>
+  </body>
+</html>

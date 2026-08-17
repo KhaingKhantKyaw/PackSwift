@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#00A8B5">
+    <meta name="description" content="Generate an editable packing checklist based on destination, climate, duration, and trip purpose.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Packing List — PackSwift">
+    <meta property="og:description" content="Pack for the conditions and the way you plan to travel.">
+    <meta property="og:url" content="https://packswift-logistics.v5t2tz86db.chatgpt.site/packing-list">
+    <meta property="og:image" content="https://packswift-logistics.v5t2tz86db.chatgpt.site/og-planner.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Packing List — PackSwift</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/app.js" defer></script>
+    <script src="/js/packing-list.js" defer></script>
+  </head>
+  <body data-page="packing">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header"><div class="header-inner">
+      <a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a class="nav-link" data-nav="home" href="/">Home</a><a class="nav-link" data-nav="planner" href="/trip-planner">Trip Planner</a><a class="nav-link" data-nav="guide" href="/travel-guide">Travel Guide</a><a class="nav-link" data-nav="packing" href="/packing-list">Packing List</a><a class="nav-link" data-nav="trips" href="/my-trips">My Trips</a></nav>
+      <a class="header-action" href="/my-trips">My trips <span aria-hidden="true">↗</span></a>
+    </div></header>
+
+    <main id="main-content" class="page-shell">
+      <section class="page-heading">
+        <div><p class="eyebrow">Packing list</p><h1>Bring what helps. <span>Leave the rest.</span></h1></div>
+        <p>Generate an editable checklist from your destination, trip length, expected climate, and purpose—then tick things off as you prepare.</p>
+      </section>
+
+      <section class="packing-layout">
+        <form id="packing-form" class="panel form-panel">
+          <h2 class="panel-title">Shape your checklist</h2>
+          <p class="panel-copy">Your latest trip plan is filled automatically. You can still adjust it before generating a new checklist.</p>
+          <div id="packing-plan-context" class="packing-plan-context" hidden>
+            <span>Using your trip plan</span>
+            <strong id="packing-context-destination"></strong>
+            <small id="packing-context-details"></small>
+          </div>
+          <div class="form-grid">
+            <div class="form-section-heading"><h3>Trip details</h3><p>Confirm the destination, duration, and number of travellers.</p></div>
+            <div class="form-field form-field-wide"><label class="form-label" for="packing-destination">Destination</label><input class="field-control" id="packing-destination" name="destination" list="packing-destinations" maxlength="160" placeholder="e.g. Bangkok, Thailand" required><datalist id="packing-destinations"></datalist></div>
+            <div class="form-field"><label class="form-label" for="packing-days">Days</label><input class="field-control" id="packing-days" name="days" type="number" min="1" max="30" value="7"></div>
+            <div class="form-field"><label class="form-label" for="packing-travelers">Travellers</label><input class="field-control" id="packing-travelers" name="travelers" type="number" min="1" max="20" value="1"></div>
+            <div class="form-section-heading"><h3>Conditions &amp; traveller needs</h3><p>Adjust weather, purpose, group, and pet requirements.</p></div>
+            <div class="form-field"><label class="form-label" for="packing-climate">Climate</label><select class="field-control" id="packing-climate" name="climate"><option value="hot">Hot</option><option value="warm">Warm</option><option value="mild">Mild</option><option value="seasonal">Changeable</option><option value="cool">Cool</option></select></div>
+            <div class="form-field"><label class="form-label" for="packing-rain">Rain likelihood</label><select class="field-control" id="packing-rain" name="rain"><option value="low">Low</option><option value="moderate" selected>Moderate</option><option value="high">High</option></select></div>
+            <div class="form-field"><label class="form-label" for="trip-purpose">Trip purpose</label><select class="field-control" id="trip-purpose" name="purpose"><option value="leisure">Leisure</option><option value="adventure">Adventure</option><option value="business">Business</option><option value="family">Family</option></select></div>
+            <div class="form-field"><label class="form-label" for="packing-demographic">Traveller group</label><select class="field-control" id="packing-demographic" name="travelerDemographic"><option value="adults">Adults</option><option value="young-adults">Young adults</option><option value="family-with-children">Family with children</option><option value="senior">Senior travellers</option></select></div>
+            <label class="packing-pet-choice form-field form-field-wide"><input id="packing-pets" name="travelingWithPets" type="checkbox" value="true"><span><strong>Travelling with pets</strong><small>Include documents, carrier, food, medication, and pet-care essentials.</small></span></label>
+          </div>
+          <div class="form-actions"><button class="button button-primary" type="submit">Generate checklist <span aria-hidden="true">→</span></button></div>
+          <p id="packing-source-note" class="packing-source-note" aria-live="polite"></p>
+        </form>
+
+        <section id="packing-result" class="panel packing-panel" aria-live="polite">
+          <div class="packing-summary">
+            <div><p class="eyebrow">Your checklist</p><h2 id="packing-title" class="panel-title">Your trip · 7 days</h2><p id="packing-subtitle" class="panel-copy">Add a destination or create a trip plan to personalize this list.</p></div>
+            <span id="packing-progress" class="progress-ring" style="--progress:0%" data-progress="0%" aria-label="0 percent packed"></span>
+          </div>
+          <div id="packing-list"></div>
+          <div class="packing-save-bar">
+            <div>
+              <strong>Keep this checklist</strong>
+              <span>Save it to your PackSwift account and continue on any device.</span>
+            </div>
+            <button id="save-packing-list-button" class="button button-primary" type="button">Save packing list</button>
+          </div>
+          <p id="packing-save-feedback" class="packing-save-feedback" role="status"></p>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="login-required-dialog" class="login-required-dialog" aria-labelledby="login-required-title">
+      <form method="dialog" class="login-required-card">
+        <button class="login-required-close" type="submit" value="cancel" aria-label="Close">×</button>
+        <span class="login-required-icon" aria-hidden="true">○</span>
+        <p class="eyebrow">Account required</p>
+        <h2 id="login-required-title">Log in to save checklist</h2>
+        <p>Keep this trip and packing checklist available across your devices.</p>
+        <div class="login-required-actions">
+          <button class="button button-quiet" type="submit" value="cancel">Not now</button>
+          <a id="packing-login-link" class="button button-primary" href="/login?return=/packing-list">Log in</a>
+        </div>
+      </form>
+    </dialog>
+
+    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Your checklist stays in this browser.</span></div></footer>
+    <nav class="mobile-nav" aria-label="Mobile navigation"><a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a><a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a><a data-nav="guide" href="/travel-guide"><span aria-hidden="true">◎</span><span>Guide</span></a><a data-nav="packing" href="/packing-list"><span aria-hidden="true">✓</span><span>Pack</span></a><a data-nav="trips" href="/my-trips"><span aria-hidden="true">▤</span><span>Trips</span></a></nav>
+  </body>
+</html>

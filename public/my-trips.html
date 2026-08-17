@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#00A8B5">
+    <meta name="description" content="Return to the personal travel plans you created with PackSwift.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="My Trips — PackSwift">
+    <meta property="og:description" content="Keep your destination matches and first itineraries together.">
+    <meta property="og:url" content="https://packswift-logistics.v5t2tz86db.chatgpt.site/my-trips">
+    <meta property="og:image" content="https://packswift-logistics.v5t2tz86db.chatgpt.site/og-planner.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>My Trips — PackSwift</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/vendor/lucide.min.js" defer></script>
+    <script src="/js/app.js" defer></script>
+    <script src="/js/my-trips.js" defer></script>
+  </head>
+  <body data-page="trips">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header"><div class="header-inner">
+      <a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a>
+      <nav class="desktop-nav" aria-label="Primary navigation"><a class="nav-link" data-nav="home" href="/">Home</a><a class="nav-link" data-nav="planner" href="/trip-planner">Trip Planner</a><a class="nav-link" data-nav="guide" href="/travel-guide">Travel Guide</a><a class="nav-link" data-nav="packing" href="/packing-list">Packing List</a><a class="nav-link" data-nav="trips" href="/my-trips">My Trips</a></nav>
+      <a class="header-action" href="/trip-planner">Plan a new trip <span aria-hidden="true">↗</span></a>
+    </div></header>
+
+    <main id="main-content" class="page-shell">
+      <section class="page-heading">
+        <div><p class="eyebrow">My trips</p><h1>Ideas worth <span>coming back to.</span></h1></div>
+        <div class="saved-trip-heading-actions"><p>Your saved destination matches and first itineraries live here, ready for another look whenever the journey becomes more real.</p><button id="add-saved-trip" class="button opacity-50 pointer-events-none bg-slate-300 cursor-not-allowed" type="button" disabled aria-disabled="true" title="Save a trip before adding itinerary items"><i data-lucide="plus" aria-hidden="true"></i> Add plan</button></div>
+      </section>
+
+      <section id="trips-empty" class="empty-state">
+        <h2>No saved trips yet</h2>
+        <p>Build your first recommendation and save it. Signed-in plans stay with your account, while guest plans remain on this device.</p>
+        <a class="button button-primary" href="/trip-planner">Plan my first trip <span aria-hidden="true">→</span></a>
+      </section>
+      <div id="trips-status" class="status-banner" role="status"></div>
+      <section id="trip-list" class="trip-list" aria-live="polite" hidden></section>
+    </main>
+
+    <dialog id="saved-trip-dialog" class="ecosystem-dialog" aria-labelledby="saved-trip-dialog-title">
+      <form id="saved-trip-form" class="ecosystem-form" novalidate>
+        <button id="close-saved-trip-dialog" class="dialog-close" type="button" aria-label="Close"><i data-lucide="x" aria-hidden="true"></i></button>
+        <p class="eyebrow">Saved Trips</p>
+        <h2 id="saved-trip-dialog-title">Add a trip plan</h2>
+        <p id="saved-trip-dialog-copy" class="muted">Save the essential plan details directly to your PackSwift account.</p>
+        <div class="form-section-heading"><h3>Trip details</h3><p>Add the destination, travel window, budget, and group size.</p></div>
+        <div class="form-grid two-column">
+          <label>Destination<input name="destination" maxlength="255" required placeholder="e.g. Bangkok"></label>
+          <label>Country<input name="country" maxlength="120" required placeholder="e.g. Thailand"></label>
+        </div>
+        <div class="form-grid two-column">
+          <label>Travel month<input name="travelMonth" maxlength="50" required placeholder="e.g. November 2026"></label>
+          <label>Budget in USD<input name="budgetUsd" type="number" min="100" max="250000" step="0.01" required></label>
+        </div>
+        <div class="form-grid three-column">
+          <label>Start date<input name="startDate" type="date"></label>
+          <label>End date<input name="endDate" type="date"></label>
+          <label>Travellers<input name="travelers" type="number" min="1" max="30" step="1" value="1" required></label>
+        </div>
+        <p id="saved-trip-form-feedback" class="form-feedback" role="status"></p>
+        <div class="saved-trip-dialog-actions"><button id="cancel-saved-trip" class="button button-secondary" type="button">Cancel</button><button id="save-saved-trip" class="button button-primary" type="submit"><i data-lucide="database" aria-hidden="true"></i> Save trip</button></div>
+      </form>
+    </dialog>
+
+    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Account plans are stored securely in MySQL.</span></div></footer>
+    <nav class="mobile-nav" aria-label="Mobile navigation"><a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a><a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a><a data-nav="guide" href="/travel-guide"><span aria-hidden="true">◎</span><span>Guide</span></a><a data-nav="packing" href="/packing-list"><span aria-hidden="true">✓</span><span>Pack</span></a><a data-nav="trips" href="/my-trips"><span aria-hidden="true">▤</span><span>Trips</span></a></nav>
+  </body>
+</html>

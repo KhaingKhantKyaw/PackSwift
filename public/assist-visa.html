@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#00A8B5">
+    <meta name="description" content="Review visa guidance and add travel insurance to a PackSwift trip."><title>Visa & Insurance Assistant — PackSwift</title>
+    <link rel="stylesheet" href="/css/styles.css"><script src="/vendor/lucide.min.js" defer></script><script src="/js/app.js" defer></script><script src="/js/visa-assistant.js" defer></script>
+  </head>
+  <body data-page="trips" class="ecosystem-page visa-page">
+    <a class="skip-link" href="#main-content">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a><nav class="desktop-nav" aria-label="Primary navigation"></nav><a class="header-action" href="/profile">Profile</a></div></header>
+    <main id="main-content" class="ecosystem-shell">
+      <section class="ecosystem-hero glass-card"><div><a id="visa-back" class="ready-back-link" href="/assist-trip"><i data-lucide="arrow-left"></i> Readiness checklist</a><p class="eyebrow">PackSwift Visa & Protection Assistant</p><h1>Know the entry requirements. Protect the journey.</h1><p>Review route-specific guidance and add suitable travel insurance to the active trip.</p></div><span class="hero-feature-icon"><i data-lucide="shield-check"></i></span></section>
+      <p id="visa-status-message" class="status-banner" role="status">Checking travel requirements…</p>
+      <section id="visa-rule-card" class="visa-rule-card glass-card" hidden>
+        <div class="visa-route"><span><i data-lucide="flag"></i><small>From</small><strong id="visa-origin"></strong></span><i data-lucide="arrow-right"></i><span><i data-lucide="flag"></i><small>To</small><strong id="visa-destination"></strong></span></div>
+        <div class="visa-rule-copy"><span id="visa-status-badge" class="visa-status-badge"></span><h2 id="visa-rule-title"></h2><p id="visa-rule-summary"></p><small id="visa-rule-note"></small><a id="visa-portal" class="button button-secondary" target="_blank" rel="noopener noreferrer" hidden>Open official portal <i data-lucide="external-link"></i></a></div>
+      </section>
+      <section class="insurance-section"><div class="section-heading"><p class="eyebrow">Travel insurance</p><h2>Select a protection level</h2><p>Choose a practical tier for this trip. Card details are never stored by PackSwift.</p></div><div id="insurance-grid" class="insurance-grid"></div></section>
+    </main>
+    <dialog id="insurance-dialog" class="ecosystem-dialog"><form id="insurance-form" class="ecosystem-form"><button class="dialog-close" type="button" data-close-insurance aria-label="Close"><i data-lucide="x"></i></button><p class="eyebrow">Secure selection</p><h2 id="insurance-dialog-title">Confirm insurance</h2><div id="insurance-order-summary" class="insurance-order-summary"></div><fieldset class="payment-methods"><legend>Payment method</legend><label><input type="radio" name="paymentMethod" value="VISA" checked><span><i data-lucide="credit-card"></i> Visa</span></label><label><input type="radio" name="paymentMethod" value="MASTERCARD"><span><i data-lucide="credit-card"></i> Mastercard</span></label><label><input type="radio" name="paymentMethod" value="CREDIT_CARD"><span><i data-lucide="wallet-cards"></i> Credit Card</span></label></fieldset><p class="secure-payment-note"><i data-lucide="lock-keyhole"></i> PackSwift stores only the selected payment method, never card numbers or security codes.</p><button class="button button-primary" type="submit"><i data-lucide="shield-check"></i> Confirm & Add Insurance</button></form></dialog>
+    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Always verify current entry rules through official government sources.</span></div></footer><nav class="mobile-nav" aria-label="Mobile navigation"></nav>
+  </body>
+</html>
