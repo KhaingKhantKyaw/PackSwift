@@ -9,10 +9,9 @@
   const pendingAiTripModeKey = "pending_ai_trip_mode";
   const modulePathPattern = /\/(assist-flight|assist-stay|assist-store|assist-trip|assist-visa|trip-planner)\b/g;
   const quickPrompts = [
-    "Help me choose a trip",
-    "What should I pack?",
-    "Check my visa rules",
-    "Suggest a 3-day itinerary",
+    "💡 3-Day Bangkok Itinerary",
+    "🎒 What to pack for Chiang Mai?",
+    "💰 Budget trip under $300",
   ];
   const welcomeMessage = "Hi! I’m PackSwift Concierge. ✨ Tell me where you’re going, or ask about packing, visas, flights, stays, and itineraries.";
 
@@ -120,7 +119,7 @@
       <div class="concierge-suggestions" aria-label="Suggested questions"></div>
       <div class="concierge-messages" role="log" aria-live="polite" aria-relevant="additions"></div>
       <div class="concierge-typing" role="status" aria-label="PackSwift Concierge is typing" hidden>
-        <span></span><span></span><span></span><small>Concierge is preparing your answer</small>
+        <span></span><span></span><span></span><i aria-hidden="true"></i><small>Concierge is preparing your answer</small>
       </div>
       <form class="concierge-form">
         <div class="concierge-input-group"><label class="concierge-input-label" for="concierge-input">Message PackSwift Concierge</label><textarea id="concierge-input" rows="1" maxlength="1200" placeholder="e.g. Plan four days in Bangkok" required></textarea></div>
@@ -425,7 +424,10 @@
   async function sendMessage(text) {
     const message = text.trim().slice(0, 1200);
     if (!message || sending) return;
-    const previousHistory = chatHistory.slice(-12);
+    const previousHistory = chatHistory.slice(-12).map((entry) => ({
+      role: entry.role === "assistant" ? "model" : "user",
+      text: entry.content,
+    }));
     chatHistory.push({ role: "user", content: message });
     saveHistory();
     renderHistory();
@@ -443,7 +445,7 @@
       const tripCard = result.trip_card || result.trip_recommendation;
       chatHistory.push({
         role: "assistant",
-        content: result.reply,
+        content: result.text || result.reply,
         ...(validRecommendation(tripCard)
           ? { trip_card: tripCard }
           : {}),

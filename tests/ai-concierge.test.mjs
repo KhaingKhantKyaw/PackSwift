@@ -153,20 +153,23 @@ test("Express Concierge route validates and rate-limits public chat messages", (
   assert.match(route, /limit: 30/);
   assert.match(route, /isLength\(\{ min: 1, max: 1200 \}\)/);
   assert.match(route, /isArray\(\{ max: 12 \}\)/);
-  assert.match(route, /generateTravelAdvice\(message, chatHistory\)/);
+  assert.match(route, /askTravelConcierge\(message, chatHistory\)/);
   assert.match(route, /request\.body\.history \|\| request\.body\.chatHistory/);
+  assert.match(route, /success: true/);
+  assert.match(route, /text,/);
 });
 
 test("shared widget includes quick prompts, safe bubbles, loading state, and trip context", () => {
   assert.match(app, /\/js\/chat-widget\.js/);
   for (const prompt of [
-    "What should I pack?",
-    "Check my visa rules",
-    "Suggest a 3-day itinerary",
-  ]) assert.match(client, new RegExp(prompt.replace(/[?]/g, "\\?")));
+    "💡 3-Day Bangkok Itinerary",
+    "🎒 What to pack for Chiang Mai?",
+    "💰 Budget trip under $300",
+  ]) assert.equal(client.includes(prompt), true);
   assert.match(client, /"\/api\/ai\/chat"/);
   assert.match(client, /currentTripContext\(\)/);
   assert.match(client, /concierge-typing/);
+  assert.match(styles, /@keyframes concierge-shimmer/);
   assert.match(client, /bubble\.textContent = entry\.content/);
   assert.doesNotMatch(client, /bubble\.innerHTML/);
   assert.match(client, /Plan & Customize This Trip with PackSwift/);

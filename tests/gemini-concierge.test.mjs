@@ -8,8 +8,11 @@ import {
   routeLocation,
 } from "../src/services/travel-planner.js";
 import {
+  askTravelConcierge,
   createTripPlanDeclaration,
   generateTravelAdvice,
+  isTravelDomainMessage,
+  OFF_TOPIC_REFUSAL,
 } from "../src/services/geminiService.js";
 
 const [route, client, tripsRoute, packageJson] = await Promise.all([
@@ -47,13 +50,46 @@ test("Gemini Concierge uses the official SDK and strict create_trip_plan tool", 
     },
   };
   const result = await generateTravelAdvice("Plan a short Bangkok trip", [], { client: fakeClient });
-  assert.equal(request.model, "gemini-3.6-flash");
+  assert.equal(request.model, "gemini-2.5-flash");
   assert.equal(request.config.tools[0].functionDeclarations[0].name, "create_trip_plan");
   assert.equal(result.trip_card.destination, "Bangkok");
   assert.equal(result.trip_card.total_budget, 10000);
   assert.equal(result.trip_card.currency, "THB");
   assert.equal(result.trip_card.duration_days, 4);
   assert.equal(result.source, "gemini");
+});
+
+test("Gemini Concierge rejects unrelated topics before calling the provider", async () => {
+  let providerCalled = false;
+  const result = await askTravelConcierge("Write JavaScript code for a calculator", [], {
+    client: { models: { generateContent: async () => { providerCalled = true; } } },
+  });
+  assert.equal(providerCalled, false);
+  assert.equal(result.text, OFF_TOPIC_REFUSAL);
+  assert.equal(result.reply, OFF_TOPIC_REFUSAL);
+  assert.equal(result.source, "domain-guardrail");
+  assert.equal(isTravelDomainMessage("What should I pack for Chiang Mai?"), true);
+  assert.equal(isTravelDomainMessage("Give me three Bangkok attractions."), true);
+  assert.equal(isTravelDomainMessage("Solve this algebra equation"), false);
+  assert.equal(isTravelDomainMessage("yes", [{ role: "model", text: "Would you like a beach trip?" }]), true);
+});
+
+test("Gemini Concierge retries a supported model only when 2.5 is unavailable", async () => {
+  const models = [];
+  const result = await askTravelConcierge("What should I pack for Chiang Mai?", [], {
+    client: {
+      models: {
+        generateContent: async (request) => {
+          models.push(request.model);
+          if (models.length === 1) throw new Error("404 model no longer available");
+          return { text: "Pack a light layer and comfortable walking shoes." };
+        },
+      },
+    },
+  });
+  assert.deepEqual(models, ["gemini-2.5-flash", "gemini-3.6-flash"]);
+  assert.equal(result.model, "gemini-3.6-flash");
+  assert.match(result.text, /light layer/);
 });
 
 test("Gemini schema exposes only the requested clean planner fields", () => {
@@ -89,6 +125,13 @@ test("budget engine accepts 10,000 THB for a four-day Yangon to Bangkok trip", (
 
 test("chat widget sends history, stores the complete card, and keeps auth gating", () => {
   assert.match(client, /history: previousHistory/);
+  assert.match(client, /role: entry\.role === "assistant" \? "model" : "user"/);
+  assert.match(client, /content: result\.text \|\| result\.reply/);
+  for (const prompt of [
+    "💡 3-Day Bangkok Itinerary",
+    "🎒 What to pack for Chiang Mai?",
+    "💰 Budget trip under $300",
+  ]) assert.equal(client.includes(prompt), true);
   assert.match(client, /sessionStorage\.setItem\(pendingAiTripKey, JSON\.stringify\(recommendation\)\)/);
   assert.match(client, /await window\.PackSwift\.authReady/);
   assert.match(client, /Save Your Trip &amp; Unlock 1-Click Planning/);

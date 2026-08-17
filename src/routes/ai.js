@@ -3,7 +3,11 @@ import { rateLimit } from "express-rate-limit";
 import { body } from "express-validator";
 import { validateRequest } from "../middleware/validate.js";
 import { createConciergeResponse, normalizeTripContext } from "../services/ai-concierge-service.js";
-import { generateTravelAdvice } from "../services/geminiService.js";
+import {
+  askTravelConcierge,
+  isTravelDomainMessage,
+  OFF_TOPIC_REFUSAL,
+} from "../services/geminiService.js";
 import { cleanMultilineText } from "../utils/sanitize.js";
 
 export const aiRouter = Router();
@@ -27,7 +31,12 @@ aiRouter.post(
       .withMessage("Enter a message of up to 1,200 characters."),
     body("tripContext").optional({ nullable: true }).isObject(),
     body("history").optional().isArray({ max: 12 }),
-    body("history.*.role").optional().isIn(["user", "assistant"]),
+    body("history.*.role").optional().isIn(["user", "model", "assistant"]),
+    body("history.*.text")
+      .optional()
+      .isString()
+      .trim()
+      .isLength({ min: 1, max: 1200 }),
     body("history.*.content")
       .optional()
       .isString()
@@ -47,26 +56,40 @@ aiRouter.post(
       const message = cleanMultilineText(request.body.message, 1200);
       const suppliedHistory = request.body.history || request.body.chatHistory || [];
       const chatHistory = suppliedHistory.slice(-12).map((entry) => ({
-        role: entry.role,
-        content: cleanMultilineText(entry.content, 1200),
+        role: entry.role === "assistant" ? "model" : entry.role,
+        text: cleanMultilineText(entry.text ?? entry.content, 1200),
+        content: cleanMultilineText(entry.text ?? entry.content, 1200),
       }));
       const tripContext = normalizeTripContext(request.body.tripContext);
       let result;
-      if (process.env.GEMINI_API_KEY) {
+      if (!isTravelDomainMessage(message, chatHistory)) {
+        result = { text: OFF_TOPIC_REFUSAL, reply: OFF_TOPIC_REFUSAL, source: "domain-guardrail" };
+      } else if (process.env.GEMINI_API_KEY) {
         try {
-          result = await generateTravelAdvice(message, chatHistory);
+          result = await askTravelConcierge(message, chatHistory);
         } catch (providerError) {
           console.error("PackSwift Gemini provider error:", providerError.message);
           result = await createConciergeResponse(
             { message, chatHistory, tripContext },
             { apiKey: "" },
           );
-          result.reply += "\n\nI’m using PackSwift’s built-in guidance while the live AI service is temporarily unavailable.";
+          result.reply += "\n\nI’m using PackSwift’s built-in travel guidance while the live concierge is temporarily unavailable.";
+          result.text = result.reply;
         }
       } else {
         result = await createConciergeResponse({ message, chatHistory, tripContext });
+        result.text = result.reply;
       }
-      response.json(result);
+      const text = String(result.text || result.reply || "").trim();
+      response.json({
+        success: true,
+        text,
+        reply: text,
+        ...(result.trip_card ? { trip_card: result.trip_card } : {}),
+        ...(result.trip_recommendation ? { trip_recommendation: result.trip_recommendation } : {}),
+        source: result.source,
+        ...(result.model ? { model: result.model } : {}),
+      });
     } catch (error) {
       next(error);
     }

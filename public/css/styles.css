@@ -14054,10 +14054,33 @@ html.concierge-modal-open body {
 
 .concierge-typing span:nth-child(2) { animation-delay: 150ms; }
 .concierge-typing span:nth-child(3) { animation-delay: 300ms; }
+.concierge-typing i {
+  position: relative;
+  width: 58px;
+  height: 6px;
+  overflow: hidden;
+  margin-left: 5px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.concierge-typing i::after {
+  position: absolute;
+  width: 50%;
+  background: linear-gradient(90deg, transparent, rgba(0, 168, 181, 0.55), transparent);
+  content: "";
+  inset-block: 0;
+  animation: concierge-shimmer 1.15s ease-in-out infinite;
+}
 .concierge-typing small { margin-left: 5px; font-size: 0.58rem; }
 
 @keyframes concierge-typing {
   to { opacity: 0.35; transform: translateY(-3px); }
+}
+
+@keyframes concierge-shimmer {
+  from { transform: translateX(-130%); }
+  to { transform: translateX(260%); }
 }
 
 .concierge-form {
