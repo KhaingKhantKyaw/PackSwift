@@ -133,7 +133,7 @@ async function api(path, options = {}) {
   const contentType = response.headers.get("content-type") || "";
   const payload = contentType.includes("application/json") ? await response.json() : null;
   if (!response.ok) {
-    const error = new Error(payload?.error || "The request could not be completed.");
+    const error = new Error(payload?.message || payload?.error || "The request could not be completed.");
     error.status = response.status;
     error.fields = payload?.fields || [];
     throw error;

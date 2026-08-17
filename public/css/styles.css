@@ -2238,6 +2238,16 @@ html[data-theme="dark"] .pace-choice input:checked + span strong {
   font-weight: 700;
 }
 
+.form-feedback.is-error {
+  color: #b91c1c;
+}
+
+.auth-panel .field-control.is-auth-invalid,
+.auth-panel .field-control.is-auth-invalid:focus {
+  border-color: #f87171 !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.14) !important;
+}
+
 .form-success {
   color: #32704f;
 }

@@ -47,6 +47,24 @@ const passwordValidator = body("password")
     "Use 10+ characters with uppercase, lowercase, a number, and a special character.",
   );
 
+const databaseUnavailableCodes = new Set([
+  "ECONNREFUSED",
+  "ETIMEDOUT",
+  "PROTOCOL_CONNECTION_LOST",
+  "ER_ACCESS_DENIED_ERROR",
+  "ER_BAD_DB_ERROR",
+  "ER_NO_SUCH_TABLE",
+]);
+
+function sendLoginDatabaseError(response, error) {
+  if (!databaseUnavailableCodes.has(error?.code)) return false;
+  response.status(503).json({
+    success: false,
+    message: "Sign-in is temporarily unavailable. Start MySQL in XAMPP and try again.",
+  });
+  return true;
+}
+
 function publicUser(user) {
   return {
     id: user.id,
@@ -102,12 +120,16 @@ authRouter.post(
         : await bcrypt.compare(request.body.password, "$2b$12$KIXQ4Rz9zmz9E5ZpYl0YAeHh5KjnrxKxN4SX7qPHWLxV0wAw1eDLm");
 
       if (!user || !passwordMatches) {
-        response.status(401).json({ error: "We couldn’t sign you in with those details. Check your email or username and password, then try again." });
+        response.status(401).json({
+          success: false,
+          message: "Email or password is incorrect",
+        });
         return;
       }
       response.cookie(authCookieName, issueAuthToken(user), authCookieOptions());
       response.json({ user: publicUser(user) });
     } catch (error) {
+      if (sendLoginDatabaseError(response, error)) return;
       next(error);
     }
   },

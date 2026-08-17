@@ -2,10 +2,11 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const [styles, app, home, homeSupport, login, signup, planner, packing, guide, profile, authRoute] =
+const [styles, app, authForms, home, homeSupport, login, signup, planner, packing, guide, profile, authRoute] =
   await Promise.all([
     readFile(new URL("../public/css/styles.css", import.meta.url), "utf8"),
     readFile(new URL("../public/js/app.js", import.meta.url), "utf8"),
+    readFile(new URL("../public/js/auth-forms.js", import.meta.url), "utf8"),
     readFile(new URL("../public/index.html", import.meta.url), "utf8"),
     readFile(new URL("../public/js/home-support.js", import.meta.url), "utf8"),
     readFile(new URL("../public/login.html", import.meta.url), "utf8"),
@@ -50,8 +51,15 @@ test("validation errors are constructive and rendered beside fields", () => {
   assert.match(styles, /\.field-control\[aria-invalid="true"\]/);
   assert.match(signup, /Password must contain at least 10 characters/);
   assert.match(profile, /Password must contain at least 10 characters/);
-  assert.doesNotMatch(authRoute, /password is incorrect/i);
-  assert.match(authRoute, /Check your email or username and password, then try again/);
+  assert.match(authRoute, /status\(401\)\.json\(\{[\s\S]*success: false,[\s\S]*message: "Email or password is incorrect"/);
+  assert.match(authRoute, /status\(503\)\.json\(\{[\s\S]*Start MySQL in XAMPP and try again/);
+  assert.match(app, /payload\?\.message \|\| payload\?\.error/);
+  assert.match(authForms, /mode === "login" && error\.status === 401/);
+  assert.match(authForms, /authFeedback\.textContent = invalidLoginMessage/);
+  assert.match(authForms, /control\.classList\.add\("is-auth-invalid"\)/);
+  assert.match(authForms, /control\.addEventListener\("input", clearLoginError\)/);
+  assert.match(styles, /\.auth-panel \.field-control\.is-auth-invalid/);
+  assert.match(login, /id="login-auth-feedback"[\s\S]*aria-live="assertive"/);
 });
 
 test("microcopy is concise and placeholders remain examples", () => {

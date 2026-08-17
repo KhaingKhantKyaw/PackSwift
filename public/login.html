@@ -14,7 +14,7 @@
           <div class="form-field form-field-wide"><label class="form-label" for="login-identity">Email or username</label><input class="field-control" id="login-identity" name="identity" type="text" maxlength="255" autocomplete="username" placeholder="e.g. adrian or adrian@example.com" required></div>
           <div class="form-field form-field-wide"><label class="form-label" for="login-password">Password</label><input class="field-control" id="login-password" name="password" type="password" maxlength="128" autocomplete="current-password" required></div>
         </div>
-        <div class="form-actions"><button class="button button-primary" type="submit">Sign in <span aria-hidden="true">→</span></button></div><p class="form-feedback" data-auth-feedback role="alert"></p><p class="auth-switch">New to PackSwift? <a href="/signup">Create an account</a></p>
+        <p id="login-auth-feedback" class="form-feedback" data-auth-feedback role="alert" aria-live="assertive"></p><div class="form-actions"><button class="button button-primary" type="submit">Sign in <span aria-hidden="true">→</span></button></div><p class="auth-switch">New to PackSwift? <a href="/signup">Create an account</a></p>
       </form>
     </main>
     <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Your account is protected with secure sign-in.</span></div></footer><nav class="mobile-nav" aria-label="Mobile navigation"></nav>
