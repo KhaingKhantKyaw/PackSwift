@@ -10598,7 +10598,7 @@ html:not([data-theme="dark"]) body[data-page="planner"] .live-itinerary-list art
 }
 
 .button-secondary,
-.concierge-auth-guest {
+.concierge-auth-secondary {
   border: 1px solid #cbd5e1;
   color: #334155;
   background: transparent;
@@ -10606,7 +10606,7 @@ html:not([data-theme="dark"]) body[data-page="planner"] .live-itinerary-list art
 }
 
 .button-secondary:hover,
-.concierge-auth-guest:hover {
+.concierge-auth-secondary:hover {
   color: #0d1b2a;
   background: #f8fafc;
 }
@@ -10709,14 +10709,14 @@ html:not([data-theme="dark"]) body[data-page="planner"] .live-itinerary-list art
 }
 
 html[data-theme="dark"] .button-secondary,
-html[data-theme="dark"] .concierge-auth-guest {
+html[data-theme="dark"] .concierge-auth-secondary {
   border-color: #64748b;
   color: #e2e8f0;
   background: transparent;
 }
 
 html[data-theme="dark"] .button-secondary:hover,
-html[data-theme="dark"] .concierge-auth-guest:hover {
+html[data-theme="dark"] .concierge-auth-secondary:hover {
   color: #fff;
   background: rgba(255, 255, 255, 0.08);
 }
@@ -13429,7 +13429,7 @@ html[data-theme="dark"] .button-danger-quiet {
 .concierge-close:focus-visible,
 .concierge-auth-close:focus-visible,
 .concierge-auth-primary:focus-visible,
-.concierge-auth-guest:focus-visible,
+.concierge-auth-secondary:focus-visible,
 .concierge-chip:focus-visible,
 .concierge-send:focus-visible,
 .concierge-module-link:focus-visible,
@@ -13985,7 +13985,7 @@ html.concierge-modal-open body {
 }
 
 .concierge-auth-primary,
-.concierge-auth-guest {
+.concierge-auth-secondary {
   display: inline-flex;
   min-height: 45px;
   padding: 11px 16px;
@@ -14009,14 +14009,14 @@ html.concierge-modal-open body {
   box-shadow: 0 10px 24px rgba(0, 168, 181, 0.24);
 }
 
-.concierge-auth-guest {
+.concierge-auth-secondary {
   border: 1px solid rgba(100, 116, 139, 0.32);
   color: #334155;
   background: rgba(255, 255, 255, 0.64);
 }
 
 .concierge-auth-primary:hover,
-.concierge-auth-guest:hover {
+.concierge-auth-secondary:hover {
   transform: translateY(-1px);
 }
 
@@ -14234,7 +14234,7 @@ html[data-theme="dark"] .concierge-auth-perks li {
 }
 
 html[data-theme="dark"] .concierge-auth-close,
-html[data-theme="dark"] .concierge-auth-guest {
+html[data-theme="dark"] .concierge-auth-secondary {
   border-color: rgba(100, 116, 139, 0.52);
   color: #e2e8f0;
   background: rgba(20, 39, 53, 0.88);

@@ -161,6 +161,10 @@
                 </div>
               </div>
             </fieldset>
+            <div class="form-field form-field-wide">
+              <label class="form-label" for="trip-notes">Trip notes <span class="label-optional">Optional</span></label>
+              <textarea class="field-control" id="trip-notes" name="notes" rows="3" maxlength="600" placeholder="e.g. Add a beach day and vegetarian food options"></textarea>
+            </div>
             <fieldset class="form-field form-field-wide" style="border:0;padding:0;margin:0">
               <legend class="form-legend">Travelling with pets?</legend>
               <div class="choice-row">
@@ -255,11 +259,12 @@
         <button class="login-required-close" type="submit" value="cancel" aria-label="Close">×</button>
         <span class="login-required-icon" aria-hidden="true">○</span>
         <p class="eyebrow">Account required</p>
-        <h2 id="trip-login-required-title">Log in to save trip</h2>
-        <p>Save this plan, add activities, and keep your selected route and preferences.</p>
+        <h2 id="trip-login-required-title">Continue your trip with an account</h2>
+        <p>Your route, dates, travellers, budget, and preferences are preserved while you sign in.</p>
         <div class="login-required-actions">
           <button class="button button-quiet" type="submit" value="cancel">Not now</button>
-          <a id="trip-login-link" class="button button-primary" href="/login?return=/trip-planner">Log in</a>
+          <a id="trip-login-link" class="button button-primary" href="/login?redirect=/trip-planner">Log in</a>
+          <a id="trip-signup-link" class="button button-secondary" href="/signup?redirect=/trip-planner">Create an account</a>
         </div>
       </form>
     </dialog>

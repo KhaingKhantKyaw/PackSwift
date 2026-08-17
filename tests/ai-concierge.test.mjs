@@ -152,7 +152,7 @@ test("Express Concierge route validates and rate-limits public chat messages", (
   assert.match(route, /windowMs: 10 \* 60 \* 1000/);
   assert.match(route, /limit: 30/);
   assert.match(route, /isLength\(\{ min: 1, max: 1200 \}\)/);
-  assert.match(route, /isArray\(\{ max: 12 \}\)/);
+  assert.match(route, /isArray\(\{ max: 20 \}\)/);
   assert.match(route, /askTravelConcierge\(message, chatHistory\)/);
   assert.match(route, /request\.body\.history \|\| request\.body\.chatHistory/);
   assert.match(route, /success: true/);
@@ -186,31 +186,31 @@ test("shared widget includes quick prompts, safe bubbles, loading state, and tri
   assert.match(styles, /@media \(max-width: 680px\)/);
 });
 
-test("Concierge trip action is auth-gated with a persistent guest conversion modal", () => {
+test("Concierge trip action preserves the plan and offers login or account creation", () => {
   assert.match(client, /Save Your Trip &amp; Unlock 1-Click Planning/);
   assert.match(client, /Instant auto-generated packing lists/);
   assert.match(client, /Offline trip access &amp; PDF exports/);
   assert.match(client, /Smart group expense splitting/);
   assert.match(client, /await window\.PackSwift\.authReady/);
-  assert.match(client, /sessionStorage\.setItem\(pendingAiTripKey/);
+  assert.match(client, /sessionStorage\.setItem\(pendingPackswiftTripKey/);
+  assert.match(client, /sessionStorage\.setItem\(authRedirectTargetKey, "\/trip-planner"\)/);
   assert.match(client, /"save_after_auth"/);
-  assert.match(client, /"guest_preview"/);
-  assert.match(client, /\/login\?return=/);
-  assert.match(client, /\/trip-planner\?pending_ai_trip=1&preview=guest/);
-  assert.match(client, /authModalPrimary\.addEventListener\("click"[\s\S]*storePendingAiTrip[\s\S]*closeAuthModal\(\)/);
-  assert.match(client, /authModalGuest\.addEventListener\("click"[\s\S]*storePendingAiTrip[\s\S]*closeAuthModal\(\)[\s\S]*window\.location\.assign/);
+  assert.doesNotMatch(client, /"guest_preview"|Continue as Guest/);
+  assert.match(client, /\/login\?redirect=/);
+  assert.match(client, /\/signup\?redirect=/);
+  assert.match(client, /authModalLogin\.addEventListener\("click"[\s\S]*storePendingAiTrip[\s\S]*closeAuthModal\(\)/);
+  assert.match(client, /authModalSignup\.addEventListener\("click"[\s\S]*storePendingAiTrip[\s\S]*closeAuthModal\(\)/);
   assert.match(styles, /\.concierge-auth-modal/);
   assert.match(styles, /backdrop-filter: blur\(8px\)/);
   assert.match(styles, /html\[data-theme="dark"\] \.concierge-auth-card/);
 });
 
-test("pending AI trip resumes after sign-in or loads as a database-free guest preview", () => {
-  assert.match(planner, /const pendingAiTripKey = "pending_ai_trip"/);
+test("pending AI trip resumes only after authentication and restores every planner field", () => {
+  assert.match(planner, /const pendingPackswiftTripKey = "pending_packswift_trip"/);
   assert.match(planner, /async function hydratePendingAiTrip/);
-  assert.match(planner, /pendingMode === "save_after_auth"/);
+  assert.match(planner, /if \(!user\)[\s\S]*showTripLoginRequired\(input\)/);
   assert.match(planner, /window\.PackSwift\.api\("\/api\/trips\/create"/);
-  assert.match(planner, /buildLocalPlan\(input\)/);
-  assert.match(planner, /reason: "ai_guest_preview"/);
+  assert.doesNotMatch(planner, /reason: "ai_guest_preview"|Guest preview loaded/);
   assert.match(planner, /if \(await hydratePendingAiTrip\(\)\) return/);
   for (const mapping of [
     /origin: recommendation\.origin/,
@@ -223,8 +223,17 @@ test("pending AI trip resumes after sign-in or loads as a database-free guest pr
     /paceMap\[recommendation\.travel_pace\]/,
   ]) assert.match(planner, mapping);
   assert.match(planner, /restorePlannerFormFromPlan\(\{ input \}\)/);
+  assert.match(planner, /tripNotesInput\.value = input\.notes \|\| ""/);
   assert.match(authForms, /authSwitchLink\.href/);
-  assert.match(authForms, /encodeURIComponent\(returnPath\(\)\)/);
+  assert.match(authForms, /postAuthDestination\(\)/);
+  assert.match(authForms, /sessionStorage\.getItem\(pendingPackswiftTripKey\)/);
+});
+
+test("widget sends every retained user/model message without clearing the card history", () => {
+  assert.match(client, /const previousHistory = chatHistory\.map/);
+  assert.match(client, /role: entry\.role === "assistant" \? "model" : "user"/);
+  assert.match(client, /text: entry\.content/);
+  assert.doesNotMatch(client, /const previousHistory = chatHistory\.slice/);
 });
 
 test("one-click Concierge plans persist and reload into the Trip Planner", () => {

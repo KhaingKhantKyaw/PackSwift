@@ -327,6 +327,7 @@ function parseInput(input = {}) {
     hotelName: String(input.hotelName || "").trim().slice(0, 180) || null,
     hotelAddress:
       String(input.hotelAddress || "").trim().slice(0, 255) || null,
+    notes: String(input.notes || "").trim().slice(0, 600),
   };
 }
 

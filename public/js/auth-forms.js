@@ -1,19 +1,36 @@
 const authForm = document.querySelector("[data-auth-form]");
 const authFeedback = document.querySelector("[data-auth-feedback]");
+const pendingPackswiftTripKey = "pending_packswift_trip";
+const authRedirectTargetKey = "auth_redirect_target";
 
-function returnPath() {
-  const value = new URLSearchParams(window.location.search).get("return");
-  return value?.startsWith("/") && !value.startsWith("//") ? value : "/profile";
+function safeRelativePath(value, fallback = "/profile") {
+  return value?.startsWith("/") && !value.startsWith("//") ? value : fallback;
+}
+
+function requestedRedirectPath() {
+  const params = new URLSearchParams(window.location.search);
+  return safeRelativePath(params.get("redirect") || params.get("return"));
+}
+
+function postAuthDestination() {
+  let hasPendingTrip = false;
+  try {
+    hasPendingTrip = Boolean(sessionStorage.getItem(pendingPackswiftTripKey));
+  } catch {
+    hasPendingTrip = false;
+  }
+  if (!hasPendingTrip) return requestedRedirectPath();
+  return safeRelativePath(sessionStorage.getItem(authRedirectTargetKey), "/trip-planner");
 }
 
 const authSwitchLink = document.querySelector(".auth-switch a");
 if (authSwitchLink) {
   const target = authForm.dataset.authForm === "login" ? "/signup" : "/login";
-  authSwitchLink.href = `${target}?return=${encodeURIComponent(returnPath())}`;
+  authSwitchLink.href = `${target}?redirect=${encodeURIComponent(postAuthDestination())}`;
 }
 
 window.PackSwift.authReady.then((user) => {
-  if (user) window.location.replace(returnPath());
+  if (user) window.location.replace(postAuthDestination());
 });
 
 authForm.addEventListener("submit", async (event) => {
@@ -33,7 +50,7 @@ authForm.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload),
     });
     window.PackSwift.setCurrentUser(result.user);
-    window.location.assign(returnPath());
+    window.location.assign(postAuthDestination());
   } catch (error) {
     const hasInlineError = window.PackSwift.forms.showServerErrors(authForm, error);
     if (!hasInlineError && mode === "signup" && error.status === 409) {

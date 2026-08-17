@@ -13,6 +13,7 @@ import {
   generateTravelAdvice,
   isTravelDomainMessage,
   OFF_TOPIC_REFUSAL,
+  PACKSWIFT_SYSTEM_PROMPT,
 } from "../src/services/geminiService.js";
 
 const [route, client, tripsRoute, packageJson] = await Promise.all([
@@ -92,6 +93,25 @@ test("Gemini Concierge retries a supported model only when 2.5 is unavailable", 
   assert.match(result.text, /light layer/);
 });
 
+test("Gemini Concierge accepts itinerary refinements and sends the full conversation", async () => {
+  let request;
+  const history = [
+    { role: "user", text: "Plan three days in Bangkok." },
+    { role: "model", text: "Day 1 temples, Day 2 markets, Day 3 river sights." },
+  ];
+  const result = await askTravelConcierge("add beach plan", history, {
+    client: { models: { generateContent: async (value) => {
+      request = value;
+      return { text: "I added a beach day to your Bangkok plan." };
+    } } },
+  });
+  assert.equal(request.contents.length, 3);
+  assert.deepEqual(request.contents.map((entry) => entry.role), ["user", "model", "user"]);
+  assert.match(result.text, /added a beach day/i);
+  assert.match(PACKSWIFT_SYSTEM_PROMPT, /Always consider the entire chat history/);
+  assert.match(PACKSWIFT_SYSTEM_PROMPT, /modify, add, remove, or refine activities/);
+});
+
 test("Gemini schema exposes only the requested clean planner fields", () => {
   assert.equal(createTripPlanDeclaration.name, "create_trip_plan");
   assert.deepEqual(createTripPlanDeclaration.parametersJsonSchema.required, [
@@ -132,7 +152,8 @@ test("chat widget sends history, stores the complete card, and keeps auth gating
     "🎒 What to pack for Chiang Mai?",
     "💰 Budget trip under $300",
   ]) assert.equal(client.includes(prompt), true);
-  assert.match(client, /sessionStorage\.setItem\(pendingAiTripKey, JSON\.stringify\(recommendation\)\)/);
+  assert.match(client, /sessionStorage\.setItem\(pendingPackswiftTripKey, JSON\.stringify\(pendingTrip\)\)/);
+  assert.match(client, /sessionStorage\.setItem\(authRedirectTargetKey, "\/trip-planner"\)/);
   assert.match(client, /await window\.PackSwift\.authReady/);
   assert.match(client, /Save Your Trip &amp; Unlock 1-Click Planning/);
   assert.match(client, /Plan & Customize This Trip with PackSwift/);

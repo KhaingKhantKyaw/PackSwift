@@ -30,7 +30,7 @@ aiRouter.post(
       .isLength({ min: 1, max: 1200 })
       .withMessage("Enter a message of up to 1,200 characters."),
     body("tripContext").optional({ nullable: true }).isObject(),
-    body("history").optional().isArray({ max: 12 }),
+    body("history").optional().isArray({ max: 20 }),
     body("history.*.role").optional().isIn(["user", "model", "assistant"]),
     body("history.*.text")
       .optional()
@@ -42,7 +42,7 @@ aiRouter.post(
       .isString()
       .trim()
       .isLength({ min: 1, max: 1200 }),
-    body("chatHistory").optional().isArray({ max: 12 }),
+    body("chatHistory").optional().isArray({ max: 20 }),
     body("chatHistory.*.role").optional().isIn(["user", "assistant"]),
     body("chatHistory.*.content")
       .optional()
@@ -55,7 +55,7 @@ aiRouter.post(
     try {
       const message = cleanMultilineText(request.body.message, 1200);
       const suppliedHistory = request.body.history || request.body.chatHistory || [];
-      const chatHistory = suppliedHistory.slice(-12).map((entry) => ({
+      const chatHistory = suppliedHistory.slice(-20).map((entry) => ({
         role: entry.role === "assistant" ? "model" : entry.role,
         text: cleanMultilineText(entry.text ?? entry.content, 1200),
         content: cleanMultilineText(entry.text ?? entry.content, 1200),

@@ -5,8 +5,10 @@
   const packingContextKey = "packswift.packing-context.v1";
   const latestPlanKey = "packswift.latest-plan.v1";
   const generatedTripKey = "packswift.concierge.generated-trip.v1";
-  const pendingAiTripKey = "pending_ai_trip";
+  const pendingPackswiftTripKey = "pending_packswift_trip";
+  const legacyPendingAiTripKey = "pending_ai_trip";
   const pendingAiTripModeKey = "pending_ai_trip_mode";
+  const authRedirectTargetKey = "auth_redirect_target";
   const modulePathPattern = /\/(assist-flight|assist-stay|assist-store|assist-trip|assist-visa|trip-planner)\b/g;
   const quickPrompts = [
     "💡 3-Day Bangkok Itinerary",
@@ -143,8 +145,8 @@
           <li><span aria-hidden="true">✓</span> Smart group expense splitting</li>
         </ul>
         <div class="concierge-auth-actions">
-          <a class="concierge-auth-primary" href="/login">Sign In / Create Free Account <span aria-hidden="true">→</span></a>
-          <button class="concierge-auth-guest" type="button">Continue as Guest</button>
+          <a class="concierge-auth-primary" href="/login?redirect=/trip-planner">Log In <span aria-hidden="true">→</span></a>
+          <a class="concierge-auth-secondary" href="/signup?redirect=/trip-planner">Create an Account</a>
         </div>
         <small>Your preview stays in this browser while you sign in.</small>
       </div>
@@ -164,8 +166,8 @@
   const authModalCard = root.querySelector(".concierge-auth-card");
   const authModalClose = root.querySelector(".concierge-auth-close");
   const authModalBackdrop = root.querySelector(".concierge-auth-backdrop");
-  const authModalPrimary = root.querySelector(".concierge-auth-primary");
-  const authModalGuest = root.querySelector(".concierge-auth-guest");
+  const authModalLogin = root.querySelector(".concierge-auth-primary");
+  const authModalSignup = root.querySelector(".concierge-auth-secondary");
   let pendingModalRecommendation = null;
   let pendingModalTrigger = null;
 
@@ -238,8 +240,11 @@
 
   function storePendingAiTrip(recommendation, mode) {
     try {
-      sessionStorage.setItem(pendingAiTripKey, JSON.stringify(recommendation));
-      sessionStorage.setItem(pendingAiTripModeKey, mode);
+      const pendingTrip = { source: "concierge", recommendation };
+      sessionStorage.setItem(pendingPackswiftTripKey, JSON.stringify(pendingTrip));
+      sessionStorage.setItem(legacyPendingAiTripKey, JSON.stringify(recommendation));
+      sessionStorage.setItem(pendingAiTripModeKey, mode || "save_after_auth");
+      sessionStorage.setItem(authRedirectTargetKey, "/trip-planner");
       return true;
     } catch {
       showTripToast("This browser could not preserve the trip preview.", "error");
@@ -260,8 +265,9 @@
     if (!storePendingAiTrip(recommendation, "save_after_auth")) return;
     pendingModalRecommendation = recommendation;
     pendingModalTrigger = trigger;
-    const returnTo = "/trip-planner?pending_ai_trip=1";
-    authModalPrimary.href = `/login?return=${encodeURIComponent(returnTo)}`;
+    const returnTo = "/trip-planner";
+    authModalLogin.href = `/login?redirect=${encodeURIComponent(returnTo)}`;
+    authModalSignup.href = `/signup?redirect=${encodeURIComponent(returnTo)}`;
     authModal.hidden = false;
     document.documentElement.classList.add("concierge-modal-open");
     requestAnimationFrame(() => authModalClose.focus());
@@ -289,7 +295,10 @@
           // The saved database trip remains available when browser storage is unavailable.
         }
       }
-      sessionStorage.removeItem(pendingAiTripKey);
+      sessionStorage.removeItem(pendingPackswiftTripKey);
+      sessionStorage.removeItem(legacyPendingAiTripKey);
+      sessionStorage.removeItem(pendingAiTripModeKey);
+      sessionStorage.removeItem(authRedirectTargetKey);
       showTripToast("Trip plan generated successfully! 🎉");
       window.setTimeout(() => {
         window.location.assign(result.redirect_url || `/trip-planner?trip_id=${encodeURIComponent(result.trip_id)}`);
@@ -424,7 +433,7 @@
   async function sendMessage(text) {
     const message = text.trim().slice(0, 1200);
     if (!message || sending) return;
-    const previousHistory = chatHistory.slice(-12).map((entry) => ({
+    const previousHistory = chatHistory.map((entry) => ({
       role: entry.role === "assistant" ? "model" : "user",
       text: entry.content,
     }));
@@ -478,17 +487,17 @@
   closeButton.addEventListener("click", () => setOpen(false));
   authModalClose.addEventListener("click", closeAuthModal);
   authModalBackdrop.addEventListener("click", closeAuthModal);
-  authModalPrimary.addEventListener("click", () => {
+  authModalLogin.addEventListener("click", () => {
     if (pendingModalRecommendation) {
       storePendingAiTrip(pendingModalRecommendation, "save_after_auth");
     }
     closeAuthModal();
   });
-  authModalGuest.addEventListener("click", () => {
-    const recommendation = pendingModalRecommendation;
-    if (!recommendation || !storePendingAiTrip(recommendation, "guest_preview")) return;
+  authModalSignup.addEventListener("click", () => {
+    if (pendingModalRecommendation) {
+      storePendingAiTrip(pendingModalRecommendation, "save_after_auth");
+    }
     closeAuthModal();
-    window.location.assign("/trip-planner?pending_ai_trip=1&preview=guest");
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();

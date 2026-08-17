@@ -57,7 +57,7 @@ test("validation errors are constructive and rendered beside fields", () => {
 test("microcopy is concise and placeholders remain examples", () => {
   assert.match(home, />Submit Feedback/);
   assert.match(homeSupport, /\/api\/contact\/feedback/);
-  assert.match(planner, />Log in to save trip/);
+  assert.match(planner, />Continue your trip with an account/);
   assert.match(packing, />Log in to save checklist/);
   assert.doesNotMatch(`${planner}${packing}`, /You need to login first/);
   for (const source of [home, login, signup, planner, packing, guide]) {

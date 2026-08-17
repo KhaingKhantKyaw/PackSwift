@@ -52,7 +52,7 @@ test("saving a guest packing list requires login and returns to the checklist", 
   assert.match(packingScript, /window\.PackSwift\.authReady/);
   assert.match(packingScript, /\/api\/saved-trips/);
   assert.match(packingScript, /packingChecklistSnapshot/);
-  assert.match(authScript, /window\.location\.assign\(returnPath\(\)\)/);
+  assert.match(authScript, /window\.location\.assign\(postAuthDestination\(\)\)/);
   assert.match(savedTripRepository, /JSON_EXTRACT\(trip_data, '\$\.id'\)/);
 });
 
@@ -64,14 +64,17 @@ test("saving a guest trip requires login and resumes into My Trips", async () =>
   ]);
 
   assert.match(plannerHtml, /id="save-trip-button"/);
-  assert.match(plannerHtml, />Log in to save trip</);
+  assert.match(plannerHtml, />Continue your trip with an account</);
   assert.match(plannerHtml, /id="trip-login-required-dialog"/);
   assert.match(plannerHtml, /id="save-trip-feedback"/);
   assert.match(plannerScript, /packswift\.pending-trip-save\.v1/);
-  assert.match(plannerScript, /\/login\?return=/);
+  assert.match(plannerScript, /function tripLoginDestination\(path = "\/login"\)/);
+  assert.match(plannerScript, /\?redirect=\$\{encodeURIComponent/);
+  assert.match(plannerScript, /pending_packswift_trip/);
+  assert.match(plannerHtml, /id="trip-signup-link"/);
   assert.match(plannerScript, /window\.PackSwift\.authReady/);
   assert.match(plannerScript, /\/api\/trips\/analyze/);
   assert.match(plannerScript, /\/api\/saved-trips/);
   assert.match(plannerScript, /resumePendingTripSave/);
-  assert.match(authScript, /window\.location\.assign\(returnPath\(\)\)/);
+  assert.match(authScript, /window\.location\.assign\(postAuthDestination\(\)\)/);
 });

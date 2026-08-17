@@ -12,6 +12,7 @@ const tripLoginRequiredDialog = document.querySelector(
   "#trip-login-required-dialog",
 );
 const tripLoginLink = document.querySelector("#trip-login-link");
+const tripSignupLink = document.querySelector("#trip-signup-link");
 const originSearch = document.querySelector("#origin-search");
 const destinationSearch = document.querySelector("#destination-search");
 const domesticDestinationInput = document.querySelector("#domestic-destination");
@@ -23,6 +24,7 @@ const budgetField = document.querySelector(".budget-field");
 const budgetCurrencySymbol = document.querySelector("#budget-currency-symbol");
 const adultInput = document.querySelector("#adults");
 const childInput = document.querySelector("#children");
+const tripNotesInput = document.querySelector("#trip-notes");
 const budgetMinimumHint = document.querySelector("#budget-minimum-hint");
 const budgetInfoTitle = document.querySelector("#budget-info-title");
 const budgetInfoRoute = document.querySelector("#budget-info-route");
@@ -91,8 +93,10 @@ const featuredPresets = [...document.querySelectorAll("[data-featured-destinatio
 const storageKey = "packswift.trips.v1";
 const latestPlanKey = "packswift.latest-plan.v1";
 const conciergeGeneratedTripKey = "packswift.concierge.generated-trip.v1";
-const pendingAiTripKey = "pending_ai_trip";
+const pendingPackswiftTripKey = "pending_packswift_trip";
+const legacyPendingAiTripKey = "pending_ai_trip";
 const pendingAiTripModeKey = "pending_ai_trip_mode";
+const authRedirectTargetKey = "auth_redirect_target";
 const packingHandoffKey = "packswift.packing-context.v1";
 const pendingTripSaveKey = "packswift.pending-trip-save.v1";
 const liveActivityGrid = document.querySelector("#live-activity-grid");
@@ -1228,6 +1232,7 @@ function collectInput() {
     travelerDemographic: String(formData.get("travelerDemographic")),
     travelingWithPets: formData.get("travelingWithPets") === "true",
     interests: [...(purposeInterests[tripPurpose] || purposeInterests.leisure)],
+    notes: String(formData.get("notes") || "").trim(),
   };
 }
 
@@ -1800,6 +1805,7 @@ function planAnalysisInput(plan) {
     travelerDemographic: input.travelerDemographic || "couples",
     travelingWithPets: input.travelingWithPets === true,
     interests: input.interests || [],
+    notes: input.notes || "",
     arrivalAt: input.arrivalAt || null,
     hotelName: input.hotelName || null,
     hotelAddress: input.hotelAddress || null,
@@ -1859,6 +1865,7 @@ function restorePlannerFormFromPlan(plan) {
     'input[name="travelingWithPets"]',
   );
   petOption.checked = input.travelingWithPets === true;
+  tripNotesInput.value = input.notes || "";
   updateBudgetMinimum();
 }
 
@@ -1944,6 +1951,7 @@ function pendingRecommendationInput(recommendation) {
     smartPace: { lateRiser: false, middayRest: false, clusterNearby: true },
     preferredClimate: "any",
     interests: [...(purposeInterests[tripPurpose] || purposeInterests.leisure)],
+    notes: recommendation.summary_pitch || "",
   };
 }
 
@@ -1978,26 +1986,36 @@ function applyCuratedGuideRoute(plan, recommendation) {
 
 async function hydratePendingAiTrip() {
   const params = new URLSearchParams(window.location.search);
-  if (params.get("pending_ai_trip") !== "1") return false;
   let pending = null;
   try {
-    pending = JSON.parse(sessionStorage.getItem(pendingAiTripKey) || "null");
+    pending = JSON.parse(
+      sessionStorage.getItem(pendingPackswiftTripKey) ||
+      sessionStorage.getItem(legacyPendingAiTripKey) ||
+      "null",
+    );
   } catch {
     pending = null;
   }
-  const recommendation = pending?.recommendation || pending;
-  const pendingMode = pending?.mode || sessionStorage.getItem(pendingAiTripModeKey) || "guest_preview";
-  if (!recommendation || typeof recommendation !== "object") {
+  const hasPendingMarker = params.get("pending_ai_trip") === "1" ||
+    params.get("pending_packswift_trip") === "1";
+  if (!pending && !hasPendingMarker) return false;
+  if (!pending || typeof pending !== "object") {
     plannerFeedback.textContent = "Your AI trip preview expired. Ask PackSwift Concierge to create it again.";
     return true;
   }
 
-  const input = pendingRecommendationInput(recommendation);
+  const recommendation = pending.recommendation || (pending.input ? null : pending);
+  const input = pending.input || pendingRecommendationInput(recommendation);
   restorePlannerFormFromPlan({ input });
   updateLiveTripPreview();
   const user = await window.PackSwift.authReady;
+  if (!user) {
+    plannerFeedback.textContent = "Log in or create an account to continue this saved trip.";
+    showTripLoginRequired(input);
+    return true;
+  }
   try {
-    if (user && pendingMode === "save_after_auth") {
+    if (recommendation) {
       const result = await window.PackSwift.api("/api/trips/create", {
         method: "POST",
         body: JSON.stringify({ recommendation }),
@@ -2008,20 +2026,22 @@ async function hydratePendingAiTrip() {
         tripId: result.trip_id,
         plan: activePlan,
       }));
-      sessionStorage.removeItem(pendingAiTripKey);
-      sessionStorage.removeItem(pendingAiTripModeKey);
       window.history.replaceState({}, "", result.redirect_url ||
         `/trip-planner?trip_id=${encodeURIComponent(result.trip_id)}`);
-      plannerFeedback.textContent = "Welcome back — your Concierge trip was saved and loaded automatically. 🎉";
     } else {
-      activePlan = await buildLocalPlan(input);
-      activePlan.persistence = { saved: false, reason: "ai_guest_preview" };
-      plannerFeedback.textContent = "Guest preview loaded. Sign in whenever you want to save and continue this trip.";
+      activePlan = await requestPlan(input);
+      if (!activePlan.persistence?.saved) activePlan = await ensureAuthenticatedPlan(activePlan);
     }
+    sessionStorage.removeItem(pendingPackswiftTripKey);
+    sessionStorage.removeItem(legacyPendingAiTripKey);
+    sessionStorage.removeItem(pendingAiTripModeKey);
+    sessionStorage.removeItem(authRedirectTargetKey);
+    localStorage.setItem(latestPlanKey, JSON.stringify(activePlan));
     activePlan = applyCuratedGuideRoute(activePlan, recommendation);
     restorePlannerFormFromPlan(activePlan);
     renderPlan(activePlan);
     updateLiveTripPreview();
+    plannerFeedback.textContent = "Welcome back — your saved trip details were loaded automatically. 🎉";
     return true;
   } catch (error) {
     plannerFeedback.textContent = error.message || "The AI trip preview could not be loaded.";
@@ -2094,18 +2114,31 @@ function tripPlannerReturnPath() {
   return `${window.location.pathname}${window.location.search}`;
 }
 
-function tripLoginDestination() {
-  return `/login?return=${encodeURIComponent(tripPlannerReturnPath())}`;
+function tripLoginDestination(path = "/login") {
+  return `${path}?redirect=${encodeURIComponent("/trip-planner")}`;
 }
 
-function showTripLoginRequired() {
-  tripLoginLink.href = tripLoginDestination();
+function persistPendingPlannerTrip(input) {
+  if (!input) return;
+  const pendingTrip = {
+    source: "trip-planner",
+    input,
+    notes: input.notes || activePlan?.summary || "",
+  };
+  sessionStorage.setItem(pendingPackswiftTripKey, JSON.stringify(pendingTrip));
+  sessionStorage.setItem(authRedirectTargetKey, "/trip-planner");
+  sessionStorage.setItem(pendingAiTripModeKey, "save_after_auth");
+}
+
+function showTripLoginRequired(input = activePlan?.input) {
+  persistPendingPlannerTrip(input);
+  tripLoginLink.href = tripLoginDestination("/login");
+  tripSignupLink.href = tripLoginDestination("/signup");
   if (typeof tripLoginRequiredDialog.showModal === "function") {
     tripLoginRequiredDialog.showModal();
     return;
   }
   window.alert("Log in to save trip.");
-  sessionStorage.setItem(pendingTripSaveKey, "true");
   window.location.assign(tripLoginLink.href);
 }
 
@@ -2157,6 +2190,12 @@ plannerForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  const user = await window.PackSwift.authReady;
+  if (!user) {
+    showTripLoginRequired(input);
+    return;
+  }
+
   const button = plannerForm.querySelector('[type="submit"]');
   button.disabled = true;
   button.textContent = "Shaping your plan…";
@@ -2197,10 +2236,6 @@ saveTripButton.addEventListener("click", async () => {
     return;
   }
   await saveActiveTripToAccount();
-});
-
-tripLoginLink.addEventListener("click", () => {
-  sessionStorage.setItem(pendingTripSaveKey, "true");
 });
 
 for (const preset of featuredPresets) {
