@@ -683,8 +683,15 @@ fetch("/data/destinations.json")
   })
   .then((catalog) => {
     destinations = catalog;
-    activeDestination = destinations.find((destination) => destination.slug === "bangkok") || destinations[0];
+    const requestedSlug = new URLSearchParams(window.location.search).get("destination");
+    activeDestination = destinations.find((destination) => destination.slug === requestedSlug)
+      || destinations.find((destination) => destination.slug === "bangkok")
+      || destinations[0];
     renderDestinations();
+    if (requestedSlug && activeDestination?.slug === requestedSlug) {
+      const selectedCard = document.querySelector(`[data-guide-destination="${CSS.escape(requestedSlug)}"]`);
+      openPreview(activeDestination, selectedCard || document.querySelector("#guide-sidebar-plan"));
+    }
   })
   .catch((error) => {
     guideContainer.replaceChildren(element("p", "status-banner status-error", error.message));

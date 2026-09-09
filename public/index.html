@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/js/app.js" defer></script>
     <script src="/js/home-background.js" defer></script>
+    <script src="/js/home-discovery.js" defer></script>
     <script src="/js/home-support.js" defer></script>
   </head>
   <body data-page="home">
@@ -50,22 +51,39 @@
           <p class="hero-copy">Tell PackSwift where you might go, who is travelling, and what feels right. Get one connected plan for budget, places, weather, itinerary, and packing.</p>
           <div class="hero-actions">
             <a class="button button-primary easy-trip-cta" href="/trip-planner">Plan my trip <span class="button-arrow" aria-hidden="true">→</span></a>
-            <a class="home-text-link" href="/travel-guide">Explore destinations <span aria-hidden="true">↗</span></a>
+            <a class="home-text-link" href="#discover">Explore destinations <span aria-hidden="true">↓</span></a>
           </div>
           <p class="home-hero-note">No sales pressure. No scattered tabs. Just practical guidance.</p>
         </div>
       </section>
 
-      <section class="home-simple-path" aria-labelledby="home-path-title">
-        <header class="home-simple-heading">
-          <p class="eyebrow">One calm flow</p>
-          <h2 id="home-path-title">From a travel thought to a ready trip.</h2>
+      <section id="discover" class="home-discovery" aria-labelledby="home-discovery-title">
+        <header class="home-discovery-heading">
+          <div>
+            <p class="eyebrow">Destination guide</p>
+            <h2 id="home-discovery-title">Find a place that fits.</h2>
+            <p>Compare useful costs, seasons, and highlights—then begin planning without entering everything twice.</p>
+          </div>
+          <a class="home-guide-link" href="/travel-guide">Open the full Travel Guide <span aria-hidden="true">→</span></a>
         </header>
-        <div class="home-path-grid">
-          <article class="home-path-step"><span>01</span><div><h3>Share the idea</h3><p>Choose a place—or let PackSwift help you decide.</p></div></article>
-          <article class="home-path-step"><span>02</span><div><h3>Shape the journey</h3><p>Compare realistic costs, weather, attractions, and daily plans.</p></div></article>
-          <article class="home-path-step"><span>03</span><div><h3>Travel prepared</h3><p>Keep your itinerary and smart packing checklist together.</p></div></article>
+
+        <div class="home-discovery-tools">
+          <div class="home-destination-search">
+            <label for="home-destination-search">Search places</label>
+            <input id="home-destination-search" type="search" maxlength="100" autocomplete="off" placeholder="e.g. Bangkok or Japan">
+          </div>
+          <div class="home-destination-filters" aria-label="Filter destinations">
+            <button type="button" data-home-filter="featured" aria-pressed="true">Featured</button>
+            <button type="button" data-home-filter="budget" aria-pressed="false">Budget-friendly</button>
+            <button type="button" data-home-filter="food" aria-pressed="false">Food &amp; culture</button>
+            <button type="button" data-home-filter="nature" aria-pressed="false">Nature &amp; coast</button>
+          </div>
         </div>
+
+        <div class="home-destination-meta">
+          <p id="home-destination-count" aria-live="polite">Loading destination ideas…</p>
+        </div>
+        <div id="home-destination-grid" class="home-destination-grid" aria-live="polite"></div>
       </section>
 
       <section id="support" class="home-support-section" aria-labelledby="support-title">

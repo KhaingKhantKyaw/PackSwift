@@ -75,6 +75,12 @@ test("one-click planning persists the selected destination and planner payload",
   assert.match(planner, /This preview uses the exact curated Pocket Guide route/);
 });
 
+test("a destination opened from Home selects its exact pocket guide", () => {
+  assert.match(script, /new URLSearchParams\(window\.location\.search\)\.get\("destination"\)/);
+  assert.match(script, /activeDestination = destinations\.find\(\(destination\) => destination\.slug === requestedSlug\)/);
+  assert.match(script, /openPreview\(activeDestination, selectedCard/);
+});
+
 test("discovery hub has responsive cards, sidebar, and off-canvas styling", () => {
   assert.match(styles, /\.guide-filter-tabs/);
   assert.match(styles, /\.guide-discovery-card/);

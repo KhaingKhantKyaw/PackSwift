@@ -35,16 +35,15 @@ test("existing Home content and routes remain present", () => {
   assert.match(app, /href="\/profile"/);
 });
 
-test("Home presents one concise message and a three-step planning path", () => {
+test("Home presents one concise message and a calm destination guide", () => {
   assert.match(home, /Your AI travel assistant/);
   assert.match(home, /Think of a trip/);
   assert.match(home, /No sales pressure/);
-  assert.match(home, /From a travel thought to a ready trip/);
-  assert.match(home, /Share the idea/);
-  assert.match(home, /Shape the journey/);
-  assert.match(home, /Travel prepared/);
+  assert.match(home, /Destination guide/);
+  assert.match(home, /Find a place that fits/);
+  assert.match(home, /Search places/);
   assert.match(home, />Plan my trip/);
   assert.doesNotMatch(home, /The Stressful Way|The PackSwift Way|comparison-card/);
-  assert.match(styles, /\.home-path-grid \{[\s\S]*grid-template-columns: repeat\(3/);
-  assert.match(styles, /\.home-simple-path \{[\s\S]*backdrop-filter: blur\(18px\)/);
+  assert.match(styles, /\.home-destination-grid \{[\s\S]*grid-template-columns: repeat\(3/);
+  assert.match(styles, /\.home-discovery \{[\s\S]*backdrop-filter: blur\(20px\)/);
 });
