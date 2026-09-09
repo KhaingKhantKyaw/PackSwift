@@ -30,7 +30,8 @@ test("existing Home content and routes remain present", () => {
   assert.doesNotMatch(home, /Recommended Famous Places to Explore All Around the World/);
   assert.match(home, /href="\/trip-planner"/);
   assert.doesNotMatch(app, /href="\/community-feed"/);
-  assert.match(app, /href="\/#discover"/);
+  assert.doesNotMatch(app, /data-nav="guide"|>Destinations<|>Travel Guide</);
+  assert.match(home, /href="#discover"/);
   assert.match(app, /href="\/#support"/);
   assert.match(app, /href="\/profile"/);
 });

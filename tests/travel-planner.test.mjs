@@ -139,7 +139,6 @@ test("build output contains all requested application pages", async () => {
   const pages = [
     "index.html",
     "trip-planner.html",
-    "travel-guide.html",
     "packing-list.html",
     "my-trips.html",
     "about.html",

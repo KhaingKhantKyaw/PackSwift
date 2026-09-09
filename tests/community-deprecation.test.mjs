@@ -14,9 +14,10 @@ const [app, pages, api, profileHtml, profileClient, profileRepository, worker] =
 
 test("Community is absent from desktop and mobile navigation", () => {
   assert.doesNotMatch(app, /community-feed|data-nav="community"/i);
-  for (const expected of ["Home", "Plan Trip", "Destinations", "About", "Support"]) {
+  for (const expected of ["Home", "Plan Trip", "About", "Support"]) {
     assert.match(app, new RegExp(`>${expected}<`));
   }
+  assert.doesNotMatch(app, />Destinations<|>Travel Guide<|data-nav="guide"/);
 });
 
 test("legacy Community and Travel Guide URLs redirect to Home discovery", () => {
