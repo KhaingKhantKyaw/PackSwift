@@ -16,16 +16,16 @@ test("shared navigation uses the floating glass pill skin", () => {
   assert.match(app, /const mainNavigation/);
 });
 
-test("sky, cloud, serif hero, and teal actions are visual-only CSS", () => {
+test("sky backdrop, compact modern hero, and teal actions are visual-only CSS", () => {
   assert.match(styles, /--sky-top: #8cb8ec/);
   assert.match(styles, /body:not\(\.shorts-page\)::before \{[\s\S]*radial-gradient\(ellipse/);
   assert.match(styles, /\.button-primary,[\s\S]*\.concierge-auth-primary \{[\s\S]*background: #00a8b5/);
-  assert.match(styles, /body\[data-page="home"\] \.hero h1 \{[\s\S]*font-size: clamp\(2\.8rem/);
-  assert.match(styles, /font-family: Georgia, "Times New Roman", serif/);
+  assert.match(styles, /body\[data-page="home"\] \.home-minimal-hero h1 \{[\s\S]*font-size: clamp\(2\.8rem/);
+  assert.match(styles, /font-family: Inter, ui-sans-serif, system-ui/);
 });
 
 test("existing Home content and routes remain present", () => {
-  assert.match(home, /Got a sudden urge to escape/);
+  assert.match(home, /Think of a trip/);
   assert.doesNotMatch(home, /travel-impact-card/);
   assert.doesNotMatch(home, /Recommended Famous Places to Explore All Around the World/);
   assert.match(home, /href="\/trip-planner"/);
@@ -35,17 +35,16 @@ test("existing Home content and routes remain present", () => {
   assert.match(app, /href="\/profile"/);
 });
 
-test("Home explains effortless planning with a clear two-way comparison", () => {
-  assert.match(home, /Trip planning shouldn’t be hard/);
-  assert.match(home, /No spreadsheets/);
-  assert.match(home, /No twenty open tabs/);
-  assert.match(home, /The Stressful Way/);
-  assert.match(home, /The PackSwift Way/);
-  assert.match(home, /1-Click AI plan/);
-  assert.match(home, /Weather-smart packing/);
-  assert.match(home, /All you need is a 10-second thought to travel/);
-  assert.match(home, /⚡ Plan an Easy-Going Trip in 1-Click/);
-  assert.match(styles, /\.ease-comparison-grid \{[\s\S]*grid-template-columns: repeat\(2/);
-  assert.match(styles, /\.comparison-card-packswift \{[\s\S]*#00a8b5/);
-  assert.match(styles, /\.easy-going-callout \{[\s\S]*backdrop-filter: blur\(18px\)/);
+test("Home presents one concise message and a three-step planning path", () => {
+  assert.match(home, /Your AI travel assistant/);
+  assert.match(home, /Think of a trip/);
+  assert.match(home, /No sales pressure/);
+  assert.match(home, /From a travel thought to a ready trip/);
+  assert.match(home, /Share the idea/);
+  assert.match(home, /Shape the journey/);
+  assert.match(home, /Travel prepared/);
+  assert.match(home, />Plan my trip/);
+  assert.doesNotMatch(home, /The Stressful Way|The PackSwift Way|comparison-card/);
+  assert.match(styles, /\.home-path-grid \{[\s\S]*grid-template-columns: repeat\(3/);
+  assert.match(styles, /\.home-simple-path \{[\s\S]*backdrop-filter: blur\(18px\)/);
 });

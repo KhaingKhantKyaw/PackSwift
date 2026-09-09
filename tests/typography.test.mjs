@@ -23,6 +23,6 @@ test("forms, captions, cards, and travel prices use proportional sizes", () => {
   assert.match(styles, /body \.field-control,[\s\S]*?font-size: var\(--text-sm\) !important/);
   assert.match(styles, /body small,[\s\S]*?font-size: var\(--text-xs\) !important/);
   assert.match(styles, /body h3,[\s\S]*?font-size: var\(--text-base\) !important/);
-  assert.match(styles, /body \.flight-route-price strong,[\s\S]*?font-size: var\(--text-xl\) !important/);
-  assert.match(styles, /color: var\(--color-primary\) !important/);
+  assert.match(styles, /body button,[\s\S]*?font-size: var\(--text-sm\) !important/);
+  assert.match(styles, /\.text-primary \{[\s\S]*?color: var\(--color-primary\) !important/);
 });

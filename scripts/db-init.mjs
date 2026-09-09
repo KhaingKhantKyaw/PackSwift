@@ -27,65 +27,6 @@ const connection = await mysql.createConnection({
 
 try {
   await connection.query(portableSchema);
-  const [orderColumns] = await connection.execute(
-    `SELECT COLUMN_NAME
-     FROM INFORMATION_SCHEMA.COLUMNS
-     WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'orders'`,
-    [databaseName],
-  );
-  const existingOrderColumns = new Set(orderColumns.map((column) => column.COLUMN_NAME));
-  if (!existingOrderColumns.has("order_type")) {
-    await connection.query(
-      "ALTER TABLE orders ADD COLUMN order_type ENUM('FLIGHT', 'HOTEL', 'GEAR') NULL AFTER category",
-    );
-    await connection.query(
-      `UPDATE orders SET order_type = CASE category
-         WHEN 'flight' THEN 'FLIGHT'
-         WHEN 'accommodation' THEN 'HOTEL'
-         ELSE 'GEAR'
-       END`,
-    );
-    await connection.query(
-      "ALTER TABLE orders MODIFY order_type ENUM('FLIGHT', 'HOTEL', 'GEAR') NOT NULL",
-    );
-  }
-  if (!existingOrderColumns.has("payment_method")) {
-    await connection.query(
-      "ALTER TABLE orders ADD COLUMN payment_method ENUM('VISA', 'MASTERCARD', 'CREDIT_CARD') NOT NULL DEFAULT 'CREDIT_CARD' AFTER status",
-    );
-  }
-  if (!existingOrderColumns.has("payment_status")) {
-    await connection.query(
-      "ALTER TABLE orders ADD COLUMN payment_status ENUM('PAID', 'FAILED') NOT NULL DEFAULT 'PAID' AFTER payment_method",
-    );
-  }
-  if (!existingOrderColumns.has("card_brand")) {
-    await connection.query(
-      "ALTER TABLE orders ADD COLUMN card_brand ENUM('VISA', 'MASTERCARD') NULL AFTER payment_status",
-    );
-  }
-  if (!existingOrderColumns.has("card_last4")) {
-    await connection.query(
-      "ALTER TABLE orders ADD COLUMN card_last4 CHAR(4) NULL AFTER card_brand",
-    );
-  }
-  if (!existingOrderColumns.has("payment_reference")) {
-    await connection.query(
-      "ALTER TABLE orders ADD COLUMN payment_reference VARCHAR(60) NULL AFTER card_last4",
-    );
-    await connection.query(
-      "UPDATE orders SET payment_reference = CONCAT('PAY-LEGACY-', id) WHERE payment_reference IS NULL",
-    );
-    await connection.query(
-      "ALTER TABLE orders MODIFY payment_reference VARCHAR(60) NOT NULL, ADD UNIQUE KEY uq_orders_payment_reference (payment_reference)",
-    );
-  }
-  await connection.query(
-    "ALTER TABLE orders MODIFY category ENUM('flight', 'accommodation', 'travel_gear', 'insurance') NOT NULL",
-  );
-  await connection.query(
-    "ALTER TABLE orders MODIFY order_type ENUM('FLIGHT', 'HOTEL', 'GEAR', 'INSURANCE') NOT NULL",
-  );
   const [readinessColumns] = await connection.execute(
     `SELECT COLUMN_NAME
      FROM INFORMATION_SCHEMA.COLUMNS

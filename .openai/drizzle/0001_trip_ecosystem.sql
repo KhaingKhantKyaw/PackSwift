@@ -34,39 +34,8 @@ CREATE TABLE IF NOT EXISTS hosted_visa_rules (
   UNIQUE (origin_country_code, destination_country_code)
 );
 
-CREATE TABLE IF NOT EXISTS hosted_trip_expenses (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  trip_session_id INTEGER NOT NULL,
-  paid_by TEXT NOT NULL,
-  title TEXT NOT NULL,
-  category TEXT NOT NULL,
-  amount REAL NOT NULL,
-  currency TEXT NOT NULL,
-  expense_date TEXT NOT NULL,
-  notes TEXT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (trip_session_id) REFERENCES hosted_trip_sessions(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS hosted_expense_splits (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  expense_id INTEGER NOT NULL,
-  participant_name TEXT NOT NULL,
-  share_amount REAL NOT NULL,
-  is_settled INTEGER NOT NULL DEFAULT 0,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (expense_id) REFERENCES hosted_trip_expenses(id) ON DELETE CASCADE,
-  UNIQUE (expense_id, participant_name)
-);
-
 CREATE INDEX IF NOT EXISTS idx_hosted_itinerary_trip
 ON hosted_itinerary_activities(trip_session_id, day_number, sequence_number);
-
-CREATE INDEX IF NOT EXISTS idx_hosted_expenses_trip
-ON hosted_trip_expenses(trip_session_id, expense_date DESC);
-
-CREATE INDEX IF NOT EXISTS idx_hosted_expense_splits
-ON hosted_expense_splits(expense_id, participant_name);
 
 INSERT OR IGNORE INTO hosted_visa_rules
   (origin_country_code, destination_country_code, status, allowed_days, summary, official_portal_url, source_note)

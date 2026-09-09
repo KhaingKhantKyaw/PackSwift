@@ -19,7 +19,7 @@ test("hosted PackSwift uses authenticated identity and persistent D1 storage", a
   assert.match(worker, /\/api\/profile/);
   assert.match(worker, /hosted_saved_trips/);
   assert.match(worker, /hosted_readiness_items/);
-  assert.match(worker, /confirm-assistance/);
+  assert.doesNotMatch(worker, /confirm-assistance|hosted_orders|checkout\/process/);
   assert.match(worker, /readiness\\\/complete/);
   assert.match(worker, /readiness\\\/cancel/);
   assert.match(worker, /readyTrips/);

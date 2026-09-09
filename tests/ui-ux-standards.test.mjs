@@ -63,7 +63,7 @@ test("validation errors are constructive and rendered beside fields", () => {
 });
 
 test("microcopy is concise and placeholders remain examples", () => {
-  assert.match(home, />Submit Feedback/);
+  assert.match(home, />Send feedback/);
   assert.match(homeSupport, /\/api\/contact\/feedback/);
   assert.match(planner, />Continue your trip with an account/);
   assert.match(packing, />Log in to save checklist/);

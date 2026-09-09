@@ -101,8 +101,12 @@ const packingHandoffKey = "packswift.packing-context.v1";
 const pendingTripSaveKey = "packswift.pending-trip-save.v1";
 const liveActivityGrid = document.querySelector("#live-activity-grid");
 const liveActivityStatus = document.querySelector("#live-activity-status");
+const selectedPlacesSection = document.querySelector("#selected-places-section");
+const selectedPlacesList = document.querySelector("#selected-places-list");
+const selectedPlacesCount = document.querySelector("#selected-places-count");
 const liveItineraryList = document.querySelector("#live-itinerary-list");
 const liveItineraryDensity = document.querySelector("#live-itinerary-density");
+const activityChoiceStorageKey = "packswift.planner.activity-choices.v1";
 
 const currencyRatesToUsd = {
   USD: 1,
@@ -210,6 +214,9 @@ let liveRecommendationDestination = null;
 let liveRecommendationRefilling = false;
 let liveRecommendationRefreshAttempted = false;
 const selectedActivityPlaceIds = new Set();
+const selectedActivityDetails = new Map();
+const dismissedActivityPlaceIds = new Set();
+let activeActivityContextKey = "";
 const activityPlanToast = document.querySelector("#activity-plan-toast");
 
 function titleCase(value) {
@@ -455,7 +462,7 @@ function updateBudgetMinimum() {
   const isBelowMinimum = amount > 0 && amount < rule.minimumAmount;
   syncBudgetCurrencySymbol();
   budgetInfoTitle.textContent = isBelowMinimum
-    ? "Budget Below Requirement"
+    ? "Budget-saving plan"
     : "Route Budget Estimate";
   budgetInfoRoute.textContent = routeText;
   budgetInfoAmount.textContent = formatMoney(rule.minimumAmount, rule.currency);
@@ -463,16 +470,16 @@ function updateBudgetMinimum() {
   const distanceLabel = Number.isFinite(rule.distanceKm)
     ? `${new Intl.NumberFormat("en-US").format(rule.distanceKm)} km route. `
     : "";
-  budgetInfoDetail.textContent =
+  const estimateFormula =
     `${distanceLabel}~USD ${rule.transitCostPerPersonUsd} transit/person × ${rule.travelers} ${travellerLabel} + ` +
     `USD ${rule.dailyRatePerPersonUsd}/day × ${rule.travelers} × ${rule.days} days.`;
+  budgetInfoDetail.textContent = isBelowMinimum
+    ? `${formatMoney(amount, rule.currency)} is accepted. PackSwift will prioritize free and lower-cost options. ` +
+      `The amount above is a comfort reference: ${estimateFormula}`
+    : estimateFormula;
   budgetMinimumHint.classList.toggle("is-warning", isBelowMinimum);
   budgetField.classList.toggle("is-warning", isBelowMinimum);
-  budgetInput.setCustomValidity(
-    isBelowMinimum
-      ? `Minimum budget is ${formatMoney(rule.minimumAmount, rule.currency)} for this trip.`
-      : "",
-  );
+  budgetInput.setCustomValidity("");
   return rule;
 }
 
@@ -609,7 +616,9 @@ function recommendLiveActivities(activities, input, destination) {
     ...activity,
     provider: activity.provider || "packswift_catalog",
     placeId: activity.providerPlaceId || `catalog:${activity.slug}`,
-  }));
+  })).filter((activity) =>
+    !selectedActivityPlaceIds.has(activity.placeId) &&
+    !dismissedActivityPlaceIds.has(activity.placeId));
   return {
     city: { id: destination?.slug || "global", name: destination?.name || "Worldwide" },
     budget,
@@ -702,6 +711,7 @@ async function requestLiveRecommendation(
         cluster_nearby: input.smartPace.clusterNearby,
         trip_id: activePlan?.persistence?.saved ? activePlan.persistence.tripId : undefined,
         saved_place_ids: [...selectedActivityPlaceIds],
+        excluded_place_ids: [...dismissedActivityPlaceIds],
         page_token: pageToken || undefined,
         refresh_queue: refreshQueue || undefined,
       }),
@@ -728,6 +738,108 @@ function activityPlaceIdentity(activity) {
   };
 }
 
+function activityContextKey(input) {
+  return [input.origin, input.destination]
+    .map((value) => String(value || "").trim().toLowerCase())
+    .join("::");
+}
+
+function storedActivityChoice(activity) {
+  const { placeId, provider } = activityPlaceIdentity(activity);
+  return {
+    placeId,
+    provider,
+    title: String(activity.title || "Selected place").slice(0, 180),
+    category: String(activity.category || "Place to visit").slice(0, 100),
+    imageUrl: String(activity.imageUrl || fallbackActivityImages[0]).slice(0, 1000),
+    imageAlt: String(activity.imageAlt || activity.title || "Selected place").slice(0, 240),
+  };
+}
+
+function readActivityChoices() {
+  try {
+    const value = JSON.parse(sessionStorage.getItem(activityChoiceStorageKey) || "{}");
+    return value && typeof value === "object" ? value : {};
+  } catch {
+    return {};
+  }
+}
+
+function persistActivityChoices() {
+  if (!activeActivityContextKey) return;
+  const choices = readActivityChoices();
+  choices[activeActivityContextKey] = {
+    selected: [...selectedActivityDetails.values()].map(storedActivityChoice),
+    dismissed: [...dismissedActivityPlaceIds].slice(0, 100),
+  };
+  sessionStorage.setItem(activityChoiceStorageKey, JSON.stringify(choices));
+}
+
+function activateActivityContext(input) {
+  const nextContextKey = activityContextKey(input);
+  if (!nextContextKey || nextContextKey === activeActivityContextKey) return;
+  activeActivityContextKey = nextContextKey;
+  selectedActivityPlaceIds.clear();
+  selectedActivityDetails.clear();
+  dismissedActivityPlaceIds.clear();
+  const saved = readActivityChoices()[nextContextKey];
+  for (const activity of Array.isArray(saved?.selected) ? saved.selected : []) {
+    const { placeId } = activityPlaceIdentity(activity);
+    if (!placeId) continue;
+    selectedActivityPlaceIds.add(placeId);
+    selectedActivityDetails.set(placeId, activity);
+  }
+  for (const placeId of Array.isArray(saved?.dismissed) ? saved.dismissed : []) {
+    if (typeof placeId === "string" && placeId.length >= 3) {
+      dismissedActivityPlaceIds.add(placeId);
+    }
+  }
+  renderSelectedPlaces();
+}
+
+function renderSelectedPlaces() {
+  const activities = [...selectedActivityDetails.values()];
+  selectedPlacesSection.hidden = activities.length === 0;
+  selectedPlacesCount.textContent = `${activities.length} ${activities.length === 1 ? "place" : "places"}`;
+  selectedPlacesList.replaceChildren(...activities.map((activity) => {
+    const item = document.createElement("article");
+    item.className = "selected-place-item";
+    const thumbnail = document.createElement("figure");
+    thumbnail.className = "selected-place-thumbnail";
+    const image = document.createElement("img");
+    image.src = activity.imageUrl || fallbackActivityImages[0];
+    image.alt = activity.imageAlt || `${activity.title || "Selected place"} thumbnail`;
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.width = 96;
+    image.height = 72;
+    image.addEventListener("error", () => {
+      if (image.dataset.fallbackApplied === "true") return;
+      image.dataset.fallbackApplied = "true";
+      image.src = fallbackActivityImages[0];
+      image.alt = `${activity.title || "Selected place"} PackSwift placeholder`;
+    });
+    thumbnail.append(image);
+    const copy = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = activity.title || "Selected place";
+    const category = document.createElement("small");
+    category.textContent = `${activity.category || "Place to visit"} · Added ✓`;
+    copy.append(title, category);
+    item.append(thumbnail, copy);
+    return item;
+  }));
+}
+
+function rememberSelectedActivity(activity) {
+  const stored = storedActivityChoice(activity);
+  selectedActivityPlaceIds.add(stored.placeId);
+  selectedActivityDetails.set(stored.placeId, stored);
+  dismissedActivityPlaceIds.delete(stored.placeId);
+  persistActivityChoices();
+  renderSelectedPlaces();
+}
+
 function showActivityPlanToast(message = "Added to your plan! ✓") {
   activityPlanToast.textContent = message;
   activityPlanToast.hidden = false;
@@ -738,38 +850,6 @@ function showActivityPlanToast(message = "Added to your plan! ✓") {
     activityPlanToast.classList.remove("is-visible");
     setTimeout(() => { activityPlanToast.hidden = true; }, 220);
   }, 2200);
-}
-
-function plannerInputSignature(input) {
-  return JSON.stringify({
-    origin: input.origin,
-    destination: input.destination,
-    startDate: input.startDate,
-    endDate: input.endDate,
-    budget: input.budget,
-    currency: input.currency,
-    adults: input.adults,
-    children: input.children,
-    purpose: input.tripPurpose,
-    group: input.travelerDemographic,
-    pace: input.pace,
-  });
-}
-
-async function ensureSuggestionTrip() {
-  const user = await window.PackSwift.authReady;
-  if (!user) {
-    showTripLoginRequired();
-    return null;
-  }
-  const input = collectInput();
-  const validationError = validateInput(input);
-  if (validationError) throw new Error(validationError);
-  if (!activePlan || plannerInputSignature(activePlan.input || {}) !== plannerInputSignature(input)) {
-    activePlan = await requestPlan(input);
-  }
-  activePlan = await ensureAuthenticatedPlan(activePlan);
-  return activePlan;
 }
 
 async function refillLiveRecommendationQueue() {
@@ -789,6 +869,7 @@ async function refillLiveRecommendationQueue() {
     liveRecommendationNextPageToken = next.nextPageToken || null;
     const currentIds = new Set([
       ...selectedActivityPlaceIds,
+      ...dismissedActivityPlaceIds,
       ...liveRecommendationBackupQueue.map((activity) => activityPlaceIdentity(activity).placeId),
       ...[...liveActivityGrid.querySelectorAll("[data-place-id]")]
         .map((card) => card.dataset.placeId),
@@ -810,19 +891,33 @@ async function refillLiveRecommendationQueue() {
   }
 }
 
-async function addActivityToPlan(activity, card, button, currency) {
-  if (card.classList.contains("is-leaving")) return;
-  button.disabled = true;
-  button.textContent = "Adding…";
-  try {
-    const plan = await ensureSuggestionTrip();
-    if (!plan) {
-      button.disabled = false;
-      button.innerHTML = '<span aria-hidden="true">+</span> Add to Plan';
-      return;
-    }
+async function replaceLiveActivityCard(card, currency) {
+  let replacement = liveRecommendationBackupQueue.shift();
+  if (!replacement) {
+    await refillLiveRecommendationQueue();
+    replacement = liveRecommendationBackupQueue.shift();
+  }
+  card.classList.add("is-leaving");
+  await new Promise((resolve) => setTimeout(resolve, 220));
+  if (replacement) {
+    const replacementCard = buildLiveActivityCard(replacement, currency);
+    replacementCard.classList.add("is-entering");
+    card.replaceWith(replacementCard);
+    requestAnimationFrame(() => replacementCard.classList.remove("is-entering"));
+  } else {
+    card.remove();
+    liveActivityStatus.textContent = "No more matching places right now";
+  }
+  if (liveRecommendationBackupQueue.length <= 2) {
+    refillLiveRecommendationQueue();
+  }
+}
+
+async function syncSelectedActivitiesToPlan(plan) {
+  if (!plan?.persistence?.tripId || selectedActivityDetails.size === 0) return;
+  for (const activity of selectedActivityDetails.values()) {
     const { placeId, provider } = activityPlaceIdentity(activity);
-    const result = await window.PackSwift.api("/api/trip/plan/add", {
+    await window.PackSwift.api("/api/trip/plan/add", {
       method: "POST",
       body: JSON.stringify({
         trip_id: plan.persistence.tripId,
@@ -830,29 +925,43 @@ async function addActivityToPlan(activity, card, button, currency) {
         provider,
       }),
     });
-    selectedActivityPlaceIds.add(placeId);
-    showActivityPlanToast(result.message === "Already in your plan."
-      ? "Already in your plan ✓"
-      : "Added to your plan! ✓");
-    card.classList.add("is-leaving");
-    await new Promise((resolve) => setTimeout(resolve, 220));
-    const replacement = liveRecommendationBackupQueue.shift();
-    if (replacement) {
-      const replacementCard = buildLiveActivityCard(replacement, currency);
-      replacementCard.classList.add("is-entering");
-      card.replaceWith(replacementCard);
-      requestAnimationFrame(() => replacementCard.classList.remove("is-entering"));
-    } else {
-      card.remove();
+  }
+}
+
+async function addActivityToPlan(activity, card, button, currency) {
+  if (card.classList.contains("is-leaving")) return;
+  button.disabled = true;
+  button.textContent = "Adding…";
+  try {
+    const user = await window.PackSwift.authReady;
+    rememberSelectedActivity(activity);
+    let message = user ? "Added to your trip choices ✓" : "Added to this trip preview ✓";
+    if (user && activePlan?.persistence?.tripId) {
+      try {
+        await syncSelectedActivitiesToPlan(activePlan);
+        message = "Added to your saved trip! ✓";
+      } catch {
+        message = "Added now — it will sync when you save the trip";
+      }
     }
-    if (liveRecommendationBackupQueue.length <= 2) {
-      refillLiveRecommendationQueue();
-    }
+    showActivityPlanToast(message);
+    await replaceLiveActivityCard(card, currency);
   } catch (error) {
     button.disabled = false;
-    button.innerHTML = '<span aria-hidden="true">+</span> Add to Plan';
+    button.innerHTML = '<span aria-hidden="true">+</span> Add to visit';
     showActivityPlanToast(error.message || "Could not add this activity.");
   }
+}
+
+async function dismissActivityRecommendation(activity, card, button, currency) {
+  if (card.classList.contains("is-leaving")) return;
+  button.disabled = true;
+  button.textContent = "Replacing…";
+  const { placeId } = activityPlaceIdentity(activity);
+  dismissedActivityPlaceIds.add(placeId);
+  persistActivityChoices();
+  showActivityPlanToast("Noted — showing another place");
+  await replaceLiveActivityCard(card, currency);
 }
 
 function buildLiveActivityCard(activity, currency) {
@@ -900,14 +1009,28 @@ function buildLiveActivityCard(activity, currency) {
   const addButton = document.createElement("button");
   addButton.type = "button";
   addButton.className = "live-activity-add";
-  addButton.innerHTML = '<span aria-hidden="true">+</span> Add to Plan';
+  addButton.innerHTML = '<span aria-hidden="true">+</span> Add to visit';
   addButton.addEventListener("click", () => addActivityToPlan(
     activity,
     card,
     addButton,
     currency,
   ));
-  body.append(category, title, description, cost, addButton);
+  const dismissButton = document.createElement("button");
+  dismissButton.type = "button";
+  dismissButton.className = "live-activity-skip";
+  dismissButton.textContent = "Not interested";
+  dismissButton.setAttribute("aria-label", `Not interested in ${activity.title}. Show another place.`);
+  dismissButton.addEventListener("click", () => dismissActivityRecommendation(
+    activity,
+    card,
+    dismissButton,
+    currency,
+  ));
+  const actions = document.createElement("div");
+  actions.className = "live-activity-actions";
+  actions.append(addButton, dismissButton);
+  body.append(category, title, description, cost, actions);
   card.append(figure, body);
   return card;
 }
@@ -924,6 +1047,13 @@ function renderLiveRecommendation(recommendation, input) {
   for (const placeId of recommendation.savedPlaceIds || []) {
     selectedActivityPlaceIds.add(placeId);
   }
+  for (const activity of recommendation.selectedPlaces || []) {
+    const stored = storedActivityChoice(activity);
+    selectedActivityPlaceIds.add(stored.placeId);
+    selectedActivityDetails.set(stored.placeId, stored);
+  }
+  persistActivityChoices();
+  renderSelectedPlaces();
   liveActivityGrid.replaceChildren();
   for (const activity of recommendation.primary || recommendation.activities || []) {
     appendLiveActivityCard(activity, input.currency);
@@ -957,6 +1087,7 @@ function renderLiveRecommendation(recommendation, input) {
 }
 
 function scheduleLiveRecommendation(input) {
+  activateActivityContext(input);
   clearTimeout(liveRecommendationTimer);
   liveActivityStatus.textContent = "Updating…";
   const sequence = ++liveRecommendationSequence;
@@ -1247,14 +1378,13 @@ function validateInput(input) {
   if (input.tripScope === "domestic" && origin.country !== destination.country) {
     return "Nationwide trips require the origin and destination to be in the same country.";
   }
-  const budgetRule = updateBudgetMinimum();
+  updateBudgetMinimum();
   if (
     !Number.isFinite(input.budget) ||
     input.budget <= 0 ||
-    input.budgetUsd < budgetRule.minimumUsd ||
     input.budgetUsd > 250000
   ) {
-    return `Enter at least ${formatMoney(budgetRule.minimumAmount, input.currency)} for this ${input.tripScope === "domestic" ? "domestic" : "international"} route.`;
+    return "Enter a trip budget greater than zero and within the supported planning range.";
   }
   if (!input.startDate || !input.endDate || dateValue(input.endDate) < dateValue(input.startDate)) {
     return "Choose an end date that is on or after your start date.";
@@ -1272,8 +1402,7 @@ function plannerValidationControl(input) {
   if (input.tripScope === "domestic" && origin.country !== destination.country) {
     return document.querySelector("#destination-search");
   }
-  const budgetRule = minimumBudgetForCurrentRoute();
-  if (!Number.isFinite(input.budget) || input.budget <= 0 || input.budgetUsd < budgetRule.minimumUsd || input.budgetUsd > 250000) {
+  if (!Number.isFinite(input.budget) || input.budget <= 0 || input.budgetUsd > 250000) {
     return document.querySelector("#budget");
   }
   if (!input.startDate) return document.querySelector("#start-date-display");
@@ -1905,6 +2034,7 @@ function storedTripPlannerPlan(trip) {
 function pendingRecommendationInput(recommendation) {
   const purposeMap = {
     "Adventure & Outdoor": "adventure",
+    "Adventure & Leisure": "adventure",
     "Leisure & Relaxation": "leisure",
     "Culture & Heritage": "cultural",
     "Food & Nightlife": "food",
@@ -2032,6 +2162,7 @@ async function hydratePendingAiTrip() {
       activePlan = await requestPlan(input);
       if (!activePlan.persistence?.saved) activePlan = await ensureAuthenticatedPlan(activePlan);
     }
+    await syncSelectedActivitiesToPlan(activePlan);
     sessionStorage.removeItem(pendingPackswiftTripKey);
     sessionStorage.removeItem(legacyPendingAiTripKey);
     sessionStorage.removeItem(pendingAiTripModeKey);
@@ -2152,6 +2283,7 @@ async function saveActiveTripToAccount() {
 
   try {
     activePlan = await ensureAuthenticatedPlan(activePlan);
+    await syncSelectedActivitiesToPlan(activePlan);
     rememberPackingHandoff(activePlan);
     restorePlannerFormFromPlan(activePlan);
     renderPlan(activePlan);
@@ -2201,6 +2333,7 @@ plannerForm.addEventListener("submit", async (event) => {
   button.textContent = "Shaping your plan…";
   try {
     activePlan = await requestPlan(input);
+    await syncSelectedActivitiesToPlan(activePlan);
     rememberPackingHandoff(activePlan);
     renderPlan(activePlan);
     saveTripButton.textContent = "Save to My Trips";

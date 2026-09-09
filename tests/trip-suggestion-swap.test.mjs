@@ -30,24 +30,39 @@ test("selected place IDs persist against an owned trip without copied Google con
 
 test("recommendations expose a six-card primary set and a replacement queue", () => {
   assert.match(routes, /saved_place_ids/);
-  assert.match(routes, /filter\(\(activity\) => !savedPlaceIds\.has\(activity\.placeId\)\)/);
+  assert.match(routes, /excluded_place_ids/);
+  assert.match(routes, /!savedPlaceIds\.has\(activity\.placeId\) && !excludedPlaceIds\.has\(activity\.placeId\)/);
   assert.match(routes, /const primary = candidates\.slice\(0, 6\)/);
   assert.match(routes, /const backupQueue = candidates\.slice\(6, 20\)/);
+  assert.match(routes, /supplementalActivities/);
   assert.match(routes, /nextPageToken/);
   assert.match(worker, /hosted_trip_itinerary_items/);
+  assert.match(worker, /excluded_place_ids/);
+  assert.match(worker, /supplementalActivities/);
   assert.match(worker, /const backupQueue = candidates\.slice\(6, 20\)/);
 });
 
-test("activity cards add, fade, replace, refill, and announce success without reload", () => {
-  assert.match(client, /Add to Plan/);
+test("activity cards add visibly, reject suggestions, replace, and refill without reload", () => {
+  assert.match(client, /Add to visit/);
+  assert.match(client, /Not interested/);
   assert.match(client, /fetch\("\/api\/activities\/recommend"/);
   assert.match(client, /"\/api\/trip\/plan\/add"/);
+  assert.match(client, /rememberSelectedActivity\(activity\)/);
+  assert.doesNotMatch(client, /function ensureSuggestionTrip/);
+  assert.match(client, /dismissedActivityPlaceIds\.add\(placeId\)/);
+  assert.match(client, /Added to this trip preview ✓/);
   assert.match(client, /card\.classList\.add\("is-leaving"\)/);
   assert.match(client, /card\.replaceWith\(replacementCard\)/);
   assert.match(client, /refillLiveRecommendationQueue/);
-  assert.match(client, /Added to your plan! ✓/);
   assert.match(styles, /\.live-activity-card\.is-leaving/);
   assert.match(styles, /\.live-activity-card\.is-entering/);
+  assert.match(styles, /\.live-activity-skip/);
+  assert.match(styles, /\.selected-place-item/);
+  assert.match(styles, /\.selected-place-thumbnail/);
+  assert.match(styles, /aspect-ratio: 4 \/ 3/);
+  assert.match(client, /image\.addEventListener\("error"/);
+  assert.match(client, /fallbackApplied/);
   assert.match(html, /id="activity-plan-toast"/);
+  assert.match(html, /id="selected-places-list"/);
   assert.doesNotMatch(client, /location\.reload\(\)/);
 });

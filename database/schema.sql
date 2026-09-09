@@ -4,6 +4,14 @@ CREATE DATABASE IF NOT EXISTS packswift
 
 USE packswift;
 
+-- PackSwift is a planning assistant. Remove tables from retired commerce flows.
+DROP TABLE IF EXISTS gear_purchases;
+DROP TABLE IF EXISTS hotel_bookings;
+DROP TABLE IF EXISTS flight_bookings;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS expense_splits;
+DROP TABLE IF EXISTS trip_expenses;
+
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   full_name VARCHAR(100) NOT NULL,
@@ -493,7 +501,7 @@ CREATE TABLE IF NOT EXISTS trip_readiness_items (
   item_name VARCHAR(180) NOT NULL,
   description VARCHAR(500) NOT NULL,
   smart_tag VARCHAR(160) NULL,
-  assistant_type ENUM('manual', 'flight', 'accommodation', 'shopping') NOT NULL DEFAULT 'manual',
+  assistant_type ENUM('manual', 'concierge') NOT NULL DEFAULT 'concierge',
   is_required BOOLEAN NOT NULL DEFAULT TRUE,
   is_completed BOOLEAN NOT NULL DEFAULT FALSE,
   completion_source ENUM('manual', 'assistant') NULL,
@@ -507,37 +515,18 @@ CREATE TABLE IF NOT EXISTS trip_readiness_items (
   INDEX idx_trip_readiness_progress (trip_session_id, is_required, is_completed)
 );
 
-CREATE TABLE IF NOT EXISTS orders (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_number VARCHAR(40) NOT NULL UNIQUE,
-  user_id INT NOT NULL,
-  trip_session_id BIGINT UNSIGNED NOT NULL,
-  category ENUM('flight', 'accommodation', 'travel_gear', 'insurance') NOT NULL,
-  order_type ENUM('FLIGHT', 'HOTEL', 'GEAR', 'INSURANCE') NOT NULL,
-  status ENUM('confirmed', 'in_transit', 'completed', 'cancelled') NOT NULL DEFAULT 'confirmed',
-  payment_method ENUM('VISA', 'MASTERCARD', 'CREDIT_CARD') NOT NULL,
-  payment_status ENUM('PAID', 'FAILED') NOT NULL DEFAULT 'PAID',
-  card_brand ENUM('VISA', 'MASTERCARD') NULL,
-  card_last4 CHAR(4) NULL,
-  payment_reference VARCHAR(60) NOT NULL UNIQUE,
-  title VARCHAR(255) NOT NULL,
-  quantity SMALLINT UNSIGNED NOT NULL DEFAULT 1,
-  total_amount DECIMAL(12, 2) NOT NULL,
-  currency CHAR(3) NOT NULL,
-  details_json JSON NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_orders_user
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  CONSTRAINT fk_orders_trip
-    FOREIGN KEY (trip_session_id) REFERENCES trip_sessions(id) ON DELETE CASCADE,
-  CONSTRAINT chk_orders_quantity CHECK (quantity >= 1),
-  CONSTRAINT chk_orders_total CHECK (total_amount >= 0),
-  CONSTRAINT chk_orders_card_last4 CHECK (card_last4 IS NULL OR card_last4 REGEXP '^[0-9]{4}$'),
-  INDEX idx_orders_user_created (user_id, created_at),
-  INDEX idx_orders_user_category (user_id, category, created_at),
-  INDEX idx_orders_trip (trip_session_id)
-);
+ALTER TABLE trip_readiness_items
+  MODIFY assistant_type ENUM('manual', 'flight', 'accommodation', 'shopping', 'concierge')
+  NOT NULL DEFAULT 'concierge';
+
+UPDATE trip_readiness_items
+SET assistant_type = 'concierge'
+WHERE assistant_type IN ('flight', 'accommodation', 'shopping');
+
+DELETE FROM trip_readiness_items WHERE item_key = 'travel-insurance';
+
+ALTER TABLE trip_readiness_items
+  MODIFY assistant_type ENUM('manual', 'concierge') NOT NULL DEFAULT 'concierge';
 
 CREATE TABLE IF NOT EXISTS visa_rules (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -551,39 +540,6 @@ CREATE TABLE IF NOT EXISTS visa_rules (
   checked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uq_visa_rule_route (origin_country_code, destination_country_code),
   INDEX idx_visa_rule_destination (destination_country_code, status)
-);
-
-CREATE TABLE IF NOT EXISTS trip_expenses (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  trip_session_id BIGINT UNSIGNED NOT NULL,
-  paid_by VARCHAR(100) NOT NULL,
-  title VARCHAR(180) NOT NULL,
-  category ENUM('food', 'transport', 'shopping', 'activities', 'accommodation', 'other') NOT NULL,
-  amount DECIMAL(12, 2) NOT NULL,
-  currency CHAR(3) NOT NULL,
-  expense_date DATE NOT NULL,
-  notes VARCHAR(500) NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_trip_expenses_trip
-    FOREIGN KEY (trip_session_id) REFERENCES trip_sessions(id) ON DELETE CASCADE,
-  CONSTRAINT chk_trip_expense_amount CHECK (amount > 0),
-  INDEX idx_trip_expenses_trip_date (trip_session_id, expense_date, created_at)
-);
-
-CREATE TABLE IF NOT EXISTS expense_splits (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  expense_id BIGINT UNSIGNED NOT NULL,
-  participant_name VARCHAR(100) NOT NULL,
-  share_amount DECIMAL(12, 2) NOT NULL,
-  is_settled BOOLEAN NOT NULL DEFAULT FALSE,
-  settled_at TIMESTAMP NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_expense_splits_expense
-    FOREIGN KEY (expense_id) REFERENCES trip_expenses(id) ON DELETE CASCADE,
-  CONSTRAINT chk_expense_split_share CHECK (share_amount >= 0),
-  UNIQUE KEY uq_expense_split_participant (expense_id, participant_name),
-  INDEX idx_expense_splits_settlement (participant_name, is_settled)
 );
 
 INSERT INTO visa_rules
@@ -608,53 +564,6 @@ ON DUPLICATE KEY UPDATE
   summary = VALUES(summary),
   official_portal_url = VALUES(official_portal_url),
   source_note = VALUES(source_note);
-
-CREATE TABLE IF NOT EXISTS flight_bookings (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_id VARCHAR(40) NOT NULL,
-  pnr_code VARCHAR(20) NOT NULL UNIQUE,
-  route VARCHAR(180) NOT NULL,
-  departure_date DATE NULL,
-  return_date DATE NULL,
-  class_type VARCHAR(50) NOT NULL,
-  passenger_details JSON NOT NULL,
-  itinerary_details JSON NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_flight_bookings_order
-    FOREIGN KEY (order_id) REFERENCES orders(order_number) ON DELETE CASCADE,
-  UNIQUE KEY uq_flight_booking_order (order_id),
-  INDEX idx_flight_bookings_route (route)
-);
-
-CREATE TABLE IF NOT EXISTS hotel_bookings (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_id VARCHAR(40) NOT NULL,
-  hotel_name VARCHAR(255) NOT NULL,
-  room_type VARCHAR(100) NOT NULL,
-  check_in DATE NOT NULL,
-  check_out DATE NOT NULL,
-  guest_details JSON NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_hotel_bookings_order
-    FOREIGN KEY (order_id) REFERENCES orders(order_number) ON DELETE CASCADE,
-  CONSTRAINT chk_hotel_booking_dates CHECK (check_out > check_in),
-  UNIQUE KEY uq_hotel_booking_order (order_id),
-  INDEX idx_hotel_bookings_dates (check_in, check_out)
-);
-
-CREATE TABLE IF NOT EXISTS gear_purchases (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  order_id VARCHAR(40) NOT NULL,
-  item_name VARCHAR(255) NOT NULL,
-  quantity SMALLINT UNSIGNED NOT NULL DEFAULT 1,
-  item_details JSON NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_gear_purchases_order
-    FOREIGN KEY (order_id) REFERENCES orders(order_number) ON DELETE CASCADE,
-  CONSTRAINT chk_gear_purchase_quantity CHECK (quantity >= 1),
-  UNIQUE KEY uq_gear_purchase_order (order_id),
-  INDEX idx_gear_purchases_item (item_name)
-);
 
 CREATE TABLE IF NOT EXISTS travel_shorts (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

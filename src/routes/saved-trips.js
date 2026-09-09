@@ -38,7 +38,7 @@ const savedTripPlanValidation = [
     .isLength({ min: 3, max: 50 })
     .withMessage("The travel month is invalid."),
   body("plan.input.budgetUsd")
-    .isFloat({ min: 100, max: 250000 })
+    .isFloat({ gt: 0, max: 250000 })
     .withMessage("The normalized trip budget is invalid."),
 ];
 

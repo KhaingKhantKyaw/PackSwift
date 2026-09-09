@@ -7,7 +7,7 @@ const baseReadinessItems = [
     name: "Passport",
     description: "Check passport validity and keep a secure digital copy.",
     smartTag: "Required before departure",
-    assistantType: "manual",
+    assistantType: "concierge",
   },
   {
     key: "visa",
@@ -15,7 +15,7 @@ const baseReadinessItems = [
     name: "Visa and entry permission",
     description: "Confirm entry rules for the selected origin and destination.",
     smartTag: "Country-specific requirement",
-    assistantType: "manual",
+    assistantType: "concierge",
   },
   {
     key: "air-tickets",
@@ -23,7 +23,7 @@ const baseReadinessItems = [
     name: "E-Tickets",
     description: "Choose a suitable route and keep the confirmed itinerary ready.",
     smartTag: "Matched to your route",
-    assistantType: "flight",
+    assistantType: "concierge",
   },
   {
     key: "accommodation",
@@ -31,15 +31,7 @@ const baseReadinessItems = [
     name: "Hotel Vouchers",
     description: "Reserve a stay that fits the trip dates, group, and destination.",
     smartTag: "Matched to your travel dates",
-    assistantType: "accommodation",
-  },
-  {
-    key: "travel-insurance",
-    category: "Documents",
-    name: "Travel insurance",
-    description: "Keep policy details and emergency contact information available.",
-    smartTag: "Recommended protection",
-    assistantType: "manual",
+    assistantType: "concierge",
   },
   {
     key: "personal-prescriptions",
@@ -47,7 +39,7 @@ const baseReadinessItems = [
     name: "Personal Prescriptions",
     description: "Carry enough prescribed medication in labelled packaging.",
     smartTag: "Keep in hand-carry",
-    assistantType: "manual",
+    assistantType: "concierge",
   },
   {
     key: "first-aid-kit",
@@ -55,7 +47,7 @@ const baseReadinessItems = [
     name: "First Aid Kit",
     description: "Prepare compact first-aid supplies for common minor injuries.",
     smartTag: "Health essential",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "motion-sickness",
@@ -63,7 +55,7 @@ const baseReadinessItems = [
     name: "Motion Sickness Pills",
     description: "Consider suitable medication for flights, boats, or long transfers.",
     smartTag: "Useful for transit",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "clothes",
@@ -71,7 +63,7 @@ const baseReadinessItems = [
     name: "Weather-appropriate outfits",
     description: "Prepare comfortable layers that match the expected conditions.",
     smartTag: "Weather-matched",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "footwear",
@@ -79,7 +71,7 @@ const baseReadinessItems = [
     name: "Travel Footwear",
     description: "Pack comfortable shoes suited to the planned activities.",
     smartTag: "Activity-matched",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "swimwear",
@@ -87,7 +79,7 @@ const baseReadinessItems = [
     name: "Swimwear and quick-dry towel",
     description: "Include water-ready essentials when the itinerary includes pools or beaches.",
     smartTag: "Destination activity",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "luggage-30kg",
@@ -95,7 +87,7 @@ const baseReadinessItems = [
     name: "30kg Luggage / Hand-Carry",
     description: "Prepare suitable checked and cabin luggage for the trip duration.",
     smartTag: "Trip-duration matched",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "power-adapter",
@@ -103,7 +95,7 @@ const baseReadinessItems = [
     name: "Universal Power Adapter",
     description: "Check destination plug types before departure.",
     smartTag: "Destination plug check",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "power-bank",
@@ -111,7 +103,7 @@ const baseReadinessItems = [
     name: "Power Bank",
     description: "Carry a compliant portable charger for navigation and communication.",
     smartTag: "Transit essential",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
   {
     key: "charging-cables",
@@ -119,7 +111,7 @@ const baseReadinessItems = [
     name: "Charging Cables",
     description: "Pack labelled cables for every essential device.",
     smartTag: "Device check",
-    assistantType: "shopping",
+    assistantType: "concierge",
   },
 ];
 
@@ -132,7 +124,7 @@ function readinessItemsForTrip(trip) {
       name: "Rain protection",
       description: "Prepare a compact umbrella or lightweight rain shell.",
       smartTag: "Essential for Rainy Season",
-      assistantType: "shopping",
+      assistantType: "concierge",
     });
   }
   if (Number(trip.travelerBreakdown?.children || 0) > 0) {
@@ -142,7 +134,7 @@ function readinessItemsForTrip(trip) {
       name: "Kid Care Essentials",
       description: "Prepare child documents, comfort items, snacks, and age-appropriate care supplies.",
       smartTag: "Required for Kids",
-      assistantType: "shopping",
+      assistantType: "concierge",
     });
   }
   if (trip.preferences?.travelingWithPets === true) {
@@ -152,7 +144,7 @@ function readinessItemsForTrip(trip) {
       name: "Pet Travel Supplies",
       description: "Prepare vaccination records, carrier, food, medication, and identification.",
       smartTag: "Required for Pets",
-      assistantType: "shopping",
+      assistantType: "concierge",
     });
   }
   return items;
@@ -200,16 +192,6 @@ async function updateTripStatus(connection, tripSessionId) {
   const completed = Number(rows[0]?.prepared || 0);
   const remaining = Number(rows[0]?.remaining || 0);
   const ready = total > 0 && completed === total;
-  const [bookingRows] = await connection.execute(
-    `SELECT COUNT(*) AS confirmed_bookings
-     FROM orders
-     WHERE trip_session_id = ?
-       AND category IN ('flight', 'accommodation')
-       AND status IN ('confirmed', 'completed')
-       AND payment_status = 'PAID'`,
-    [tripSessionId],
-  );
-  const confirmedBookings = Number(bookingRows[0]?.confirmed_bookings || 0);
   await connection.execute(
     "UPDATE trip_sessions SET status = ? WHERE id = ?",
     [ready ? "ready" : "planned", tripSessionId],
@@ -221,12 +203,7 @@ async function updateTripStatus(connection, tripSessionId) {
     remaining,
     percentage: total ? Math.round((completed / total) * 100) : 0,
     ready,
-    confirmedBookings,
-    stage: ready
-      ? "ready"
-      : confirmedBookings > 0
-        ? "booked_confirmed"
-        : "planned",
+    stage: ready ? "ready" : "planned",
   };
 }
 
@@ -406,91 +383,6 @@ export async function updateReadinessItem(
     const progress = await updateTripStatus(connection, tripSessionId);
     await connection.commit();
     return progress;
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
-}
-
-export async function confirmReadinessAssistance(
-  userId,
-  publicId,
-  itemKey,
-  assistantType,
-  confirmationReference,
-  order,
-) {
-  const pool = getDatabasePool();
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-    const tripSessionId = await findOwnedTripDatabaseId(
-      connection,
-      userId,
-      publicId,
-    );
-    if (!tripSessionId) {
-      await connection.rollback();
-      return null;
-    }
-    const [result] = await connection.execute(
-      `UPDATE trip_readiness_items
-       SET is_completed = TRUE,
-           completion_source = 'assistant',
-           confirmation_reference = ?,
-           completed_at = CURRENT_TIMESTAMP
-       WHERE trip_session_id = ?
-         AND item_key = ?
-         AND assistant_type = ?`,
-      [confirmationReference, tripSessionId, itemKey, assistantType],
-    );
-    if (!result.affectedRows) {
-      await connection.rollback();
-      return null;
-    }
-    const category = {
-      flight: "flight",
-      accommodation: "accommodation",
-      shopping: "travel_gear",
-    }[assistantType];
-    const status = assistantType === "shopping" ? "in_transit" : "confirmed";
-    const orderType = {
-      flight: "FLIGHT",
-      accommodation: "HOTEL",
-      shopping: "GEAR",
-    }[assistantType];
-    await connection.execute(
-      `INSERT INTO orders
-        (order_number, user_id, trip_session_id, category, order_type, status,
-         payment_method, payment_status, title, quantity, total_amount,
-         currency, details_json)
-       VALUES (?, ?, ?, ?, ?, ?, 'CREDIT_CARD', 'PAID', ?, ?, ?, ?, ?)
-       ON DUPLICATE KEY UPDATE
-         status = VALUES(status),
-         title = VALUES(title),
-         quantity = VALUES(quantity),
-         total_amount = VALUES(total_amount),
-         currency = VALUES(currency),
-         details_json = VALUES(details_json)`,
-      [
-        confirmationReference,
-        userId,
-        tripSessionId,
-        category,
-        orderType,
-        status,
-        order.title,
-        order.quantity,
-        order.totalAmount,
-        order.currency,
-        JSON.stringify(order.details),
-      ],
-    );
-    const progress = await updateTripStatus(connection, tripSessionId);
-    await connection.commit();
-    return { ...progress, orderNumber: confirmationReference };
   } catch (error) {
     await connection.rollback();
     throw error;

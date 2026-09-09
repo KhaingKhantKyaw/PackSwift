@@ -8,8 +8,6 @@ import {
   ensureWeatherReadinessItem,
   getVisaStatus,
   listInteractiveItinerary,
-  listTripExpenses,
-  logTripExpense,
   replaceInteractiveItinerary,
 } from "../repositories/ecosystem-repository.js";
 import { updateReadinessItem } from "../repositories/readiness-repository.js";
@@ -185,52 +183,6 @@ ecosystemRouter.get(
       ]);
       await ensureWeatherReadinessItem(request.auth.userId, request.query.trip, weather.alert);
       response.json({ weather, currency, preferredCurrency: trip.budget.currency });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
-
-ecosystemRouter.get(
-  "/expenses",
-  [tripIdQuery],
-  validateRequest,
-  async (request, response, next) => {
-    try {
-      const result = await listTripExpenses(request.auth.userId, request.query.trip);
-      if (!result) return response.status(404).json({ error: "Trip not found." });
-      response.json(result);
-    } catch (error) {
-      next(error);
-    }
-  },
-);
-
-ecosystemRouter.post(
-  "/expenses/log",
-  [
-    tripIdBody,
-    body("title").trim().isLength({ min: 2, max: 180 }),
-    body("paidBy").trim().isLength({ min: 1, max: 100 }),
-    body("category").isIn(["food", "transport", "shopping", "activities", "accommodation", "other"]),
-    body("amount").isFloat({ min: 0.01, max: 10000000 }),
-    body("currency").matches(/^[A-Z]{3}$/),
-    body("date").isISO8601({ strict: true }),
-    body("notes").optional({ values: "falsy" }).trim().isLength({ max: 500 }),
-    body("participants").isArray({ min: 1, max: 20 }),
-    body("participants.*").trim().isLength({ min: 1, max: 100 }),
-  ],
-  validateRequest,
-  async (request, response, next) => {
-    try {
-      const participants = [...new Set(request.body.participants.map((name) => String(name).trim()))];
-      const result = await logTripExpense(request.auth.userId, request.body.tripId, {
-        ...request.body,
-        amount: Number(request.body.amount),
-        participants,
-      });
-      if (!result) return response.status(404).json({ error: "Trip not found." });
-      response.status(201).json(result);
     } catch (error) {
       next(error);
     }

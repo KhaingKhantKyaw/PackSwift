@@ -43,7 +43,6 @@ function buildList(input) {
   const list = {
     Essentials: [
       "Passport and travel documents",
-      "Travel insurance details",
       "Phone charger and universal adapter",
       "Reusable water bottle",
       "Daily medication",

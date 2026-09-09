@@ -7,7 +7,7 @@ const savedTripForm = document.querySelector("#saved-trip-form");
 const savedTripFeedback = document.querySelector("#saved-trip-form-feedback");
 const saveSavedTripButton = document.querySelector("#save-saved-trip");
 
-let currentUser = null;
+let activeAccountUser = null;
 let editingTrip = null;
 let activeLoadController = null;
 let loadSequence = 0;
@@ -95,7 +95,7 @@ function setStatus(message, type = "default") {
 }
 
 function openSavedTripEditor(trip = null) {
-  if (!currentUser) {
+  if (!activeAccountUser) {
     window.location.assign(`/login?return=${encodeURIComponent("/my-trips")}`);
     return;
   }
@@ -329,10 +329,10 @@ async function loadTrips({ successMessage = "" } = {}) {
   const sequence = ++loadSequence;
   activeLoadController?.abort();
   activeLoadController = new AbortController();
-  setStatus(currentUser ? "Refreshing trips from MySQL…" : "Loading device plans…");
+  setStatus(activeAccountUser ? "Refreshing trips from MySQL…" : "Loading device plans…");
   try {
     let trips;
-    if (currentUser) {
+    if (activeAccountUser) {
       const result = await window.PackSwift.api(`/api/saved-trips?fresh=${Date.now()}`, {
         cache: "no-store",
         signal: activeLoadController.signal,
@@ -344,7 +344,7 @@ async function loadTrips({ successMessage = "" } = {}) {
     if (sequence !== loadSequence) return;
     renderTrips(trips);
     setStatus(
-      successMessage || (currentUser ? "" : "Login to store new plans in your PackSwift account."),
+      successMessage || (activeAccountUser ? "" : "Login to store new plans in your PackSwift account."),
       successMessage ? "success" : "default",
     );
   } catch (error) {
@@ -434,7 +434,7 @@ savedTripForm.elements.startDate.addEventListener("change", () => savedTripForm.
 savedTripForm.elements.endDate.addEventListener("change", () => savedTripForm.elements.endDate.setCustomValidity(""));
 
 window.PackSwift.authReady.then((user) => {
-  currentUser = user;
+  activeAccountUser = user;
   loadTrips();
 });
 window.lucide?.createIcons();

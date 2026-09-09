@@ -16,7 +16,6 @@ import {
 } from "../repositories/trip-repository.js";
 import {
   cancelReadyTrip,
-  confirmReadinessAssistance,
   ensureReadinessItems,
   listReadinessItems,
   markTripReady,
@@ -161,7 +160,14 @@ tripsRouter.post(
           usd: details.minimumBudgetUsd,
         },
         ...(Number.isFinite(submitted)
-          ? { submitted_budget: { amount: submitted, currency: request.body.currency, is_valid: submitted >= minimumAmount } }
+          ? {
+              submitted_budget: {
+                amount: submitted,
+                currency: request.body.currency,
+                is_valid: submitted > 0,
+                meets_recommended_budget: submitted >= minimumAmount,
+              },
+            }
           : {}),
       });
     } catch (error) {
@@ -174,6 +180,7 @@ tripsRouter.use(requireAuth, requireDatabase);
 
 const recommendationPurposeMap = Object.freeze({
   "Adventure & Outdoor": "adventure",
+  "Adventure & Leisure": "adventure",
   "Leisure & Relaxation": "leisure",
   "Culture & Heritage": "cultural",
   "Food & Nightlife": "food",
@@ -254,7 +261,7 @@ function genericRecommendationPlan(recommendation) {
     },
     itinerary,
     packingList: {
-      Essentials: ["Passport and travel documents", "Travel insurance details", "Phone charger and universal adapter"],
+      Essentials: ["Passport and travel documents", "Entry requirement notes", "Phone charger and universal adapter"],
       Clothing: ["Comfortable walking shoes", "Weather-appropriate outfits", "Sleepwear"],
       Comfort: ["Small day bag", "Basic first-aid items"],
       ...(recommendation.pet_included
@@ -635,69 +642,6 @@ tripsRouter.patch(
       response.json({
         itemId: Number(request.params.itemId),
         completed: request.body.completed,
-        progress,
-      });
-    } catch (error) {
-      next(error);
-    }
-  },
-);
-
-tripsRouter.post(
-  "/:tripId/readiness/:itemKey/confirm-assistance",
-  [
-    validateTripId(),
-    param("itemKey")
-      .matches(/^[a-z0-9-]{2,60}$/)
-      .withMessage("Choose a valid readiness item."),
-    body("assistantType")
-      .isIn(["flight", "accommodation", "shopping"])
-      .withMessage("Choose a supported assistant."),
-    body("confirmationReference")
-      .isString()
-      .trim()
-      .isLength({ min: 4, max: 120 })
-      .withMessage("A confirmation reference is required."),
-    body("order").isObject().withMessage("Order details are required."),
-    body("order.title")
-      .isString()
-      .trim()
-      .isLength({ min: 2, max: 255 })
-      .withMessage("An order title is required."),
-    body("order.quantity")
-      .isInt({ min: 1, max: 99 })
-      .withMessage("Choose a valid order quantity."),
-    body("order.totalAmount")
-      .isFloat({ min: 0, max: 10000000 })
-      .withMessage("Choose a valid order total."),
-    body("order.currency")
-      .matches(/^[A-Z]{3}$/)
-      .withMessage("Choose a valid order currency."),
-    body("order.details").isObject().withMessage("Order summary details are required."),
-  ],
-  validateRequest,
-  async (request, response, next) => {
-    try {
-      if (JSON.stringify(request.body.order.details).length > 12000) {
-        response.status(413).json({ error: "Order details are too large." });
-        return;
-      }
-      const progress = await confirmReadinessAssistance(
-        request.auth.userId,
-        request.params.tripId,
-        request.params.itemKey,
-        request.body.assistantType,
-        request.body.confirmationReference,
-        request.body.order,
-      );
-      if (!progress) {
-        response.status(404).json({ error: "Assistant item not found." });
-        return;
-      }
-      response.json({
-        itemKey: request.params.itemKey,
-        completed: true,
-        orderNumber: progress.orderNumber,
         progress,
       });
     } catch (error) {

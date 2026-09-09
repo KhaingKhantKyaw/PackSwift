@@ -36,7 +36,7 @@ test("adds rain preparation when conditions require it", () => {
 test("rejects unsafe planning input ranges", () => {
   assert.throws(
     () => createTravelPlan({ budget: 0, travelers: 1 }),
-    /Budget must be between/,
+    /Budget must be greater than zero/,
   );
 });
 
@@ -159,15 +159,23 @@ test("build output contains all requested application pages", async () => {
 
   for (const page of [
     "assist-trip.html",
-    "assist-flight.html",
-    "assist-stay.html",
-    "assist-shop.html",
-    "assist-store.html",
+    "assist-visa.html",
+    "trip-itinerary.html",
   ]) {
     const html = await readFile(
       new URL(`../dist/client/${page}`, import.meta.url),
       "utf8",
     );
     assert.match(html, /PackSwift/);
+  }
+
+  for (const retiredPage of [
+    "assist-flight.html",
+    "assist-stay.html",
+    "assist-shop.html",
+    "assist-store.html",
+    "trip-expenses.html",
+  ]) {
+    await assert.rejects(readFile(new URL(`../dist/client/${retiredPage}`, import.meta.url), "utf8"));
   }
 });

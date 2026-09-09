@@ -52,7 +52,6 @@ const monthNames = [
 const basePackingItems = {
   Essentials: [
     "Passport and travel documents",
-    "Travel insurance details",
     "Phone charger and universal adapter",
     "Reusable water bottle",
     "Daily medication",
@@ -263,9 +262,9 @@ function parseInput(input = {}) {
   const minimumBudgetUsd = explicitRoute
     ? budgetDetails.minimumBudgetUsd
     : 100;
-  if (!Number.isFinite(budget) || budget <= 0 || budgetUsd < minimumBudgetUsd || budgetUsd > 250000) {
+  if (!Number.isFinite(budget) || budget <= 0 || budgetUsd > 250000) {
     throw new RangeError(
-      `Budget must be between the equivalent of USD ${minimumBudgetUsd} and USD 250,000 for this route.`,
+      "Budget must be greater than zero and no more than the equivalent of USD 250,000.",
     );
   }
 

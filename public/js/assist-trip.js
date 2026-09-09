@@ -18,7 +18,7 @@ const categoryIcons = {
   "Electronics & Tech": "zap",
 };
 
-const assistForItLabel = "Assist For It";
+const assistForItLabel = "Ask Concierge";
 
 function checklistReturnPath() {
   return `${window.location.pathname}${window.location.search}`;
@@ -52,35 +52,12 @@ function updateProgress() {
   document.body.classList.toggle("trip-is-ready", !readyBanner.hidden);
 }
 
-function assistantDestination(item) {
-  const routes = {
-    flight: "/assist-flight",
-    accommodation: "/assist-stay",
-    shopping: "/assist-store",
-  };
-  const route = routes[item.assistantType];
-  const visaKeys = new Set(["passport", "visa", "travel-insurance"]);
-  const resolvedRoute = visaKeys.has(item.key) ? "/assist-visa" : route;
-  if (!resolvedRoute) return null;
-  const url = new URL(resolvedRoute, window.location.origin);
-  url.searchParams.set("trip", tripId);
-  url.searchParams.set("item", item.key);
-  url.searchParams.set("return", `/assist-trip?trip=${tripId}`);
-  if (item.assistantType === "shopping") url.searchParams.set("category", item.key);
-  return `${url.pathname}${url.search}`;
-}
-
 function manualTips(item) {
   const tipsByKey = {
     passport: [
       "Check that the passport remains valid for the destination's required period.",
       "Confirm visa and entry requirements using an official government source.",
       "Keep a secure digital copy separate from the original.",
-    ],
-    "travel-insurance": [
-      "Confirm medical, cancellation, and baggage coverage.",
-      "Save the policy number and emergency assistance telephone number.",
-      "Share a copy with a trusted emergency contact.",
     ],
     medication: [
       "Pack enough prescribed medication for the full trip plus a small buffer.",
@@ -181,12 +158,12 @@ function createReadyItem(item) {
     : `<i data-lucide="sparkles"></i><span>${assistForItLabel}</span>`;
   assist.disabled = item.completed;
   assist.addEventListener("click", () => {
-    const destination = assistantDestination(item);
-    if (destination) {
-      window.location.assign(destination);
-      return;
-    }
-    openManualAssistant(item);
+    document.dispatchEvent(new CustomEvent("packswift:concierge:ask", {
+      detail: {
+        message: `Help me prepare ${item.name} for my active trip. Give me a concise checklist based on my destination, dates, weather, and travel group.`,
+        fallback: () => openManualAssistant(item),
+      },
+    }));
   });
 
   article.append(checkLabel, copy, assist);
@@ -259,10 +236,10 @@ async function initializeReadiness() {
     );
     document.querySelector("#ready-summary").textContent =
       `Prepare the essentials for ${trip.destination.displayName || trip.destination.name}. ` +
-      "Check items yourself or let PackSwift guide you through a demo assistant.";
+      "Check items yourself or ask PackSwift Concierge for destination-aware guidance.";
     document.querySelector("#ready-itinerary-link").href = `/trip-itinerary?trip=${encodeURIComponent(tripId)}`;
     document.querySelector("#ready-visa-link").href = `/assist-visa?trip=${encodeURIComponent(tripId)}`;
-    document.querySelector("#ready-expenses-link").href = `/trip-expenses?trip=${encodeURIComponent(tripId)}`;
+    document.querySelector("#ready-packing-link").href = `/packing-list?trip=${encodeURIComponent(tripId)}`;
     readyStatus.hidden = true;
     renderItems();
     const completedKey = new URLSearchParams(window.location.search).get("completed");

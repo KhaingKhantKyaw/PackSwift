@@ -11,14 +11,13 @@ import {
   routeDistanceKm,
 } from "../src/services/travel-planner.js";
 
-const [plannerHtml, plannerClient, flightHtml, flightClient, schema, repository] =
+const [plannerHtml, plannerClient, schema, repository, pages] =
   await Promise.all([
     readFile(new URL("../public/trip-planner.html", import.meta.url), "utf8"),
     readFile(new URL("../public/js/trip-planner.js", import.meta.url), "utf8"),
-    readFile(new URL("../public/assist-flight.html", import.meta.url), "utf8"),
-    readFile(new URL("../public/js/flight-assistant.js", import.meta.url), "utf8"),
     readFile(new URL("../database/schema.sql", import.meta.url), "utf8"),
     readFile(new URL("../src/repositories/trip-repository.js", import.meta.url), "utf8"),
+    readFile(new URL("../src/routes/pages.js", import.meta.url), "utf8"),
   ]);
 
 test("Trip Planner provides exact route, scope, five currencies, and passenger counters", () => {
@@ -68,7 +67,7 @@ test("minimum budget uses distance, transit per person, trip days, and party siz
   ]) {
     assert.ok(Math.abs(convertCurrency(380, "USD", currency) - expected) < 0.001);
   }
-  assert.throws(() => createTravelPlan({
+  const tightBudgetPlan = createTravelPlan({
     tripScope: "international",
     origin: "Yangon",
     destination: "Tokyo",
@@ -78,7 +77,10 @@ test("minimum budget uses distance, transit per person, trip days, and party siz
     currency: "USD",
     startDate: "2027-01-10",
     endDate: "2027-01-16",
-  }), /USD 2355/);
+  });
+  assert.equal(tightBudgetPlan.input.budget, 2354);
+  assert.equal(tightBudgetPlan.input.route.minimumBudgetUsd, 2355);
+  assert.equal(tightBudgetPlan.budgetFit.withinBudget, false);
   const plan = createTravelPlan({
     tripScope: "international",
     origin: "Yangon",
@@ -116,16 +118,13 @@ test("minimum budget uses distance, transit per person, trip days, and party siz
   assert.equal(regionalPlan.input.budget, 10000);
 });
 
-test("saved trips and Flight Assistant preserve the exact planner handoff", () => {
+test("saved trips preserve the exact route and retired booking URLs redirect", () => {
   for (const field of [
     "trip_scope", "origin_name", "origin_country", "origin_airport_code",
     "adult_count", "child_count",
   ]) assert.match(schema, new RegExp(field));
   assert.match(repository, /travelerBreakdown/);
   assert.match(repository, /route:/);
-  assert.match(flightHtml, /name="flightType" value="round-trip" checked/);
-  assert.match(flightHtml, /name="flightType" value="one-way"/);
-  assert.match(flightClient, /trip\.route\?\.origin/);
-  assert.match(flightClient, /passengerBreakdown/);
-  assert.match(flightClient, /const itemKey = params\.get\("item"\) \|\| "air-tickets"/);
+  assert.match(pages, /"\/assist-flight"/);
+  assert.match(pages, /response\.redirect\(302, "\/trip-planner"\)/);
 });

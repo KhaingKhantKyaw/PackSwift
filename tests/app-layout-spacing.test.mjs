@@ -8,7 +8,7 @@ test("interior pages share the compact PackSwift top rhythm", () => {
   assert.match(styles, /body:not\(\[data-page="home"\]\) \.page-shell \{\s*padding-top: 24px/);
   assert.match(styles, /\.page-heading \{\s*padding: 0 0 24px;\s*gap: 18px/);
   assert.match(styles, /\.about-hero \{\s*padding-top: 0;\s*padding-bottom: 36px/);
-  assert.match(styles, /\.ready-shell,\s*\.assistant-shell,\s*\.flight-shell \{\s*padding-top: 24px/);
+  assert.match(styles, /\.ready-shell,\s*\.assistant-shell \{\s*padding-top: 24px/);
 });
 
 test("interior pages use tighter mobile spacing", () => {

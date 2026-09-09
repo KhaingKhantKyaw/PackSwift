@@ -18,14 +18,16 @@ const pages = new Map([
   ["/signup", "signup.html"],
   ["/profile", "profile.html"],
   ["/assist-trip", "assist-trip.html"],
-  ["/assist-flight", "assist-flight.html"],
-  ["/assist-stay", "assist-stay.html"],
-  ["/assist-store", "assist-store.html"],
-  ["/assist-shop", "assist-store.html"],
   ["/trip-itinerary", "trip-itinerary.html"],
   ["/assist-visa", "assist-visa.html"],
-  ["/trip-expenses", "trip-expenses.html"],
 ]);
+
+pageRouter.get(
+  ["/assist-flight", "/assist-stay", "/assist-store", "/assist-shop", "/trip-expenses"],
+  (request, response) => {
+    response.redirect(302, "/trip-planner");
+  },
+);
 
 pageRouter.get(["/community", "/community-feed"], (request, response) => {
   response.redirect(302, "/travel-guide");

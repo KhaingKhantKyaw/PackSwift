@@ -25,7 +25,6 @@ profileRouter.get("/", requireAuth, requireDatabase, async (request, response, n
         savedTrips: profile.savedTrips,
         inProgressTrips: profile.inProgressTrips,
         readyTrips: profile.readyTrips,
-        orders: profile.orders,
       },
     });
   } catch (error) {

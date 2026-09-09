@@ -131,6 +131,24 @@ test("natural-language planning creates a complete Yangon to Bangkok trip card",
   assert.equal(routeFirst.trip_card.destination, "Bangkok, Thailand");
 });
 
+test("built-in planning preserves BKK over beach preference words", async () => {
+  const result = await createConciergeResponse({
+    message: "make plan for four nights in bkk from ygn. 2 adults 2 kids. adventure and beaches. no budget set",
+    chatHistory: [],
+    tripContext: null,
+  }, { apiKey: "" });
+
+  assert.equal(result.trip_card.origin, "Yangon");
+  assert.equal(result.trip_card.destination, "Bangkok, Thailand");
+  assert.equal(result.trip_card.duration_nights, 4);
+  assert.equal(result.trip_card.adults_count, 2);
+  assert.equal(result.trip_card.children_count, 2);
+  assert.equal(result.trip_card.trip_type, "Family");
+  assert.equal(result.trip_card.travel_group, "Family");
+  assert.equal(result.trip_card.travel_purpose, "Adventure & Leisure");
+  assert.match(JSON.stringify(result.trip_card.day_by_day_highlights), /Koh Larn|Pattaya/);
+});
+
 test("built-in consultation asks first, then produces a trip card without an API key", async () => {
   const question = await createConciergeResponse({
     message: "I am not sure where to travel", chatHistory: [], tripContext: null,
@@ -190,7 +208,7 @@ test("Concierge trip action preserves the plan and offers login or account creat
   assert.match(client, /Save Your Trip &amp; Unlock 1-Click Planning/);
   assert.match(client, /Instant auto-generated packing lists/);
   assert.match(client, /Offline trip access &amp; PDF exports/);
-  assert.match(client, /Smart group expense splitting/);
+  assert.match(client, /Destination-aware visa and cultural guidance/);
   assert.match(client, /await window\.PackSwift\.authReady/);
   assert.match(client, /sessionStorage\.setItem\(pendingPackswiftTripKey/);
   assert.match(client, /sessionStorage\.setItem\(authRedirectTargetKey, "\/trip-planner"\)/);
@@ -245,6 +263,8 @@ test("one-click Concierge plans persist and reload into the Trip Planner", () =>
   assert.match(planner, /\/api\/trips\/\$\{encodeURIComponent\(tripId\)\}/);
   assert.match(worker, /url\.pathname === "\/api\/trips\/create"/);
   assert.match(worker, /hostedPlanFromRecommendation/);
+  assert.match(worker, /const unitsPerUsd = \{ USD: 1, THB: 35, MMK: 2100, SGD: 1\.35, CNY: 7\.2 \}/);
+  assert.match(worker, /budget: recommendation\.total_budget, budgetUsd/);
 });
 
 test("hosted Concierge keeps keys private and has a durable rate-limit fallback", () => {

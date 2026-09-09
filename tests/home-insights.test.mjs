@@ -24,9 +24,9 @@ test("home omits the removed planning and inspiration grids", () => {
 });
 
 test("home keeps the main travel proposition and planner actions", () => {
-  assert.match(home, /Got a sudden urge to escape/);
-  assert.match(home, /The Stressful Way/);
-  assert.match(home, /The PackSwift Way/);
-  assert.match(home, /All you need is a 10-second thought to travel/);
+  assert.match(home, /Think of a trip/);
+  assert.match(home, /From a travel thought to a ready trip/);
+  assert.match(home, /Share the idea/);
+  assert.match(home, /Travel prepared/);
   assert.match(home, /href="\/trip-planner"/);
 });

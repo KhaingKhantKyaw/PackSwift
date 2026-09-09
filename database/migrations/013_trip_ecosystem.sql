@@ -1,10 +1,6 @@
 ALTER TABLE trip_readiness_items
   ADD COLUMN smart_tag VARCHAR(160) NULL AFTER description;
 
-ALTER TABLE orders
-  MODIFY category ENUM('flight', 'accommodation', 'travel_gear', 'insurance') NOT NULL,
-  MODIFY order_type ENUM('FLIGHT', 'HOTEL', 'GEAR', 'INSURANCE') NOT NULL;
-
 CREATE TABLE IF NOT EXISTS itinerary_activities (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   itinerary_id BIGINT UNSIGNED NOT NULL,
@@ -41,37 +37,6 @@ CREATE TABLE IF NOT EXISTS visa_rules (
   checked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uq_visa_rule_route (origin_country_code, destination_country_code),
   INDEX idx_visa_rule_destination (destination_country_code, status)
-);
-
-CREATE TABLE IF NOT EXISTS trip_expenses (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  trip_session_id BIGINT UNSIGNED NOT NULL,
-  paid_by VARCHAR(100) NOT NULL,
-  title VARCHAR(180) NOT NULL,
-  category ENUM('food', 'transport', 'shopping', 'activities', 'accommodation', 'other') NOT NULL,
-  amount DECIMAL(12, 2) NOT NULL,
-  currency CHAR(3) NOT NULL,
-  expense_date DATE NOT NULL,
-  notes VARCHAR(500) NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_trip_expenses_trip FOREIGN KEY (trip_session_id) REFERENCES trip_sessions(id) ON DELETE CASCADE,
-  CONSTRAINT chk_trip_expense_amount CHECK (amount > 0),
-  INDEX idx_trip_expenses_trip_date (trip_session_id, expense_date, created_at)
-);
-
-CREATE TABLE IF NOT EXISTS expense_splits (
-  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  expense_id BIGINT UNSIGNED NOT NULL,
-  participant_name VARCHAR(100) NOT NULL,
-  share_amount DECIMAL(12, 2) NOT NULL,
-  is_settled BOOLEAN NOT NULL DEFAULT FALSE,
-  settled_at TIMESTAMP NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT fk_expense_splits_expense FOREIGN KEY (expense_id) REFERENCES trip_expenses(id) ON DELETE CASCADE,
-  CONSTRAINT chk_expense_split_share CHECK (share_amount >= 0),
-  UNIQUE KEY uq_expense_split_participant (expense_id, participant_name),
-  INDEX idx_expense_splits_settlement (participant_name, is_settled)
 );
 
 INSERT INTO visa_rules

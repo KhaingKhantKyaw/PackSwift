@@ -32,7 +32,7 @@ test("Saved Trips UI performs real mutations and re-fetches authoritative rows",
   assert.match(client, /cache: "no-store"/);
   assert.match(client, /fresh=\$\{Date\.now\(\)\}/);
   assert.match(client, /activeLoadController\?\.abort\(\)/);
-  assert.match(client, /currentUser[\s\S]*result\.savedTrips\.map\(normalizeServerTrip\)/);
+  assert.match(client, /activeAccountUser[\s\S]*result\.savedTrips\.map\(normalizeServerTrip\)/);
 });
 
 test("Saved Trips ordering is update-aware locally and on the hosted database", () => {

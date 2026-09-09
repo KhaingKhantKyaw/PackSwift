@@ -9,11 +9,13 @@ import {
 } from "../src/services/travel-planner.js";
 import {
   askTravelConcierge,
+  explicitRouteEntities,
   createTripPlanDeclaration,
   generateTravelAdvice,
   isTravelDomainMessage,
   OFF_TOPIC_REFUSAL,
   PACKSWIFT_SYSTEM_PROMPT,
+  reinforceTripPlanArgs,
 } from "../src/services/geminiService.js";
 
 const [route, client, tripsRoute, packageJson] = await Promise.all([
@@ -37,6 +39,7 @@ test("Gemini Concierge uses the official SDK and strict create_trip_plan tool", 
               destination: "Bangkok for a short trip",
               start_date: "10/09/2026",
               end_date: "13/09/2026",
+              duration_nights: 3,
               adults_count: 1,
               children_count: 0,
               trip_type: "Solo",
@@ -112,10 +115,95 @@ test("Gemini Concierge accepts itinerary refinements and sends the full conversa
   assert.match(PACKSWIFT_SYSTEM_PROMPT, /modify, add, remove, or refine activities/);
 });
 
+test("explicit BKK and YGN route aliases override an activity-based destination guess", async () => {
+  const message = "make plan for four nights in bkk from ygn. 2 adults 2 kids. adventure and beaches. no budget set";
+  let functionArgs;
+  const fakeClient = {
+    models: {
+      generateContent: async () => ({
+        functionCalls: [{
+          name: "create_trip_plan",
+          args: {
+            origin: "Yangon",
+            destination: "Bali",
+            start_date: "10/09/2026",
+            end_date: "14/09/2026",
+            duration_nights: 4,
+            adults_count: 1,
+            children_count: 0,
+            trip_type: "Solo",
+            travel_purpose: "Adventure",
+            budget_estimate: 42000,
+            currency: "THB",
+          },
+        }],
+      }),
+    },
+  };
+  const route = explicitRouteEntities(message);
+  functionArgs = reinforceTripPlanArgs({
+    origin: "Yangon", destination: "Bali", start_date: "10/09/2026", end_date: "14/09/2026",
+    duration_nights: 4, adults_count: 1, children_count: 0, trip_type: "Solo",
+    travel_purpose: "Adventure", budget_estimate: 42000, currency: "THB",
+  }, message);
+  const result = await askTravelConcierge(message, [], { client: fakeClient });
+
+  assert.deepEqual(route, { origin: "Yangon", destination: "Bangkok" });
+  assert.equal(functionArgs.origin, "Yangon");
+  assert.equal(functionArgs.destination, "Bangkok");
+  assert.equal(functionArgs.duration_nights, 4);
+  assert.equal(functionArgs.adults_count, 2);
+  assert.equal(functionArgs.children_count, 2);
+  assert.equal(functionArgs.trip_type, "Family");
+  assert.equal(functionArgs.travel_purpose, "Adventure & Leisure");
+  assert.equal(result.trip_card.origin, "Yangon");
+  assert.equal(result.trip_card.destination, "Bangkok");
+  assert.equal(result.trip_card.duration_nights, 4);
+  assert.equal(result.trip_card.adults_count, 2);
+  assert.equal(result.trip_card.children_count, 2);
+  assert.equal(result.trip_card.trip_type, "Family");
+  assert.equal(result.trip_card.travel_purpose, "Adventure & Leisure");
+  assert.match(JSON.stringify(result.trip_card.day_by_day_highlights), /Koh Larn|Pattaya/);
+  assert.match(PACKSWIFT_SYSTEM_PROMPT, /explicit destinations as immutable constraints/);
+  assert.match(PACKSWIFT_SYSTEM_PROMPT, /BKK or DMK = Bangkok/);
+});
+
+test("Gemini trip cards cannot keep provider-generated dates in the past", async () => {
+  const result = await askTravelConcierge("Plan four nights in Bangkok from Yangon for two adults", [], {
+    client: {
+      models: {
+        generateContent: async () => ({
+          functionCalls: [{
+            name: "create_trip_plan",
+            args: {
+              origin: "Yangon",
+              destination: "Bangkok",
+              start_date: "01/12/2024",
+              end_date: "05/12/2024",
+              duration_nights: 4,
+              adults_count: 2,
+              children_count: 0,
+              trip_type: "Couples",
+              travel_purpose: "Leisure",
+              budget_estimate: 1200,
+              currency: "USD",
+            },
+          }],
+        }),
+      },
+    },
+  });
+  const [day, month, year] = result.trip_card.start_date.split("/").map(Number);
+  const start = new Date(Date.UTC(year, month - 1, day));
+  assert.ok(start > new Date());
+  assert.equal(result.trip_card.duration_nights, 4);
+  assert.match(result.text, new RegExp(result.trip_card.start_date.replaceAll("/", "\\/")));
+});
+
 test("Gemini schema exposes only the requested clean planner fields", () => {
   assert.equal(createTripPlanDeclaration.name, "create_trip_plan");
   assert.deepEqual(createTripPlanDeclaration.parametersJsonSchema.required, [
-    "origin", "destination", "start_date", "end_date", "adults_count",
+    "origin", "destination", "start_date", "end_date", "duration_nights", "adults_count",
     "children_count", "trip_type", "travel_purpose", "budget_estimate", "currency",
   ]);
   assert.match(packageJson, /"@google\/genai"/);
@@ -125,7 +213,8 @@ test("Gemini schema exposes only the requested clean planner fields", () => {
 test("budget estimate route uses clean entities and returns validity instead of throwing", () => {
   assert.match(tripsRoute, /"\/estimate-budget"/);
   assert.match(tripsRoute, /cleanTripEntity\(request\.body\.destination/);
-  assert.match(tripsRoute, /submitted_budget:[\s\S]*is_valid: submitted >= minimumAmount/);
+  assert.match(tripsRoute, /submitted_budget:[\s\S]*is_valid: submitted > 0/);
+  assert.match(tripsRoute, /meets_recommended_budget: submitted >= minimumAmount/);
 });
 
 test("budget engine accepts 10,000 THB for a four-day Yangon to Bangkok trip", () => {

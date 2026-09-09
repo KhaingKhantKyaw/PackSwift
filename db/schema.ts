@@ -65,28 +65,6 @@ export const hostedPackSwiftSchema = {
     FOREIGN KEY (trip_session_id) REFERENCES hosted_trip_sessions(id) ON DELETE CASCADE,
     UNIQUE (trip_session_id, item_key)
   )`,
-  orders: `CREATE TABLE IF NOT EXISTS hosted_orders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_number TEXT NOT NULL UNIQUE,
-    user_id INTEGER NOT NULL,
-    trip_session_id INTEGER NOT NULL,
-    category TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'confirmed',
-    payment_method TEXT NOT NULL DEFAULT 'CREDIT_CARD',
-    card_brand TEXT,
-    card_last4 TEXT,
-    payment_reference TEXT UNIQUE,
-    title TEXT NOT NULL,
-    quantity INTEGER NOT NULL DEFAULT 1,
-    total_amount REAL NOT NULL,
-    currency TEXT NOT NULL,
-    details_json TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES hosted_users(id) ON DELETE CASCADE,
-    FOREIGN KEY (trip_session_id) REFERENCES hosted_trip_sessions(id) ON DELETE CASCADE,
-    CHECK (card_last4 IS NULL OR (length(card_last4) = 4 AND card_last4 NOT GLOB '*[^0-9]*'))
-  )`,
   packing: `CREATE TABLE IF NOT EXISTS hosted_packing_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     trip_session_id INTEGER NOT NULL,
@@ -145,28 +123,5 @@ export const hostedPackSwiftSchema = {
     source_note TEXT,
     checked_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     UNIQUE (origin_country_code, destination_country_code)
-  )`,
-  tripExpenses: `CREATE TABLE IF NOT EXISTS hosted_trip_expenses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    trip_session_id INTEGER NOT NULL,
-    paid_by TEXT NOT NULL,
-    title TEXT NOT NULL,
-    category TEXT NOT NULL,
-    amount REAL NOT NULL,
-    currency TEXT NOT NULL,
-    expense_date TEXT NOT NULL,
-    notes TEXT,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (trip_session_id) REFERENCES hosted_trip_sessions(id) ON DELETE CASCADE
-  )`,
-  expenseSplits: `CREATE TABLE IF NOT EXISTS hosted_expense_splits (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    expense_id INTEGER NOT NULL,
-    participant_name TEXT NOT NULL,
-    share_amount REAL NOT NULL,
-    is_settled INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (expense_id) REFERENCES hosted_trip_expenses(id) ON DELETE CASCADE,
-    UNIQUE (expense_id, participant_name)
   )`,
 } as const;

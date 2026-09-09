@@ -166,6 +166,8 @@ activitiesRouter.post(
     body("trip_id").optional({ checkFalsy: true }).isUUID(4),
     body("saved_place_ids").optional().isArray({ max: 100 }),
     body("saved_place_ids.*").optional().isString().isLength({ min: 3, max: 255 }),
+    body("excluded_place_ids").optional().isArray({ max: 100 }),
+    body("excluded_place_ids.*").optional().isString().isLength({ min: 3, max: 255 }),
     body("page_token").optional({ checkFalsy: true }).isString().isLength({ min: 8, max: 2048 }),
     body("refresh_queue").optional().isBoolean(),
   ],
@@ -261,8 +263,19 @@ activitiesRouter.post(
           // Provider failures fall back without interrupting live planning.
         }
       }
-      if (!activities.length) {
-        activities = await fallbackActivities(destinationMatch(destinationName), input);
+      if (activities.length < 12) {
+        const supplementalActivities = await fallbackActivities(
+          destinationMatch(destinationName),
+          input,
+        );
+        const knownActivities = new Set(activities.map((activity) =>
+          String(activity.title || "").trim().toLowerCase()));
+        for (const activity of supplementalActivities) {
+          const titleKey = String(activity.title || "").trim().toLowerCase();
+          if (!titleKey || knownActivities.has(titleKey)) continue;
+          activities.push(activity);
+          knownActivities.add(titleKey);
+        }
       }
       if (!activities.length) {
         response.status(404).json({ error: "No activities are available for this destination yet." });
@@ -278,9 +291,15 @@ activitiesRouter.post(
         ).catch(() => []);
         storedPlaceIds.forEach((placeId) => savedPlaceIds.add(placeId));
       }
-      const eligibleActivities = activities
-        .map(activityWithPlaceIdentity)
-        .filter((activity) => !savedPlaceIds.has(activity.placeId));
+      const excludedPlaceIds = new Set(
+        (request.body.excluded_place_ids || []).map((placeId) => String(placeId)),
+      );
+      const identifiedActivities = activities.map(activityWithPlaceIdentity);
+      const selectedPlaces = identifiedActivities
+        .filter((activity) => savedPlaceIds.has(activity.placeId));
+      const eligibleActivities = identifiedActivities
+        .filter((activity) =>
+          !savedPlaceIds.has(activity.placeId) && !excludedPlaceIds.has(activity.placeId));
       const recommendation = recommendPlannerActivities(eligibleActivities, input);
       const candidates = recommendation.candidateActivities || recommendation.activities || [];
       const primary = candidates.slice(0, 6);
@@ -292,6 +311,7 @@ activitiesRouter.post(
         primary,
         backupQueue,
         savedPlaceIds: [...savedPlaceIds],
+        selectedPlaces,
         nextPageToken,
         hasMore: Boolean(nextPageToken),
         source,

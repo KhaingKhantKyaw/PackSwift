@@ -239,8 +239,8 @@ export async function ensureWeatherReadinessItem(userId, publicId, alert) {
   const trip = await ownedTripRow(pool, userId, publicId);
   if (!trip) return;
   const item = alert.type === "rain"
-    ? ["rain-protection", "Clothing & Gear", "Raincoat or compact umbrella", "Rain is predicted during this trip.", "Essential for Rainy Weather", "shopping"]
-    : ["sun-protection", "Health & Medication", "Hydration and sun protection", "High temperatures are predicted during this trip.", "Essential for Extreme Heat", "shopping"];
+    ? ["rain-protection", "Clothing & Gear", "Raincoat or compact umbrella", "Rain is predicted during this trip.", "Essential for Rainy Weather", "concierge"]
+    : ["sun-protection", "Health & Medication", "Hydration and sun protection", "High temperatures are predicted during this trip.", "Essential for Extreme Heat", "concierge"];
   await pool.execute(
     `INSERT INTO trip_readiness_items
       (trip_session_id, item_key, category, item_name, description, smart_tag, assistant_type)
@@ -248,109 +248,4 @@ export async function ensureWeatherReadinessItem(userId, publicId, alert) {
      ON DUPLICATE KEY UPDATE smart_tag = VALUES(smart_tag), description = VALUES(description)`,
     [trip.id, ...item],
   );
-}
-
-function expensePayload(rows, trip) {
-  const expenses = [];
-  const expenseMap = new Map();
-  for (const row of rows) {
-    if (!expenseMap.has(row.id)) {
-      const expense = {
-        id: row.id,
-        title: row.title,
-        paidBy: row.paid_by,
-        category: row.category,
-        amount: Number(row.amount),
-        currency: row.currency,
-        date: row.expense_date,
-        notes: row.notes,
-        splits: [],
-      };
-      expenseMap.set(row.id, expense);
-      expenses.push(expense);
-    }
-    if (row.split_id) expenseMap.get(row.id).splits.push({
-      id: row.split_id,
-      participant: row.participant_name,
-      amount: Number(row.share_amount),
-      settled: Boolean(row.is_settled),
-    });
-  }
-  const balances = new Map();
-  for (const expense of expenses) {
-    balances.set(expense.paidBy, (balances.get(expense.paidBy) || 0) + expense.amount);
-    for (const split of expense.splits) {
-      balances.set(split.participant, (balances.get(split.participant) || 0) - split.amount);
-    }
-  }
-  const debtors = [...balances].filter(([, amount]) => amount < -0.005).map(([name, amount]) => ({ name, amount: -amount }));
-  const creditors = [...balances].filter(([, amount]) => amount > 0.005).map(([name, amount]) => ({ name, amount }));
-  const settlements = [];
-  let debtorIndex = 0;
-  let creditorIndex = 0;
-  while (debtors[debtorIndex] && creditors[creditorIndex]) {
-    const amount = Math.min(debtors[debtorIndex].amount, creditors[creditorIndex].amount);
-    settlements.push({ from: debtors[debtorIndex].name, to: creditors[creditorIndex].name, amount: Number(amount.toFixed(2)), currency: trip.budget_currency });
-    debtors[debtorIndex].amount -= amount;
-    creditors[creditorIndex].amount -= amount;
-    if (debtors[debtorIndex].amount < 0.005) debtorIndex++;
-    if (creditors[creditorIndex].amount < 0.005) creditorIndex++;
-  }
-  const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  return {
-    trip: { id: trip.public_id, destination: trip.destination_name, budget: Number(trip.budget_amount), currency: trip.budget_currency, travelers: Number(trip.travelers) || 1 },
-    expenses,
-    summary: { total, variance: Number(trip.budget_amount) - total, perPerson: total / (Number(trip.travelers) || 1), settlements },
-  };
-}
-
-export async function listTripExpenses(userId, publicId) {
-  const pool = getDatabasePool();
-  const trip = await ownedTripRow(pool, userId, publicId);
-  if (!trip) return null;
-  const [rows] = await pool.execute(
-    `SELECT expense.*, split.id AS split_id, split.participant_name, split.share_amount, split.is_settled
-     FROM trip_expenses expense
-     LEFT JOIN expense_splits split ON split.expense_id = expense.id
-     WHERE expense.trip_session_id = ?
-     ORDER BY expense.expense_date DESC, expense.created_at DESC, split.id`,
-    [trip.id],
-  );
-  return expensePayload(rows, trip);
-}
-
-export async function logTripExpense(userId, publicId, input) {
-  const pool = getDatabasePool();
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-    const trip = await ownedTripRow(connection, userId, publicId, true);
-    if (!trip) {
-      await connection.rollback();
-      return null;
-    }
-    const [result] = await connection.execute(
-      `INSERT INTO trip_expenses
-        (trip_session_id, paid_by, title, category, amount, currency, expense_date, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [trip.id, input.paidBy, input.title, input.category, input.amount, input.currency, input.date, input.notes || null],
-    );
-    const share = Number((input.amount / input.participants.length).toFixed(2));
-    let assigned = 0;
-    for (const [index, participant] of input.participants.entries()) {
-      const participantShare = index === input.participants.length - 1 ? Number((input.amount - assigned).toFixed(2)) : share;
-      assigned += participantShare;
-      await connection.execute(
-        "INSERT INTO expense_splits (expense_id, participant_name, share_amount) VALUES (?, ?, ?)",
-        [result.insertId, participant, participantShare],
-      );
-    }
-    await connection.commit();
-    return listTripExpenses(userId, publicId);
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
 }

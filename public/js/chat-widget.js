@@ -9,13 +9,13 @@
   const legacyPendingAiTripKey = "pending_ai_trip";
   const pendingAiTripModeKey = "pending_ai_trip_mode";
   const authRedirectTargetKey = "auth_redirect_target";
-  const modulePathPattern = /\/(assist-flight|assist-stay|assist-store|assist-trip|assist-visa|trip-planner)\b/g;
+  const modulePathPattern = /\/(assist-trip|assist-visa|trip-planner|trip-itinerary|packing-list|travel-guide)\b/g;
   const quickPrompts = [
     "💡 3-Day Bangkok Itinerary",
     "🎒 What to pack for Chiang Mai?",
     "💰 Budget trip under $300",
   ];
-  const welcomeMessage = "Hi! I’m PackSwift Concierge. ✨ Tell me where you’re going, or ask about packing, visas, flights, stays, and itineraries.";
+  const welcomeMessage = "Hi! I’m PackSwift Concierge. ✨ Tell me where you’re going, or ask about destinations, budgets, weather, attractions, packing, visas, and itineraries.";
 
   function safeJson(storage, key) {
     try {
@@ -51,7 +51,7 @@
     const enums = {
       scope: ["Nationwide", "Worldwide"],
       currency: ["USD", "THB", "MMK", "SGD", "CNY"],
-      travel_purpose: ["Adventure & Outdoor", "Leisure & Relaxation", "Culture & Heritage", "Food & Nightlife"],
+      travel_purpose: ["Adventure & Outdoor", "Adventure & Leisure", "Leisure & Relaxation", "Culture & Heritage", "Food & Nightlife"],
       travel_group: ["Solo", "Couples", "Friends", "Family"],
       travel_pace: ["Slow & Relaxed", "Balanced & Steady", "Packed & Fast"],
     };
@@ -142,7 +142,7 @@
         <ul class="concierge-auth-perks">
           <li><span aria-hidden="true">✓</span> Instant auto-generated packing lists</li>
           <li><span aria-hidden="true">✓</span> Offline trip access &amp; PDF exports</li>
-          <li><span aria-hidden="true">✓</span> Smart group expense splitting</li>
+          <li><span aria-hidden="true">✓</span> Destination-aware visa and cultural guidance</li>
         </ul>
         <div class="concierge-auth-actions">
           <a class="concierge-auth-primary" href="/login?redirect=/trip-planner">Log In <span aria-hidden="true">→</span></a>
@@ -485,6 +485,15 @@
 
   launcher.addEventListener("click", () => setOpen(panel.hidden));
   closeButton.addEventListener("click", () => setOpen(false));
+  document.addEventListener("packswift:concierge:ask", (event) => {
+    const message = String(event.detail?.message || "").trim();
+    if (!message) {
+      event.detail?.fallback?.();
+      return;
+    }
+    setOpen(true);
+    sendMessage(message);
+  });
   authModalClose.addEventListener("click", closeAuthModal);
   authModalBackdrop.addEventListener("click", closeAuthModal);
   authModalLogin.addEventListener("click", () => {
@@ -519,4 +528,5 @@
   });
 
   renderHistory();
+  window.PackSwift.concierge = { open: setOpen, ask: sendMessage };
 })();

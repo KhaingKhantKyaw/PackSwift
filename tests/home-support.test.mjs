@@ -14,7 +14,7 @@ const [home, client, styles, contactRoute, pages, worker] = await Promise.all([
 test("homepage ends with one focused glass support card", () => {
   assert.match(home, /id="support"/);
   assert.match(home, /User feedback &amp; support/);
-  assert.match(home, /Let’s build a better travel experience together/);
+  assert.match(home, /Help us make travel planning better/);
   assert.match(home, /packswiftdemo@support\.com/);
   assert.match(home, /mailto:packswiftdemo@support\.com/);
   assert.match(home, /data-copy-email="packswiftdemo@support\.com"/);

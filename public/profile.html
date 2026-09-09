@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#00A8B5"><meta name="description" content="Manage your PackSwift profile, saved trips, shared posts, and account settings."><meta name="robots" content="noindex"><title>Profile — PackSwift</title><link rel="stylesheet" href="/css/styles.css"><script src="/js/app.js" defer></script><script src="/js/profile.js" defer></script>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#00A8B5"><meta name="description" content="Manage your PackSwift profile, saved trips, preparation progress, and account settings."><meta name="robots" content="noindex"><title>Profile — PackSwift</title><link rel="stylesheet" href="/css/styles.css"><script src="/js/app.js" defer></script><script src="/js/profile.js" defer></script>
   </head>
   <body data-page="profile">
     <a class="skip-link" href="#main-content">Skip to content</a><header class="site-header"><div class="header-inner"><a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a><nav class="desktop-nav" aria-label="Primary navigation"></nav><a class="header-action" href="/login">Login</a></div></header>
     <main id="main-content" class="page-shell">
-      <section id="profile-guest" class="empty-state" hidden><p class="eyebrow">Your profile</p><h1>Sign in to see your travel space.</h1><p>Saved trips, shared posts, and account settings are available after login.</p><a class="button button-primary" href="/login">Login <span aria-hidden="true">→</span></a></section>
+      <section id="profile-guest" class="empty-state" hidden><p class="eyebrow">Your profile</p><h1>Sign in to see your travel space.</h1><p>Saved trips, AI planning progress, and account settings are available after login.</p><a class="button button-primary" href="/login">Login <span aria-hidden="true">→</span></a></section>
 
       <div id="profile-content" hidden>
         <section class="profile-hero panel"><div id="profile-initials" class="profile-avatar" aria-hidden="true">PS</div><div><p class="eyebrow">Your profile</p><h1 id="profile-name">Traveller</h1><p id="profile-handle" class="muted"></p></div><div class="profile-hero-action"><a class="button button-primary" href="/trip-planner">Plan a new trip</a></div></section>
@@ -24,23 +24,9 @@
           <p id="theme-feedback" class="theme-feedback" role="status"></p>
         </section>
 
-        <section id="my-orders" class="panel profile-section profile-orders-section" aria-labelledby="profile-orders-title">
-          <div class="profile-section-head">
-            <div><p class="eyebrow">Purchases &amp; reservations</p><h2 id="profile-orders-title">My Orders 📦</h2><p>Flight confirmations, accommodation reservations, and travel gear from your PackSwift assistants.</p></div>
-            <span id="profile-order-count" class="ready-count">0 orders</span>
-          </div>
-          <div id="profile-order-tabs" class="profile-order-tabs" role="tablist" aria-label="Filter My Orders">
-            <button type="button" role="tab" data-order-filter="all" aria-selected="true">All Orders</button>
-            <button type="button" role="tab" data-order-filter="flight" aria-selected="false">Air Tickets ✈️</button>
-            <button type="button" role="tab" data-order-filter="accommodation" aria-selected="false">Accommodations 🏨</button>
-            <button type="button" role="tab" data-order-filter="travel_gear" aria-selected="false">Travel Gear &amp; Supplies 🛍️</button>
-          </div>
-          <div id="profile-orders" class="profile-order-list" role="tabpanel" aria-live="polite"></div>
-        </section>
-
         <section id="in-progress-trips" class="panel profile-section ready-travel-section in-progress-travel-section" aria-labelledby="in-progress-travel-title">
           <div class="profile-section-head">
-            <div><p class="eyebrow">Reservations confirmed</p><h2 id="in-progress-travel-title">In Progress Trips ⏳</h2><p>Confirmed flight or hotel plans that still need preparation are tracked here.</p></div>
+            <div><p class="eyebrow">Planning &amp; preparation</p><h2 id="in-progress-travel-title">In Progress Trips ⏳</h2><p>Trips with unfinished itinerary, document, packing, or preparation tasks are tracked here.</p></div>
             <span id="in-progress-trip-count" class="ready-count">0 in progress</span>
           </div>
           <div id="profile-in-progress-trips" class="ready-trip-grid" aria-live="polite"></div>
@@ -75,15 +61,6 @@
         </div>
         <p id="cancel-ready-feedback" class="form-feedback" role="status"></p>
       </form>
-    </dialog>
-    <dialog id="order-details-dialog" class="order-details-dialog" aria-labelledby="order-dialog-title">
-      <article class="order-dialog-card">
-        <button id="close-order-dialog" class="login-required-close" type="button" aria-label="Close order details">×</button>
-        <div class="order-dialog-heading"><div><p id="order-dialog-eyebrow" class="eyebrow">Order details</p><h2 id="order-dialog-title">PackSwift order</h2><p id="order-dialog-reference">Order reference</p></div><span id="order-dialog-status" class="profile-order-status">Confirmed ✓</span></div>
-        <div id="order-dialog-details" class="order-dialog-details"></div>
-        <div class="order-dialog-total"><span>Total</span><strong id="order-dialog-total">—</strong></div>
-        <div class="order-dialog-actions"><button id="print-order-document" class="button button-primary" type="button">Print / Save</button><button id="done-order-dialog" class="button button-secondary" type="button">Done</button></div>
-      </article>
     </dialog>
     <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span><a href="/travel-guide">Travel Guide</a> · <a href="/packing-list">Packing List</a> · <a href="/my-trips">My Trips</a></span></div></footer><nav class="mobile-nav" aria-label="Mobile navigation"></nav>
   </body>
