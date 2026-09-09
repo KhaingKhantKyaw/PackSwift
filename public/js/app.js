@@ -67,14 +67,14 @@ const page = document.body.dataset.page;
 const mainNavigation = `
   <a class="nav-link" data-nav="home" href="/">Home</a>
   <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
-  <a class="nav-link" data-nav="guide" href="/travel-guide">Travel Guide</a>
+  <a class="nav-link" data-nav="guide" href="/#discover">Destinations</a>
   <a class="nav-link" data-nav="about" href="/about">About</a>
   <a class="nav-link" data-nav="support" href="/#support">Support</a>`;
 
 const mobileNavigation = `
   <a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a>
   <a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a>
-  <a data-nav="guide" href="/travel-guide"><span aria-hidden="true">◎</span><span>Guide</span></a>
+  <a data-nav="guide" href="/#discover"><span aria-hidden="true">◎</span><span>Explore</span></a>
   <a data-nav="about" href="/about"><span aria-hidden="true">i</span><span>About</span></a>
   <a data-nav="support" href="/#support"><span aria-hidden="true">✉</span><span>Support</span></a>
   <a data-nav="profile" href="/profile"><span aria-hidden="true">○</span><span>Account</span></a>`;
@@ -119,10 +119,14 @@ for (const year of document.querySelectorAll("[data-current-year]")) {
 }
 
 for (const footer of document.querySelectorAll(".footer-inner")) {
-  if (footer.querySelector('a[href="/travel-guide"]')) continue;
+  for (const oldGuideLink of footer.querySelectorAll('a[href="/travel-guide"]')) {
+    oldGuideLink.href = "/#discover";
+    oldGuideLink.textContent = "Destinations";
+  }
+  if (footer.querySelector('a[href="/#discover"]')) continue;
   const links = document.createElement("span");
   links.className = "footer-quick-links";
-  links.innerHTML = '<a href="/travel-guide">Travel Guide</a> · <a href="/packing-list">Packing List</a> · <a href="/my-trips">My Trips</a>';
+  links.innerHTML = '<a href="/#discover">Destinations</a> · <a href="/packing-list">Packing List</a> · <a href="/my-trips">My Trips</a>';
   footer.append(links);
 }
 

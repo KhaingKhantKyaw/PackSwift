@@ -1,7 +1,6 @@
 const pageRoutes = new Map([
   ["/", "/index.html"],
   ["/trip-planner", "/trip-planner.html"],
-  ["/travel-guide", "/travel-guide.html"],
   ["/packing-list", "/packing-list.html"],
   ["/my-trips", "/my-trips.html"],
   ["/about", "/about.html"],
@@ -2404,7 +2403,14 @@ export default {
         return errorResponse("Method not allowed.", 405);
       }
       if (["/community", "/community-feed"].includes(url.pathname)) {
-        return Response.redirect(new URL("/travel-guide", url).toString(), 302);
+        return Response.redirect(new URL("/#discover", url).toString(), 302);
+      }
+      if (url.pathname === "/travel-guide") {
+        const destination = url.searchParams.get("destination");
+        const target = new URL("/", url);
+        if (destination) target.searchParams.set("destination", destination);
+        target.hash = "discover";
+        return Response.redirect(target.toString(), 302);
       }
       if (["/assist-flight", "/assist-stay", "/assist-store", "/assist-shop", "/trip-expenses"].includes(url.pathname)) {
         return Response.redirect(new URL("/trip-planner", url).toString(), 302);

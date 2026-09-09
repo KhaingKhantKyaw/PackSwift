@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const [html, script, planner, styles, destinations] = await Promise.all([
-  readFile(new URL("../public/travel-guide.html", import.meta.url), "utf8"),
+  readFile(new URL("../public/index.html", import.meta.url), "utf8"),
   readFile(new URL("../public/js/travel-guide.js", import.meta.url), "utf8"),
   readFile(new URL("../public/js/trip-planner.js", import.meta.url), "utf8"),
   readFile(new URL("../public/css/styles.css", import.meta.url), "utf8"),

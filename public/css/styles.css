@@ -7460,6 +7460,49 @@ html[data-theme="dark"] .field-error {
 }
 
 /* Destination and budget discovery hub */
+.home-guide-section {
+  padding-top: 14px;
+}
+
+.home-guide-heading {
+  padding: 36px 0 30px;
+}
+
+.home-guide-heading h2 {
+  max-width: 650px;
+  margin: 8px 0 0;
+  color: #fff;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem) !important;
+  font-weight: 740;
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  text-shadow: 0 3px 22px rgba(7, 23, 37, 0.34);
+}
+
+.home-guide-heading h2 span {
+  color: #8debf0;
+}
+
+.home-guide-heading > p,
+.home-guide-heading .eyebrow {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2px 18px rgba(7, 23, 37, 0.34);
+}
+
+body[data-page="home"] .guide-discovery-controls,
+body[data-page="home"] .guide-discovery-card,
+body[data-page="home"] .guide-local-insights {
+  backdrop-filter: blur(18px);
+}
+
+@media (max-width: 760px) {
+  .home-guide-heading {
+    padding: 28px 0 22px;
+    grid-template-columns: 1fr;
+  }
+}
+
 .guide-discovery-controls {
   padding: 24px;
   margin-bottom: 22px;

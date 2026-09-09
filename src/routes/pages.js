@@ -10,7 +10,6 @@ export const pageRouter = Router();
 const pages = new Map([
   ["/", "index.html"],
   ["/trip-planner", "trip-planner.html"],
-  ["/travel-guide", "travel-guide.html"],
   ["/packing-list", "packing-list.html"],
   ["/my-trips", "my-trips.html"],
   ["/about", "about.html"],
@@ -30,7 +29,15 @@ pageRouter.get(
 );
 
 pageRouter.get(["/community", "/community-feed"], (request, response) => {
-  response.redirect(302, "/travel-guide");
+  response.redirect(302, "/#discover");
+});
+
+pageRouter.get("/travel-guide", (request, response) => {
+  const destination = String(request.query.destination || "").trim();
+  const target = destination
+    ? `/?destination=${encodeURIComponent(destination)}#discover`
+    : "/#discover";
+  response.redirect(302, target);
 });
 
 pageRouter.get("/contact", (request, response) => {

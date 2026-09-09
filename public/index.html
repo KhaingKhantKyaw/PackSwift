@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/js/app.js" defer></script>
     <script src="/js/home-background.js" defer></script>
-    <script src="/js/home-discovery.js" defer></script>
+    <script src="/js/travel-guide.js" defer></script>
     <script src="/js/home-support.js" defer></script>
   </head>
   <body data-page="home">
@@ -35,7 +35,7 @@
         <nav class="desktop-nav" aria-label="Primary navigation">
           <a class="nav-link" data-nav="home" href="/">Home</a>
           <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
-          <a class="nav-link" data-nav="guide" href="/travel-guide">Travel Guide</a>
+          <a class="nav-link" data-nav="guide" href="/#discover">Destinations</a>
           <a class="nav-link" data-nav="about" href="/about">About</a>
           <a class="nav-link" data-nav="support" href="/#support">Support</a>
         </nav>
@@ -57,33 +57,46 @@
         </div>
       </section>
 
-      <section id="discover" class="home-discovery" aria-labelledby="home-discovery-title">
-        <header class="home-discovery-heading">
-          <div>
-            <p class="eyebrow">Destination guide</p>
-            <h2 id="home-discovery-title">Find a place that fits.</h2>
-            <p>Compare useful costs, seasons, and highlights—then begin planning without entering everything twice.</p>
-          </div>
-          <a class="home-guide-link" href="/travel-guide">Open the full Travel Guide <span aria-hidden="true">→</span></a>
-        </header>
-
-        <div class="home-discovery-tools">
-          <div class="home-destination-search">
-            <label for="home-destination-search">Search places</label>
-            <input id="home-destination-search" type="search" maxlength="100" autocomplete="off" placeholder="e.g. Bangkok or Japan">
-          </div>
-          <div class="home-destination-filters" aria-label="Filter destinations">
-            <button type="button" data-home-filter="featured" aria-pressed="true">Featured</button>
-            <button type="button" data-home-filter="budget" aria-pressed="false">Budget-friendly</button>
-            <button type="button" data-home-filter="food" aria-pressed="false">Food &amp; culture</button>
-            <button type="button" data-home-filter="nature" aria-pressed="false">Nature &amp; coast</button>
-          </div>
+      <section id="discover" class="home-guide-section" aria-labelledby="guide-discovery-title">
+        <div class="page-heading home-guide-heading">
+          <div><p class="eyebrow">Destination &amp; budget discovery</p><h2>Find a place that fits <span>your budget and mood.</span></h2></div>
+          <p>Compare real planning signals, preview three thoughtful days, and send any destination straight to your Trip Planner.</p>
         </div>
 
-        <div class="home-destination-meta">
-          <p id="home-destination-count" aria-live="polite">Loading destination ideas…</p>
-        </div>
-        <div id="home-destination-grid" class="home-destination-grid" aria-live="polite"></div>
+        <section class="guide-discovery-controls panel" aria-labelledby="guide-discovery-title">
+          <div class="guide-control-heading"><div><p class="eyebrow">Explore worldwide</p><h2 id="guide-discovery-title">What kind of escape fits today?</h2></div><span id="guide-count" class="guide-result-count" aria-live="polite">Loading destinations…</span></div>
+          <div class="filter-group guide-filter-tabs" aria-label="Filter destinations">
+            <button class="filter-button" type="button" data-filter="all" aria-pressed="true">All Places</button>
+            <button class="filter-button" type="button" data-filter="trending" aria-pressed="false">🔥 Trending Icons</button>
+            <button class="filter-button" type="button" data-filter="budget" aria-pressed="false">💰 Budget Savers (&lt;$350)</button>
+            <button class="filter-button" type="button" data-filter="food-culture" aria-pressed="false">🍜 Food &amp; Culture</button>
+            <button class="filter-button" type="button" data-filter="nature-beach" aria-pressed="false">🏖️ Nature &amp; Beach</button>
+          </div>
+          <div class="guide-toolbar">
+            <div class="guide-search-field"><label class="persistent-field-label" for="guide-search">Search destinations</label><input id="guide-search" class="field-control guide-search" type="search" maxlength="100" autocomplete="off" placeholder="e.g. Bangkok, Thailand"></div>
+            <div class="guide-sort-field"><label class="persistent-field-label" for="guide-sort">Sort destinations</label><select id="guide-sort" class="field-control"><option value="recommended">Recommended</option><option value="budget-low">Lowest daily cost</option><option value="budget-high">Highest daily cost</option><option value="popular">Most popular</option><option value="name">City name</option></select></div>
+          </div>
+        </section>
+
+        <section class="guide-grid guide-discovery-grid">
+          <div class="guide-destination-grid" id="guide-destinations" aria-live="polite">
+            <p class="status-banner">Loading the worldwide guide…</p>
+          </div>
+
+          <aside class="guide-insights-sidebar" aria-label="Selected destination insights">
+            <section id="guide-local-insights" class="content-card guide-local-insights" aria-live="polite">
+              <div class="guide-insight-heading"><span id="guide-insight-code">BKK</span><div><p class="eyebrow">Local money-saving guide</p><h2 id="guide-insight-title">Bangkok, Thailand</h2></div></div>
+              <p id="guide-insight-intro" class="guide-insight-intro">Select a destination card to compare practical local advice.</p>
+              <dl class="guide-insight-facts"><div><dt>Best season</dt><dd id="guide-insight-season">November–February</dd></div><div><dt>Daily estimate</dt><dd id="guide-insight-cost">$45–$70/day</dd></div></dl>
+              <div class="guide-insight-list">
+                <article><span aria-hidden="true">🚇</span><div><h3>Transit savings</h3><p id="guide-insight-transit"></p></div></article>
+                <article><span aria-hidden="true">🍜</span><div><h3>Eat well for less</h3><p id="guide-insight-food"></p></div></article>
+                <article><span aria-hidden="true">🛂</span><div><h3>Visa &amp; local customs</h3><p id="guide-insight-visa"></p></div></article>
+              </div>
+              <button id="guide-sidebar-plan" class="button button-primary" type="button">⚡ Plan in 1-Click</button>
+            </section>
+          </aside>
+        </section>
       </section>
 
       <section id="support" class="home-support-section" aria-labelledby="support-title">
@@ -116,8 +129,57 @@
           </form>
         </article>
       </section>
-
     </main>
+
+    <div id="guide-preview-backdrop" class="guide-preview-backdrop" hidden></div>
+    <aside id="guide-preview-drawer" class="guide-preview-drawer pocket-guide-drawer" aria-labelledby="guide-preview-title" aria-hidden="true">
+      <header class="pocket-guide-header">
+        <div class="guide-preview-head"><div><p class="eyebrow">Visual pocket guide &amp; cheat sheet</p><h2 id="guide-preview-title">Destination pocket guide</h2><p id="guide-preview-summary"></p></div><button id="close-guide-preview" class="icon-button" type="button" aria-label="Close destination pocket guide">×</button></div>
+        <button id="guide-preview-plan" class="button button-primary pocket-guide-plan-button" type="button">⚡ Plan This Exact Itinerary in 1-Click</button>
+      </header>
+
+      <nav id="pocket-guide-tabs" class="pocket-guide-tabs" role="tablist" aria-label="Pocket guide sections">
+        <button id="pocket-tab-route" type="button" role="tab" aria-selected="true" aria-controls="pocket-panel-route" data-pocket-tab="route">Route Logic</button>
+        <button id="pocket-tab-timeline" type="button" role="tab" aria-selected="false" aria-controls="pocket-panel-timeline" data-pocket-tab="timeline" tabindex="-1">Timeline</button>
+        <button id="pocket-tab-stay" type="button" role="tab" aria-selected="false" aria-controls="pocket-panel-stay" data-pocket-tab="stay" tabindex="-1">Where to Stay</button>
+        <button id="pocket-tab-highlights" type="button" role="tab" aria-selected="false" aria-controls="pocket-panel-highlights" data-pocket-tab="highlights" tabindex="-1">12 Highlights</button>
+        <button id="pocket-tab-map" type="button" role="tab" aria-selected="false" aria-controls="pocket-panel-map" data-pocket-tab="map" tabindex="-1">Distance Hub</button>
+      </nav>
+
+      <div class="pocket-guide-content">
+        <section id="pocket-panel-route" class="pocket-guide-panel" role="tabpanel" aria-labelledby="pocket-tab-route" data-pocket-panel="route">
+          <div class="pocket-section-heading"><p class="eyebrow">Three smart travel zones</p><h3>Move with the city, not against it.</h3><p id="pocket-route-intro"></p></div>
+          <div id="pocket-day-zones" class="pocket-day-zones"></div>
+          <div id="pocket-quick-rule" class="pocket-quick-rule"></div>
+          <div id="pocket-route-cards" class="pocket-summary-grid"></div>
+        </section>
+
+        <section id="pocket-panel-timeline" class="pocket-guide-panel" role="tabpanel" aria-labelledby="pocket-tab-timeline" data-pocket-panel="timeline" hidden>
+          <div class="pocket-section-heading"><p class="eyebrow">Connected itinerary</p><h3>Every stop, interval, and useful handoff.</h3><p>Travel times are practical planning estimates and should be checked against live conditions.</p></div>
+          <div id="pocket-timeline" class="pocket-timeline"></div>
+        </section>
+
+        <section id="pocket-panel-stay" class="pocket-guide-panel" role="tabpanel" aria-labelledby="pocket-tab-stay" data-pocket-panel="stay" hidden>
+          <div class="pocket-section-heading"><p class="eyebrow">Where to stay</p><h3>Choose a base that matches your travel style.</h3><p>Compare the atmosphere, access, and traveler fit before choosing accommodation.</p></div>
+          <div class="pocket-table-wrap"><table class="pocket-stay-table"><thead><tr><th scope="col">Area Name</th><th scope="col">Best For</th><th scope="col">Transport Access</th><th scope="col">Recommended Traveler</th></tr></thead><tbody id="pocket-stay-rows"></tbody></table></div>
+          <div id="pocket-stay-tips" class="pocket-summary-grid"></div>
+        </section>
+
+        <section id="pocket-panel-highlights" class="pocket-guide-panel" role="tabpanel" aria-labelledby="pocket-tab-highlights" data-pocket-panel="highlights" hidden>
+          <div class="pocket-section-heading"><p class="eyebrow">Must-try bites &amp; must-see spots</p><h3>Twelve icons worth saving.</h3><p>Select any card to add it directly to your active saved trip.</p></div>
+          <div id="pocket-highlight-grid" class="pocket-highlight-grid"></div>
+        </section>
+
+        <section id="pocket-panel-map" class="pocket-guide-panel" role="tabpanel" aria-labelledby="pocket-tab-map" data-pocket-panel="map" hidden>
+          <div class="pocket-section-heading"><p class="eyebrow">Radial spot hub</p><h3>See the destination by travel time.</h3><p>Use the central hub to cluster nearby stops and reduce repeated transit.</p></div>
+          <div id="pocket-radial-map" class="pocket-radial-map" aria-label="Travel time map"></div>
+        </section>
+
+        <section class="guide-preview-packing" aria-labelledby="guide-packing-title"><span aria-hidden="true">✓</span><div><h3 id="guide-packing-title">Pocket packing focus</h3><ul id="guide-preview-packing-list"></ul></div></section>
+        <p id="pocket-guide-status" class="pocket-guide-status" role="status" aria-live="polite"></p>
+      </div>
+      <div class="guide-preview-actions"><button id="guide-preview-close-secondary" class="button button-secondary" type="button">Keep exploring</button></div>
+    </aside>
 
     <footer class="site-footer">
       <div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Your personal travel planning companion.</span></div>
@@ -125,7 +187,7 @@
     <nav class="mobile-nav" aria-label="Mobile navigation">
       <a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a>
       <a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a>
-      <a data-nav="guide" href="/travel-guide"><span aria-hidden="true">◎</span><span>Guide</span></a>
+      <a data-nav="guide" href="/#discover"><span aria-hidden="true">◎</span><span>Explore</span></a>
       <a data-nav="about" href="/about"><span aria-hidden="true">i</span><span>About</span></a>
       <a data-nav="support" href="/#support"><span aria-hidden="true">✉</span><span>Support</span></a>
     </nav>

@@ -30,20 +30,22 @@ test("existing Home content and routes remain present", () => {
   assert.doesNotMatch(home, /Recommended Famous Places to Explore All Around the World/);
   assert.match(home, /href="\/trip-planner"/);
   assert.doesNotMatch(app, /href="\/community-feed"/);
-  assert.match(app, /href="\/travel-guide"/);
+  assert.match(app, /href="\/#discover"/);
   assert.match(app, /href="\/#support"/);
   assert.match(app, /href="\/profile"/);
 });
 
-test("Home presents one concise message and a calm destination guide", () => {
+test("Home presents the AI hero followed by the complete destination guide", () => {
   assert.match(home, /Your AI travel assistant/);
   assert.match(home, /Think of a trip/);
   assert.match(home, /No sales pressure/);
-  assert.match(home, /Destination guide/);
+  assert.match(home, /Destination &amp; budget discovery/);
   assert.match(home, /Find a place that fits/);
-  assert.match(home, /Search places/);
+  assert.match(home, /Search destinations/);
+  assert.match(home, /Local money-saving guide/);
+  assert.match(home, /Visual pocket guide &amp; cheat sheet/);
   assert.match(home, />Plan my trip/);
   assert.doesNotMatch(home, /The Stressful Way|The PackSwift Way|comparison-card/);
-  assert.match(styles, /\.home-destination-grid \{[\s\S]*grid-template-columns: repeat\(3/);
-  assert.match(styles, /\.home-discovery \{[\s\S]*backdrop-filter: blur\(20px\)/);
+  assert.match(styles, /\.home-guide-section \{[\s\S]*padding-top: 14px/);
+  assert.match(styles, /body\[data-page="home"\] \.guide-discovery-controls/);
 });

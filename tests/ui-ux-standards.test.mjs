@@ -13,7 +13,7 @@ const [styles, app, authForms, home, homeSupport, login, signup, planner, packin
     readFile(new URL("../public/signup.html", import.meta.url), "utf8"),
     readFile(new URL("../public/trip-planner.html", import.meta.url), "utf8"),
     readFile(new URL("../public/packing-list.html", import.meta.url), "utf8"),
-    readFile(new URL("../public/travel-guide.html", import.meta.url), "utf8"),
+    readFile(new URL("../public/index.html", import.meta.url), "utf8"),
     readFile(new URL("../public/profile.html", import.meta.url), "utf8"),
     readFile(new URL("../src/routes/auth.js", import.meta.url), "utf8"),
   ]);

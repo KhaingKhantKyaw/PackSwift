@@ -14,16 +14,18 @@ const [app, pages, api, profileHtml, profileClient, profileRepository, worker] =
 
 test("Community is absent from desktop and mobile navigation", () => {
   assert.doesNotMatch(app, /community-feed|data-nav="community"/i);
-  for (const expected of ["Home", "Plan Trip", "Travel Guide", "About", "Support"]) {
+  for (const expected of ["Home", "Plan Trip", "Destinations", "About", "Support"]) {
     assert.match(app, new RegExp(`>${expected}<`));
   }
 });
 
-test("legacy Community URLs redirect to Travel Guide locally and when hosted", () => {
+test("legacy Community and Travel Guide URLs redirect to Home discovery", () => {
   assert.match(pages, /pageRouter\.get\(\["\/community", "\/community-feed"\]/);
-  assert.match(pages, /response\.redirect\(302, "\/travel-guide"\)/);
+  assert.match(pages, /response\.redirect\(302, "\/#discover"\)/);
+  assert.match(pages, /pageRouter\.get\("\/travel-guide"/);
   assert.match(worker, /\["\/community", "\/community-feed"\]\.includes\(url\.pathname\)/);
-  assert.match(worker, /Response\.redirect\(new URL\("\/travel-guide"/);
+  assert.match(worker, /Response\.redirect\(new URL\("\/#discover"/);
+  assert.match(worker, /url\.pathname === "\/travel-guide"/);
   assert.doesNotMatch(api, /communityRouter|apiRouter\.use\("\/community"/);
 });
 
