@@ -150,6 +150,7 @@ let activeFilter = "all";
 let activeDestination = null;
 let previewDestination = null;
 let previewTrigger = null;
+let guideScrollFrame = 0;
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -266,8 +267,9 @@ function insightFor(destination) {
   };
 }
 
-function updateInsights(destination) {
+function updateInsights(destination, animate = false) {
   if (!destination) return;
+  const destinationChanged = activeDestination?.slug !== destination.slug;
   activeDestination = destination;
   const insight = insightFor(destination);
   document.querySelector("#guide-insight-code").textContent = destination.code;
@@ -282,6 +284,48 @@ function updateInsights(destination) {
     card.classList.toggle("is-selected", card.dataset.guideDestination === destination.slug);
     card.setAttribute("aria-current", card.dataset.guideDestination === destination.slug ? "true" : "false");
   }
+  if (animate && destinationChanged) {
+    insightsCard.classList.remove("is-scroll-syncing");
+    void insightsCard.offsetWidth;
+    insightsCard.classList.add("is-scroll-syncing");
+  }
+}
+
+function syncInsightsWithVisibleCards() {
+  guideScrollFrame = 0;
+  if (window.innerWidth <= 900 || !visibleDestinations.length) return;
+
+  const anchorY = Math.min(window.innerHeight * 0.48, 520);
+  const rankedCards = [...document.querySelectorAll("[data-guide-destination]")]
+    .map((card) => {
+      const bounds = card.getBoundingClientRect();
+      return {
+        card,
+        bounds,
+        distance: Math.abs((bounds.top + bounds.bottom) / 2 - anchorY),
+      };
+    })
+    .filter(({ bounds }) => bounds.bottom > 110 && bounds.top < window.innerHeight)
+    .sort((left, right) => left.distance - right.distance);
+
+  if (!rankedCards.length) return;
+  const nearestDistance = rankedCards[0].distance;
+  const currentRowCard = rankedCards.find(({ card, distance }) =>
+    card.dataset.guideDestination === activeDestination?.slug
+      && Math.abs(distance - nearestDistance) < 24,
+  );
+  const selectedCard = currentRowCard?.card || rankedCards[0].card;
+  const selectedDestination = visibleDestinations.find(
+    (destination) => destination.slug === selectedCard.dataset.guideDestination,
+  );
+  if (selectedDestination?.slug !== activeDestination?.slug) {
+    updateInsights(selectedDestination, true);
+  }
+}
+
+function scheduleInsightScrollSync() {
+  if (guideScrollFrame) return;
+  guideScrollFrame = window.requestAnimationFrame(syncInsightsWithVisibleCards);
 }
 
 function packingTips(destination) {
@@ -599,9 +643,9 @@ function createDestinationCard(destination) {
   actions.append(plan, preview);
   body.append(location, title, summary, facts, tags, actions);
   card.append(visual, body);
-  card.addEventListener("mouseenter", () => updateInsights(destination));
-  card.addEventListener("focusin", () => updateInsights(destination));
-  card.addEventListener("click", () => updateInsights(destination));
+  card.addEventListener("mouseenter", () => updateInsights(destination, true));
+  card.addEventListener("focusin", () => updateInsights(destination, true));
+  card.addEventListener("click", () => updateInsights(destination, true));
   return card;
 }
 
@@ -638,6 +682,7 @@ function renderDestinations() {
     guideContainer.append(...visibleDestinations.map(createDestinationCard));
     const nextActive = visibleDestinations.find((destination) => destination.slug === activeDestination?.slug) || visibleDestinations[0];
     updateInsights(nextActive);
+    scheduleInsightScrollSync();
   }
   guideCount.textContent = `${visibleDestinations.length} ${visibleDestinations.length === 1 ? "destination" : "destinations"}`;
 }
@@ -672,6 +717,9 @@ for (const tab of document.querySelectorAll("[data-pocket-tab]")) {
   });
 }
 previewBackdrop.addEventListener("click", () => setPreviewOpen(false));
+insightsCard.addEventListener("animationend", () => insightsCard.classList.remove("is-scroll-syncing"));
+window.addEventListener("scroll", scheduleInsightScrollSync, { passive: true });
+window.addEventListener("resize", scheduleInsightScrollSync);
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && previewDrawer.getAttribute("aria-hidden") === "false") setPreviewOpen(false);
 });

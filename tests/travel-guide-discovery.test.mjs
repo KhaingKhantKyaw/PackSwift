@@ -26,8 +26,8 @@ test("travel guide exposes all discovery filters, search, and sorting controls",
 test("destination cards open the visual pocket guide", () => {
   assert.match(script, /"⚡ Plan in 1-Click"/);
   assert.match(script, /"Open Pocket Guide"/);
-  assert.match(script, /card\.addEventListener\("mouseenter", \(\) => updateInsights\(destination\)\)/);
-  assert.match(script, /card\.addEventListener\("focusin", \(\) => updateInsights\(destination\)\)/);
+  assert.match(script, /card\.addEventListener\("mouseenter", \(\) => updateInsights\(destination, true\)\)/);
+  assert.match(script, /card\.addEventListener\("focusin", \(\) => updateInsights\(destination, true\)\)/);
   assert.match(html, /id="guide-local-insights"/);
   assert.match(html, /id="guide-insight-transit"/);
   assert.match(html, /id="guide-insight-food"/);
@@ -84,10 +84,19 @@ test("a destination opened from Home selects its exact pocket guide", () => {
 test("discovery hub has responsive cards, sidebar, and off-canvas styling", () => {
   assert.match(styles, /\.guide-filter-tabs/);
   assert.match(styles, /\.guide-discovery-card/);
-  assert.match(styles, /\.guide-insights-sidebar \{\s*position: static;\s*min-width: 0;\s*align-self: start;/);
-  assert.doesNotMatch(styles, /\.guide-insights-sidebar \{\s*position: sticky/);
+  assert.match(styles, /\.guide-insights-sidebar \{\s*position: sticky;\s*top: 118px;\s*min-width: 0;\s*align-self: start;/);
+  assert.match(styles, /\.guide-local-insights\.is-scroll-syncing \{\s*animation: guide-insight-sync/);
   assert.match(styles, /\.guide-preview-drawer\[aria-hidden="false"\]/);
   assert.match(styles, /@media \(max-width: 900px\)[\s\S]*\.guide-discovery-grid/);
+});
+
+test("visible destination rows synchronize the sticky guide while scrolling", () => {
+  assert.match(script, /function syncInsightsWithVisibleCards\(\)/);
+  assert.match(script, /getBoundingClientRect\(\)/);
+  assert.match(script, /Math\.abs\(\(bounds\.top \+ bounds\.bottom\) \/ 2 - anchorY\)/);
+  assert.match(script, /window\.requestAnimationFrame\(syncInsightsWithVisibleCards\)/);
+  assert.match(script, /window\.addEventListener\("scroll", scheduleInsightScrollSync, \{ passive: true \}\)/);
+  assert.match(script, /updateInsights\(selectedDestination, true\)/);
 });
 
 test("the guide uses the existing worldwide destination catalog", () => {
