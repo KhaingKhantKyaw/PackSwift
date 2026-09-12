@@ -200,11 +200,14 @@ test("Gemini trip cards cannot keep provider-generated dates in the past", async
   assert.match(result.text, new RegExp(result.trip_card.start_date.replaceAll("/", "\\/")));
 });
 
-test("Gemini schema exposes only the requested clean planner fields", () => {
+test("Gemini schema exposes clean route, traveler, and lifestyle planner fields", () => {
   assert.equal(createTripPlanDeclaration.name, "create_trip_plan");
   assert.deepEqual(createTripPlanDeclaration.parametersJsonSchema.required, [
     "origin", "destination", "start_date", "end_date", "duration_nights", "adults_count",
-    "children_count", "trip_type", "travel_purpose", "budget_estimate", "currency",
+    "children_count", "trip_type", "travel_purpose", "planning_goal",
+    "accommodation_style", "food_style", "transport_style", "activity_style", "shopping_style",
+    "date_flexible", "trip_length_flexible", "must_have_experience",
+    "budget_estimate", "currency",
   ]);
   assert.match(packageJson, /"@google\/genai"/);
   assert.match(route, /process\.env\.GEMINI_API_KEY/);

@@ -28,11 +28,11 @@ test("minimum budget callout and warning state are driven by the route rule", ()
   assert.match(styles, /\.budget-info-callout\.is-warning \{[\s\S]*?border-color: #f0ad38;[\s\S]*?background: #fffbeb/);
   assert.match(client, /budgetMinimumHint\.classList\.toggle\("is-warning", isBelowMinimum\)/);
   assert.match(client, /budgetField\.classList\.toggle\("is-warning", isBelowMinimum\)/);
-  assert.match(client, /Budget-saving plan/);
-  assert.match(client, /is accepted\. PackSwift will prioritize free and lower-cost options/);
+  assert.match(client, /A leaner version is possible/);
+  assert.match(client, /is still accepted\. PackSwift will suggest fewer days/);
   assert.match(client, /budgetInput\.setCustomValidity\(""\)/);
   assert.match(client, /function routeDistanceKm/);
-  assert.match(client, /minimumDailyBudgetUsd \* normalizedTravelers \* normalizedDays/);
+  assert.match(client, /normalizedDailyRate \* normalizedTravelers \* normalizedDays/);
   assert.match(client, /\["bangkok::yangon", 100\]/);
   assert.match(client, /const minimumDailyBudgetUsd = 40/);
   assert.match(client, /minimumUsd \/ currencyRatesToUsd\[currency\]/);

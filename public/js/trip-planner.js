@@ -161,6 +161,29 @@ const groupLabels = {
   "business-duo": "Digital Nomad / Business Duo",
   senior: "Senior Travelers",
 };
+const planningGoalLabels = {
+  "make-possible": "Make the trip possible",
+  "fixed-budget": "Stay within my exact budget",
+  "best-value": "Best value",
+  "comfort-first": "Comfort first",
+  luxury: "Luxury experience",
+  "once-in-lifetime": "Once-in-a-lifetime trip",
+};
+const planningGoalSettings = {
+  "make-possible": { dailyMultiplier: 0.72, activityReserveUsd: 0 },
+  "fixed-budget": { dailyMultiplier: 0.9, activityReserveUsd: 0 },
+  "best-value": { dailyMultiplier: 1, activityReserveUsd: 0 },
+  "comfort-first": { dailyMultiplier: 1.22, activityReserveUsd: 0 },
+  luxury: { dailyMultiplier: 1.85, activityReserveUsd: 0 },
+  "once-in-lifetime": { dailyMultiplier: 1.05, activityReserveUsd: 90 },
+};
+const lifestyleDailyRatesUsd = {
+  accommodation: { hostel: 13, budget: 25, comfortable: 45, boutique: 75, luxury: 170 },
+  food: { street: 9, local: 17, mixed: 30, fine: 85 },
+  transport: { public: 5, mixed: 14, private: 42, premium: 85 },
+  activities: { free: 3, essential: 16, balanced: 32, premium: 95 },
+  shopping: { none: 0, light: 5, planned: 15, priority: 40 },
+};
 const liveBudgetRanks = { budget: 0, mid: 1, luxury: 2 };
 const livePaceActivityCount = {
   relaxed: 2,
@@ -418,18 +441,75 @@ function estimateTransitCostUsd(origin, destination) {
   return Math.max(origin.country === destination.country ? 25 : 75, roundToNearestFive(estimate));
 }
 
-function minimumTripBudgetDetails(scope, origin, destination, travelers, days) {
+function travelStyleFromFormData(data) {
+  return {
+    planningGoal: String(data.get("planningGoal") || "best-value"),
+    accommodationStyle: String(data.get("accommodationStyle") || "comfortable"),
+    foodStyle: String(data.get("foodStyle") || "mixed"),
+    transportStyle: String(data.get("transportStyle") || "mixed"),
+    activityStyle: String(data.get("activityStyle") || "balanced"),
+    shoppingStyle: String(data.get("extrasStyle") || "light"),
+    dateFlexible: data.get("dateFlexible") === "true",
+    tripLengthFlexible: data.get("tripLengthFlexible") === "true",
+    mustHaveExperience: String(data.get("mustHaveExperience") || "").trim(),
+  };
+}
+
+function lifestyleDailyRateUsd(style = {}) {
+  const base =
+    (lifestyleDailyRatesUsd.accommodation[style.accommodationStyle] || 45) +
+    (lifestyleDailyRatesUsd.food[style.foodStyle] || 30) +
+    (lifestyleDailyRatesUsd.transport[style.transportStyle] || 14) +
+    (lifestyleDailyRatesUsd.activities[style.activityStyle] || 32) +
+    (lifestyleDailyRatesUsd.shopping[style.shoppingStyle] ?? 5);
+  const settings = planningGoalSettings[style.planningGoal] || planningGoalSettings["best-value"];
+  return Math.max(22, Math.round(base * settings.dailyMultiplier));
+}
+
+function tripBudgetScenarios({
+  scope, origin, destination, adults = 1, children = 0, days = 1,
+  budgetUsd = 0, style = {},
+}) {
+  const travelers = Math.max(1, Number(adults) + Number(children));
+  const travelerUnits = Math.max(1, Number(adults) + Number(children) * 0.65);
+  const transitPerPersonUsd = estimateTransitCostUsd(origin, destination);
+  const transitTotalUsd = transitPerPersonUsd * travelers;
+  const lifestyleRate = lifestyleDailyRateUsd(style);
+  const mustHaveReserve = style.mustHaveExperience
+    ? (planningGoalSettings[style.planningGoal]?.activityReserveUsd || 55) * travelers
+    : 0;
+  const viableUsd = transitTotalUsd + 24 * travelerUnits * days;
+  const recommendedUsd = transitTotalUsd + lifestyleRate * travelerUnits * days + mustHaveReserve;
+  const comfortDailyRate = Math.max(105, lifestyleRate * 1.35);
+  const comfortUsd = transitTotalUsd + comfortDailyRate * travelerUnits * days + mustHaveReserve;
+  const fit = budgetUsd >= comfortUsd ? "comfort"
+    : budgetUsd >= recommendedUsd ? "recommended"
+      : budgetUsd >= viableUsd ? "viable" : "stretch";
+  return {
+    scope,
+    transitPerPersonUsd,
+    transitTotalUsd,
+    lifestyleDailyRateUsd: lifestyleRate,
+    viableUsd: Math.round(viableUsd),
+    recommendedUsd: Math.round(recommendedUsd),
+    comfortUsd: Math.round(comfortUsd),
+    fit,
+  };
+}
+
+function minimumTripBudgetDetails(scope, origin, destination, travelers, days, dailyRateUsd = minimumDailyBudgetUsd) {
   const normalizedTravelers = Math.max(1, Math.min(20, Math.round(Number(travelers) || 1)));
   const normalizedDays = Math.max(1, Math.min(30, Math.round(Number(days) || 1)));
   const transitCostPerPersonUsd = estimateTransitCostUsd(origin, destination);
   const totalTransitCostUsd = transitCostPerPersonUsd * normalizedTravelers;
-  const dailyStayCostUsd = minimumDailyBudgetUsd * normalizedTravelers * normalizedDays;
+  const normalizedDailyRate = Math.max(1, Number(dailyRateUsd) || minimumDailyBudgetUsd);
+  const dailyStayCostUsd = normalizedDailyRate * normalizedTravelers * normalizedDays;
   return {
     scope,
     distanceKm: routeDistanceKm(origin, destination),
     travelers: normalizedTravelers,
     days: normalizedDays,
-    dailyRatePerPersonUsd: minimumDailyBudgetUsd,
+    dailyRatePerPersonUsd: normalizedDailyRate,
     transitCostPerPersonUsd,
     totalTransitCostUsd,
     dailyStayCostUsd,
@@ -445,11 +525,19 @@ function minimumBudgetForCurrentRoute() {
   const travelers = Math.max(1, Number(data.get("adults") || 1)) +
     Math.max(0, Number(data.get("children") || 0));
   const days = getDays(String(data.get("startDate") || ""), String(data.get("endDate") || ""));
-  const details = minimumTripBudgetDetails(scope, origin, destination, travelers, days);
-  const minimumUsd = details.minimumBudgetUsd;
+  const style = travelStyleFromFormData(data);
+  const adults = Math.max(1, Number(data.get("adults") || 1));
+  const children = Math.max(0, Number(data.get("children") || 0));
+  const budget = parseBudgetValue(data.get("budget"));
   const currency = String(data.get("currency") || "USD");
+  const scenarios = tripBudgetScenarios({
+    scope, origin, destination, adults, children, days,
+    budgetUsd: budget * currencyRatesToUsd[currency], style,
+  });
+  const details = minimumTripBudgetDetails(scope, origin, destination, travelers, days, 24);
+  const minimumUsd = scenarios.viableUsd;
   const minimumAmount = Math.ceil(minimumUsd / currencyRatesToUsd[currency]);
-  return { ...details, origin, destination, minimumUsd, currency, minimumAmount };
+  return { ...details, ...scenarios, style, origin, destination, minimumUsd, currency, minimumAmount };
 }
 
 function updateBudgetMinimum() {
@@ -462,8 +550,8 @@ function updateBudgetMinimum() {
   const isBelowMinimum = amount > 0 && amount < rule.minimumAmount;
   syncBudgetCurrencySymbol();
   budgetInfoTitle.textContent = isBelowMinimum
-    ? "Budget-saving plan"
-    : "Route Budget Estimate";
+    ? "A leaner version is possible"
+    : `${planningGoalLabels[rule.style.planningGoal] || "Trip"} budget guide`;
   budgetInfoRoute.textContent = routeText;
   budgetInfoAmount.textContent = formatMoney(rule.minimumAmount, rule.currency);
   const travellerLabel = rule.travelers === 1 ? "traveller" : "travellers";
@@ -472,11 +560,10 @@ function updateBudgetMinimum() {
     : "";
   const estimateFormula =
     `${distanceLabel}~USD ${rule.transitCostPerPersonUsd} transit/person × ${rule.travelers} ${travellerLabel} + ` +
-    `USD ${rule.dailyRatePerPersonUsd}/day × ${rule.travelers} × ${rule.days} days.`;
+    `a minimum USD 24/day travel baseline across ${rule.days} days.`;
   budgetInfoDetail.textContent = isBelowMinimum
-    ? `${formatMoney(amount, rule.currency)} is accepted. PackSwift will prioritize free and lower-cost options. ` +
-      `The amount above is a comfort reference: ${estimateFormula}`
-    : estimateFormula;
+    ? `${formatMoney(amount, rule.currency)} is still accepted. PackSwift will suggest fewer days, flexible dates, lower-cost stays, public transit, and free highlights. ${estimateFormula}`
+    : `${estimateFormula} Your lifestyle-matched recommendation is ${formatMoney(rule.recommendedUsd / currencyRatesToUsd[rule.currency], rule.currency)}.`;
   budgetMinimumHint.classList.toggle("is-warning", isBelowMinimum);
   budgetField.classList.toggle("is-warning", isBelowMinimum);
   budgetInput.setCustomValidity("");
@@ -570,6 +657,24 @@ function liveActivityScore(activity, input, profile) {
   const budgetDistance = liveBudgetRanks[activity.budgetTier] - liveBudgetRanks[profile.tier];
   score += budgetDistance === 0 ? 18 : budgetDistance < 0 ? 10 : -12 * budgetDistance;
   if (activity.costUsd > profile.perPersonDayUsd * 1.5) score -= 12;
+  if (["make-possible", "fixed-budget"].includes(input.planningGoal)) {
+    score += activity.budgetTier === "budget" ? 24 : activity.budgetTier === "luxury" ? -24 : 2;
+  } else if (input.planningGoal === "luxury") {
+    score += activity.budgetTier === "luxury" ? 26 : activity.budgetTier === "budget" ? -8 : 8;
+  } else if (input.planningGoal === "once-in-lifetime") {
+    score += activity.budgetTier === "luxury" ? 12 : 5;
+  }
+  if (input.activityStyle === "free") score += activity.costUsd === 0 ? 28 : activity.budgetTier === "budget" ? 12 : -18;
+  if (input.activityStyle === "premium") score += activity.budgetTier === "luxury" ? 22 : -4;
+  if (input.shoppingStyle === "none" && (activity.experienceTags || []).includes("shopping")) score -= 30;
+  if (["planned", "priority"].includes(input.shoppingStyle) && (activity.experienceTags || []).includes("shopping")) {
+    score += input.shoppingStyle === "priority" ? 28 : 16;
+  }
+  if (input.mustHaveExperience) {
+    const wanted = input.mustHaveExperience.toLowerCase().split(/\s+/).filter((word) => word.length > 3);
+    const searchable = `${activity.title} ${activity.description} ${(activity.experienceTags || []).join(" ")}`.toLowerCase();
+    score += wanted.filter((word) => searchable.includes(word)).length * 16;
+  }
   const preferredTags = liveGroupTags[input.travelerDemographic] || [];
   score += (activity.experienceTags || [])
     .filter((tag) => preferredTags.includes(tag)).length * 8;
@@ -709,6 +814,10 @@ async function requestLiveRecommendation(
         late_riser: input.smartPace.lateRiser,
         midday_rest: input.smartPace.middayRest,
         cluster_nearby: input.smartPace.clusterNearby,
+        planning_goal: input.planningGoal,
+        activity_style: input.activityStyle,
+        shopping_style: input.shoppingStyle,
+        must_have_experience: input.mustHaveExperience || undefined,
         trip_id: activePlan?.persistence?.saved ? activePlan.persistence.tripId : undefined,
         saved_place_ids: [...selectedActivityPlaceIds],
         excluded_place_ids: [...dismissedActivityPlaceIds],
@@ -1109,6 +1218,58 @@ function scheduleLiveRecommendation(input) {
   }, 140);
 }
 
+function renderLiveBudgetOptions(scenarios, currency, planningGoal) {
+  const options = [
+    {
+      key: "viable",
+      eyebrow: "Lowest realistic",
+      title: "Minimum viable trip",
+      amountUsd: scenarios.viableUsd,
+      detail: "Safe basics, simple stays, public transport, and mostly free highlights.",
+    },
+    {
+      key: "recommended",
+      eyebrow: "Matched to you",
+      title: planningGoalLabels[planningGoal] || "Recommended trip",
+      amountUsd: scenarios.recommendedUsd,
+      detail: "Reflects the accommodation, food, transport, and activity levels you selected.",
+    },
+    {
+      key: "comfort",
+      eyebrow: "Optional upgrade",
+      title: "Comfort upgrade",
+      amountUsd: scenarios.comfortUsd,
+      detail: "Adds easier logistics, stronger location choices, and more spending flexibility.",
+    },
+  ];
+  const fitMessages = {
+    comfort: "Your budget can support this level",
+    recommended: "Your budget supports your matched plan",
+    viable: "Your budget supports the lean version",
+    stretch: "Adjustments are needed, but planning stays open",
+  };
+  document.querySelector("#live-budget-options").replaceChildren(
+    ...options.map((option) => {
+      const card = document.createElement("article");
+      card.className = `live-budget-option${option.key === "recommended" ? " is-recommended" : ""}`;
+      const eyebrow = document.createElement("span");
+      eyebrow.textContent = option.eyebrow;
+      const title = document.createElement("strong");
+      title.textContent = option.title;
+      const detail = document.createElement("small");
+      detail.textContent = option.detail;
+      const amount = document.createElement("em");
+      amount.textContent = formatMoney(option.amountUsd / currencyRatesToUsd[currency], currency);
+      card.append(eyebrow, title, detail, amount);
+      return card;
+    }),
+  );
+  const fit = document.createElement("span");
+  fit.textContent = fitMessages[scenarios.fit];
+  fit.dataset.budgetFit = scenarios.fit;
+  return fit;
+}
+
 function updateLiveTripPreview() {
   const data = new FormData(plannerForm);
   const origin = String(data.get("origin") || "").trim();
@@ -1123,6 +1284,8 @@ function updateLiveTripPreview() {
   const purposeValue = String(data.get("tripPurpose") || "leisure");
   const paceValue = String(data.get("pace") || "balanced");
   const groupValue = String(data.get("travelerDemographic") || "couples");
+  const travelStyle = travelStyleFromFormData(data);
+  const planningGoal = travelStyle.planningGoal;
   const smartPace = {
     lateRiser: data.get("lateRiser") === "true",
     middayRest: data.get("middayRest") === "true",
@@ -1135,6 +1298,16 @@ function updateLiveTripPreview() {
   const days = startDate && endDate ? getDays(startDate, endDate) : 1;
   const budgetUsd = budget * currencyRatesToUsd[currency];
   const budgetProfile = liveBudgetProfile(budgetUsd, days, travelers);
+  const budgetScenarios = tripBudgetScenarios({
+    scope: String(data.get("tripScope") || "international"),
+    origin: resolveRouteLocation(origin),
+    destination: resolveRouteLocation(destination),
+    adults,
+    children,
+    days,
+    budgetUsd,
+    style: travelStyle,
+  });
 
   document.querySelector("#live-destination").textContent =
     origin && destination ? `${origin} → ${destination}` : destination || "Choose a route";
@@ -1145,6 +1318,8 @@ function updateLiveTripPreview() {
       budgetProfile.perPersonDayUsd / currencyRatesToUsd[currency],
       currency,
     )}/person/day`;
+  document.querySelector("#live-planning-goal").textContent =
+    planningGoalLabels[planningGoal] || titleCase(planningGoal);
   document.querySelector("#live-travellers").textContent =
     `${adults} ${adults === 1 ? "adult" : "adults"} · ${children} ${children === 1 ? "child" : "children"}`;
   document.querySelector("#live-style").textContent =
@@ -1163,6 +1338,8 @@ function updateLiveTripPreview() {
     startDate && endDate ? `${days} ${days === 1 ? "day" : "days"}` : "Dates pending";
   document.querySelector("#live-tag-budget").textContent =
     `${budgetProfile.label} budget`;
+  document.querySelector("#live-tag-goal").textContent =
+    planningGoalLabels[planningGoal] || titleCase(planningGoal);
   document.querySelector("#live-tag-group").textContent = group;
   document.querySelector("#live-tag-pace").textContent = pace;
   const activeSmartPace = [
@@ -1183,6 +1360,11 @@ function updateLiveTripPreview() {
     notices.push("Worldwide discovery is active for the strongest budget match.");
   }
   if (withPets) notices.push("Pet documents and pet-care essentials will be added.");
+  if (travelStyle.mustHaveExperience) {
+    notices.push(`Protected priority: ${travelStyle.mustHaveExperience}. PackSwift will save elsewhere before removing it.`);
+  }
+  if (travelStyle.dateFlexible) notices.push("Flexible dates can be used to reduce transport and stay costs.");
+  if (travelStyle.tripLengthFlexible) notices.push("Trip length may be adjusted before essential experiences are removed.");
   if (smartPace.lateRiser) notices.push("Daily activities will begin after 10 AM.");
   if (smartPace.middayRest) notices.push("Each day includes a protected 2-hour afternoon rest.");
   if (smartPace.clusterNearby) notices.push("Activities will be grouped by nearby areas to reduce transit.");
@@ -1195,7 +1377,9 @@ function updateLiveTripPreview() {
     );
   }
   document.querySelector("#live-announcement").textContent = notices[0];
+  const budgetFitNotice = renderLiveBudgetOptions(budgetScenarios, currency, planningGoal);
   document.querySelector("#live-notices").replaceChildren(
+    budgetFitNotice,
     ...notices.slice(1).map((notice) => {
       const item = document.createElement("span");
       item.textContent = notice;
@@ -1219,6 +1403,7 @@ function updateLiveTripPreview() {
     smartPace,
     travelerDemographic: groupValue,
     travelingWithPets: withPets,
+    ...travelStyle,
   });
 }
 
@@ -1335,6 +1520,7 @@ async function loadDestinationCatalog() {
 
 function collectInput() {
   const formData = new FormData(plannerForm);
+  const travelStyle = travelStyleFromFormData(formData);
   const currency = String(formData.get("currency"));
   const budget = parseBudgetValue(formData.get("budget"));
   const tripPurpose = String(formData.get("tripPurpose") || "leisure");
@@ -1364,6 +1550,7 @@ function collectInput() {
     travelingWithPets: formData.get("travelingWithPets") === "true",
     interests: [...(purposeInterests[tripPurpose] || purposeInterests.leisure)],
     notes: String(formData.get("notes") || "").trim(),
+    ...travelStyle,
   };
 }
 
@@ -1469,6 +1656,9 @@ function buildLocalPacking(input, weather) {
   if (weather.rain !== "low") list.Comfort.push("Compact umbrella or rain shell");
   if (input.tripPurpose === "business") list.Essentials.push("Meeting documents and laptop");
   if (input.tripPurpose === "adventure") list.Comfort.push("Activity-ready footwear");
+  if (input.accommodationStyle === "hostel") list.Comfort.push("Travel towel", "Small luggage lock", "Sleep mask");
+  if (input.foodStyle === "fine" || input.planningGoal === "luxury") list.Clothing.push("Smart evening outfit");
+  if (input.transportStyle === "public") list.Comfort.push("Compact transit daypack", "Offline transit map");
   if (input.travelingWithPets) list["Pet care"] = ["Pet documents", "Secure carrier", "Food and medication"];
   return list;
 }
@@ -1502,9 +1692,15 @@ function localScore(destination, input, days, month, weather) {
     (input.preferredClimate === "warm" && weather.climate === "hot")
       ? 8
       : 3;
+  const intentionFit = input.planningGoal === "luxury"
+    ? Math.min(7, destination.dailyBudgetUsd / 25)
+    : ["make-possible", "fixed-budget"].includes(input.planningGoal)
+      ? Math.min(7, 140 / Math.max(25, destination.dailyBudgetUsd))
+      : 5;
+  const gatewayFit = Math.min(7, Number(destination.businessScore || 0) * 1.3);
   return Math.min(
     100,
-    Math.round(budgetFit + Math.min(17, 5 + matches * 3) + monthFit + purposeFit + petFit + climateFit),
+    Math.round(budgetFit + Math.min(17, 5 + matches * 3) + monthFit + purposeFit + petFit + climateFit + intentionFit + gatewayFit),
   );
 }
 
@@ -1580,13 +1776,34 @@ async function buildLocalPlan(input) {
     days,
   );
   const estimatedTransitCostUsd = routeBudget.transitCostPerPersonUsd;
-  const estimatedCostUsd = destination.dailyBudgetUsd * days * input.travelers;
+  const style = {
+    planningGoal: input.planningGoal || "best-value",
+    accommodationStyle: input.accommodationStyle || "comfortable",
+    foodStyle: input.foodStyle || "mixed",
+    transportStyle: input.transportStyle || "mixed",
+    activityStyle: input.activityStyle || "balanced",
+    shoppingStyle: input.shoppingStyle || "light",
+    mustHaveExperience: input.mustHaveExperience || "",
+  };
+  const budgetScenarios = tripBudgetScenarios({
+    scope: input.tripScope, origin, destination: routeDestination,
+    adults: input.adults, children: input.children, days,
+    budgetUsd: input.budgetUsd, style,
+  });
+  const selectedEstimateUsd = input.planningGoal === "make-possible"
+    ? budgetScenarios.viableUsd
+    : input.planningGoal === "luxury"
+      ? budgetScenarios.comfortUsd
+      : budgetScenarios.recommendedUsd;
+  const estimatedCostUsd = selectedEstimateUsd;
   const estimatedCost = estimatedCostUsd / currencyRatesToUsd[input.currency];
   const budgetDifference = Math.round(Math.abs(input.budget - estimatedCost) * 100) / 100;
   const withinBudget = estimatedCost <= input.budget;
   const budgetMessage = withinBudget
-    ? `The estimated local cost stays within your ${formatMoney(input.budget, input.currency)} budget, leaving about ${formatMoney(budgetDifference, input.currency)} for flexibility.`
-    : `The estimate is about ${formatMoney(budgetDifference, input.currency)} above your current budget; shorten the stay or compare the suggested alternatives.`;
+    ? `Your ${planningGoalLabels[input.planningGoal].toLowerCase()} plan stays within ${formatMoney(input.budget, input.currency)}, leaving about ${formatMoney(budgetDifference, input.currency)} for flexibility.`
+    : ["make-possible", "fixed-budget"].includes(input.planningGoal)
+      ? `${formatMoney(input.budget, input.currency)} remains accepted as your limit. PackSwift will protect essential experiences and suggest flexible dates, fewer nights, simpler stays, public transport, and free highlights.`
+      : `The lifestyle-matched plan is about ${formatMoney(budgetDifference, input.currency)} above your current budget. Compare the minimum viable and comfort paths before changing the trip.`;
   const previewDays = Math.min(days, 4);
   const itinerary = Array.from({ length: previewDays }, (_, index) => {
     const first = destination.attractions[index % destination.attractions.length];
@@ -1596,8 +1813,12 @@ async function buildLocalPlan(input) {
       title: index === 0 ? "Arrive and orient" : `Explore ${first}`,
       morning: input.smartPace.lateRiser
         ? `10:30 start · ${index === 0 ? "Settle in and orient" : first}`
-        : index === 0 ? "08:30 start · Settle in and orient" : `08:30 start · ${first}`,
-      afternoon: input.smartPace.middayRest
+        : index === 0
+          ? `08:30 start · ${["private", "premium"].includes(input.transportStyle) ? "Private airport transfer" : "Practical airport transfer"} and orientation`
+          : `08:30 start · ${first}`,
+      afternoon: index === 1 && input.mustHaveExperience
+        ? `Protected priority · ${input.mustHaveExperience}`
+        : input.smartPace.middayRest
         ? `14:00–16:00 rest · ${second} afterwards`
         : input.pace === "relaxed"
           ? `Unhurried time around ${second}`
@@ -1650,9 +1871,18 @@ async function buildLocalPlan(input) {
       withinBudget,
       difference: budgetDifference,
       message: budgetMessage,
+      planningGoal: input.planningGoal,
+      fit: budgetScenarios.fit,
+    },
+    budgetScenarios: {
+      ...budgetScenarios,
+      viable: budgetScenarios.viableUsd / currencyRatesToUsd[input.currency],
+      recommended: budgetScenarios.recommendedUsd / currencyRatesToUsd[input.currency],
+      comfort: budgetScenarios.comfortUsd / currencyRatesToUsd[input.currency],
+      currency: input.currency,
     },
     bestTimeToVisit: destination.bestMonths.map((value) => monthNames[value - 1]).join(", "),
-    costNote: `Estimated local costs include accommodation, meals, daily transport, and typical activities. The minimum route budget uses about USD ${routeBudget.transitCostPerPersonUsd} transit per person plus USD ${routeBudget.dailyRatePerPersonUsd} per traveller per day.`,
+    costNote: `This estimate includes return transit, ${input.accommodationStyle} accommodation, ${input.foodStyle} dining, ${input.transportStyle} transport, and ${input.activityStyle} activities. The budget paths are guidance—not a barrier to planning.`,
     summary: `${destination.name} is the strongest ${purposeLabels[input.tripPurpose] || titleCase(input.tripPurpose)} match for ${input.travelers} ${input.travelers === 1 ? "traveller" : "travellers"} in ${monthNames[month - 1]}. ${budgetMessage}`,
     weather: destination.weather,
     itinerary,
@@ -1935,6 +2165,15 @@ function planAnalysisInput(plan) {
     travelingWithPets: input.travelingWithPets === true,
     interests: input.interests || [],
     notes: input.notes || "",
+    planningGoal: input.planningGoal || "best-value",
+    accommodationStyle: input.accommodationStyle || "comfortable",
+    foodStyle: input.foodStyle || "mixed",
+    transportStyle: input.transportStyle || "mixed",
+    activityStyle: input.activityStyle || "balanced",
+    shoppingStyle: input.shoppingStyle || "light",
+    dateFlexible: input.dateFlexible === true,
+    tripLengthFlexible: input.tripLengthFlexible === true,
+    mustHaveExperience: input.mustHaveExperience || "",
     arrivalAt: input.arrivalAt || null,
     hotelName: input.hotelName || null,
     hotelAddress: input.hotelAddress || null,
@@ -1995,6 +2234,28 @@ function restorePlannerFormFromPlan(plan) {
   );
   petOption.checked = input.travelingWithPets === true;
   tripNotesInput.value = input.notes || "";
+  const lifestyleValues = {
+    accommodationStyle: input.accommodationStyle || "comfortable",
+    foodStyle: input.foodStyle || "mixed",
+    transportStyle: input.transportStyle || "mixed",
+    activityStyle: input.activityStyle || "balanced",
+    shoppingStyle: input.shoppingStyle || "light",
+  };
+  for (const [name, value] of Object.entries(lifestyleValues)) {
+    const control = plannerForm.elements.namedItem(name);
+    if (control && [...control.options].some((option) => option.value === value)) {
+      control.value = value;
+    }
+  }
+  const restoredGoal = input.planningGoal || "best-value";
+  for (const option of plannerForm.querySelectorAll('input[name="planningGoal"]')) {
+    option.checked = option.value === restoredGoal;
+  }
+  for (const field of ["dateFlexible", "tripLengthFlexible"]) {
+    const control = plannerForm.querySelector(`input[name="${field}"]`);
+    control.checked = input[field] === true;
+  }
+  plannerForm.elements.namedItem("mustHaveExperience").value = input.mustHaveExperience || "";
   updateBudgetMinimum();
 }
 
@@ -2023,6 +2284,15 @@ function storedTripPlannerPlan(trip) {
         clusterNearby: true,
       },
       interests: trip.interests || [],
+      planningGoal: trip.preferences?.planningGoal || "best-value",
+      accommodationStyle: trip.preferences?.accommodationStyle || "comfortable",
+      foodStyle: trip.preferences?.foodStyle || "mixed",
+      transportStyle: trip.preferences?.transportStyle || "mixed",
+      activityStyle: trip.preferences?.activityStyle || "balanced",
+      shoppingStyle: trip.preferences?.shoppingStyle || "light",
+      dateFlexible: trip.preferences?.dateFlexible === true,
+      tripLengthFlexible: trip.preferences?.tripLengthFlexible === true,
+      mustHaveExperience: trip.preferences?.mustHaveExperience || "",
     },
     destination: trip.destination,
     weather: trip.weather,
@@ -2082,6 +2352,15 @@ function pendingRecommendationInput(recommendation) {
     preferredClimate: "any",
     interests: [...(purposeInterests[tripPurpose] || purposeInterests.leisure)],
     notes: recommendation.summary_pitch || "",
+    planningGoal: recommendation.planning_goal || "best-value",
+    accommodationStyle: recommendation.accommodation_style || "comfortable",
+    foodStyle: recommendation.food_style || "mixed",
+    transportStyle: recommendation.transport_style || "mixed",
+    activityStyle: recommendation.activity_style || "balanced",
+    shoppingStyle: recommendation.shopping_style || "light",
+    dateFlexible: recommendation.date_flexible === true,
+    tripLengthFlexible: recommendation.trip_length_flexible === true,
+    mustHaveExperience: recommendation.must_have_experience || "",
   };
 }
 
@@ -2210,6 +2489,37 @@ async function hydrateConciergeTripFromQuery() {
     plannerFeedback.textContent = "Your saved Concierge trip inputs are loaded and ready to adjust.";
   } catch (error) {
     plannerFeedback.textContent = error.message || "The Concierge trip could not be loaded.";
+  }
+}
+
+async function loadSavedTravelPreferences() {
+  if (activePlan) return;
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("trip_id") || params.has("pending_ai_trip") || params.has("pending_packswift_trip")) return;
+  if (sessionStorage.getItem(pendingPackswiftTripKey) || sessionStorage.getItem(legacyPendingAiTripKey)) return;
+  const user = await window.PackSwift.authReady;
+  if (!user) return;
+  try {
+    const { profile } = await window.PackSwift.api("/api/profile", { cache: "no-store" });
+    const preferences = profile?.travelPreferences;
+    if (!preferences) return;
+    restorePlannerFormFromPlan({
+      input: {
+        ...collectInput(),
+        planningGoal: preferences.planning_goal,
+        accommodationStyle: preferences.accommodation_style,
+        foodStyle: preferences.food_style,
+        transportStyle: preferences.transport_style,
+        activityStyle: preferences.activity_style,
+        shoppingStyle: preferences.shopping_style,
+        dateFlexible: Boolean(preferences.date_flexible),
+        tripLengthFlexible: Boolean(preferences.trip_length_flexible),
+        mustHaveExperience: preferences.must_have_experience || "",
+      },
+    });
+    updateLiveTripPreview();
+  } catch {
+    // A first-time traveler simply keeps the balanced defaults.
   }
 }
 
@@ -2417,6 +2727,13 @@ for (const input of [
   document.querySelector("#traveler-demographic"),
   ...plannerForm.querySelectorAll('input[name="pace"]'),
   ...plannerForm.querySelectorAll('.smart-pace-toggle input'),
+  ...plannerForm.querySelectorAll('input[name="planningGoal"]'),
+  document.querySelector("#accommodation-style"),
+  document.querySelector("#food-style"),
+  document.querySelector("#transport-style"),
+  document.querySelector("#activity-style"),
+  document.querySelector("#extras-style"),
+  ...plannerForm.querySelectorAll('input[name="dateFlexible"], input[name="tripLengthFlexible"]'),
 ]) {
   input.addEventListener("change", updateBudgetMinimum);
   if ([budgetInput, originSearch, destinationSearch].includes(input)) {
@@ -2444,7 +2761,10 @@ syncTripScopeState();
 updateBudgetMinimum();
 updateLiveTripPreview();
 loadDestinationCatalog()
-  .then(() => hydrateConciergeTripFromQuery())
+  .then(async () => {
+    await hydrateConciergeTripFromQuery();
+    await loadSavedTravelPreferences();
+  })
   .catch(() => {});
 
 async function resumePendingTripSave() {

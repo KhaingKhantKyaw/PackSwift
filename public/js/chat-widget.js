@@ -46,6 +46,17 @@
 
   let chatHistory = loadHistory();
   let sending = false;
+  let accountTravelPreferences = null;
+
+  window.PackSwift.authReady.then(async (user) => {
+    if (!user) return;
+    try {
+      const { profile } = await window.PackSwift.api("/api/profile", { cache: "no-store" });
+      accountTravelPreferences = profile?.travelPreferences || null;
+    } catch {
+      accountTravelPreferences = null;
+    }
+  });
 
   function validRecommendation(value) {
     const enums = {
@@ -101,6 +112,17 @@
       tripPurpose: input.tripPurpose || handoff.tripPurpose || null,
       travelGroup: input.travelerDemographic || handoff.travelerDemographic || null,
       pace: input.pace || handoff.pace || null,
+      travelStyle: {
+        planningGoal: input.planningGoal || accountTravelPreferences?.planning_goal || null,
+        accommodationStyle: input.accommodationStyle || accountTravelPreferences?.accommodation_style || null,
+        foodStyle: input.foodStyle || accountTravelPreferences?.food_style || null,
+        transportStyle: input.transportStyle || accountTravelPreferences?.transport_style || null,
+        activityStyle: input.activityStyle || accountTravelPreferences?.activity_style || null,
+        shoppingStyle: input.shoppingStyle || accountTravelPreferences?.shopping_style || null,
+        dateFlexible: input.dateFlexible ?? Boolean(accountTravelPreferences?.date_flexible),
+        tripLengthFlexible: input.tripLengthFlexible ?? Boolean(accountTravelPreferences?.trip_length_flexible),
+        mustHaveExperience: input.mustHaveExperience || accountTravelPreferences?.must_have_experience || null,
+      },
       weather: plan.weather || handoff.weather || null,
     };
   }
@@ -344,7 +366,15 @@
 
     const badges = document.createElement("div");
     badges.className = "concierge-trip-badges";
-    [recommendation.scope, recommendation.travel_group, recommendation.travel_purpose, recommendation.travel_pace]
+    const planningGoalLabel = {
+      "make-possible": "Make it possible",
+      "fixed-budget": "Strict budget",
+      "best-value": "Best value",
+      "comfort-first": "Comfort first",
+      luxury: "Luxury",
+      "once-in-lifetime": "Once-in-a-lifetime",
+    }[recommendation.planning_goal] || "Best value";
+    [recommendation.scope, recommendation.travel_group, recommendation.travel_purpose, recommendation.travel_pace, planningGoalLabel]
       .forEach((value) => {
         const badge = document.createElement("span");
         badge.textContent = value;
@@ -361,6 +391,7 @@
       recommendationMeta("Total budget", new Intl.NumberFormat("en-US", {
         style: "currency", currency: recommendation.currency, maximumFractionDigits: 0,
       }).format(recommendation.total_budget)),
+      recommendationMeta("Travel style", `${recommendation.accommodation_style || "comfortable"} stay · ${recommendation.transport_style || "mixed"} transport`),
     );
 
     const itinerary = document.createElement("div");

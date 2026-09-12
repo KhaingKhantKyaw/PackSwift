@@ -80,7 +80,9 @@ test("minimum budget uses distance, transit per person, trip days, and party siz
   });
   assert.equal(tightBudgetPlan.input.budget, 2354);
   assert.equal(tightBudgetPlan.input.route.minimumBudgetUsd, 2355);
-  assert.equal(tightBudgetPlan.budgetFit.withinBudget, false);
+  assert.equal(tightBudgetPlan.budgetFit.withinBudget, true);
+  assert.equal(tightBudgetPlan.input.planningGoal, "best-value");
+  assert.ok(tightBudgetPlan.budgetScenarios.viableUsd > 0);
   const plan = createTravelPlan({
     tripScope: "international",
     origin: "Yangon",

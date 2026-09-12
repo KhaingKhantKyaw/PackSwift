@@ -80,7 +80,19 @@ test("Concierge parses a strict function call into a safe actionable recommendat
       highlights: ["Explore a tailored Bangkok highlight"],
     })),
   };
-  assert.deepEqual(normalizeTripRecommendation(recommendation), recommendation);
+  const normalizedRecommendation = normalizeTripRecommendation(recommendation);
+  assert.deepEqual(normalizedRecommendation, {
+    ...recommendation,
+    planning_goal: "best-value",
+    accommodation_style: "comfortable",
+    food_style: "mixed",
+    transport_style: "mixed",
+    activity_style: "balanced",
+    shopping_style: "light",
+    date_flexible: false,
+    trip_length_flexible: false,
+    must_have_experience: "",
+  });
   const cleaned = normalizeTripRecommendation({
     ...recommendation,
     destination: "Bangkok, Thailand for a short trip",
@@ -98,8 +110,8 @@ test("Concierge parses a strict function call into a safe actionable recommendat
       }), { status: 200, headers: { "content-type": "application/json" } }),
     },
   );
-  assert.deepEqual(result.trip_recommendation, recommendation);
-  assert.deepEqual(result.trip_card, recommendation);
+  assert.deepEqual(result.trip_recommendation, normalizedRecommendation);
+  assert.deepEqual(result.trip_card, normalizedRecommendation);
   assert.match(result.reply, /4-night \/ 5-day/i);
   assert.equal(normalizeTripRecommendation({ ...recommendation, end_date: "09/09/2026" }), null);
 });
@@ -171,7 +183,7 @@ test("Express Concierge route validates and rate-limits public chat messages", (
   assert.match(route, /limit: 30/);
   assert.match(route, /isLength\(\{ min: 1, max: 1200 \}\)/);
   assert.match(route, /isArray\(\{ max: 20 \}\)/);
-  assert.match(route, /askTravelConcierge\(message, chatHistory\)/);
+  assert.match(route, /askTravelConcierge\(message, chatHistory, \{ tripContext \}\)/);
   assert.match(route, /request\.body\.history \|\| request\.body\.chatHistory/);
   assert.match(route, /success: true/);
   assert.match(route, /text,/);

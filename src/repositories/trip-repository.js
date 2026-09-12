@@ -119,6 +119,15 @@ export async function saveTrip(plan, userId = null) {
         adults: plan.input.adults || plan.input.travelers || 1,
         children: plan.input.children || 0,
       },
+      planningGoal: plan.input.planningGoal || "best-value",
+      accommodationStyle: plan.input.accommodationStyle || "comfortable",
+      foodStyle: plan.input.foodStyle || "mixed",
+      transportStyle: plan.input.transportStyle || "mixed",
+      activityStyle: plan.input.activityStyle || "balanced",
+      shoppingStyle: plan.input.shoppingStyle || "light",
+      dateFlexible: plan.input.dateFlexible === true,
+      tripLengthFlexible: plan.input.tripLengthFlexible === true,
+      mustHaveExperience: plan.input.mustHaveExperience || "",
     };
     const timeline = buildDetailedTimeline(plan, {
       slug: destination?.slug || plan.destination.slug,
@@ -130,6 +139,36 @@ export async function saveTrip(plan, userId = null) {
       arrivalAt: plan.input.arrivalAt || null,
       hotelName: plan.input.hotelName || null,
     });
+
+    await connection.execute(
+      `INSERT INTO traveler_profiles
+        (user_id, planning_goal, accommodation_style, food_style,
+         transport_style, activity_style, shopping_style, date_flexible,
+         trip_length_flexible, must_have_experience)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON DUPLICATE KEY UPDATE
+         planning_goal = VALUES(planning_goal),
+         accommodation_style = VALUES(accommodation_style),
+         food_style = VALUES(food_style),
+         transport_style = VALUES(transport_style),
+         activity_style = VALUES(activity_style),
+         shopping_style = VALUES(shopping_style),
+         date_flexible = VALUES(date_flexible),
+         trip_length_flexible = VALUES(trip_length_flexible),
+         must_have_experience = VALUES(must_have_experience)`,
+      [
+        userId,
+        preferences.planningGoal,
+        preferences.accommodationStyle,
+        preferences.foodStyle,
+        preferences.transportStyle,
+        preferences.activityStyle,
+        preferences.shoppingStyle,
+        preferences.dateFlexible,
+        preferences.tripLengthFlexible,
+        preferences.mustHaveExperience || null,
+      ],
+    );
 
     const [tripResult] = await connection.execute(
       `INSERT INTO trip_sessions

@@ -66,7 +66,7 @@ aiRouter.post(
         result = { text: OFF_TOPIC_REFUSAL, reply: OFF_TOPIC_REFUSAL, source: "domain-guardrail" };
       } else if (process.env.GEMINI_API_KEY) {
         try {
-          result = await askTravelConcierge(message, chatHistory);
+          result = await askTravelConcierge(message, chatHistory, { tripContext });
         } catch (providerError) {
           console.error("PackSwift Gemini provider error:", providerError.message);
           result = await createConciergeResponse(

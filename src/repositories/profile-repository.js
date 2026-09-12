@@ -3,7 +3,7 @@ import { findUserById } from "./user-repository.js";
 
 export async function getProfile(userId) {
   const pool = getDatabasePool();
-  const [user, tripsResult, readinessTripsResult] = await Promise.all([
+  const [user, tripsResult, readinessTripsResult, travelerProfileResult] = await Promise.all([
     findUserById(userId),
     pool.execute(
       `SELECT id, destination, travel_month, budget, trip_data, created_at, updated_at
@@ -30,6 +30,15 @@ export async function getProfile(userId) {
        WHERE user_id = ? AND status <> 'archived'
        ORDER BY start_date IS NULL, start_date, updated_at DESC
        LIMIT 40`,
+      [userId],
+    ),
+    pool.execute(
+      `SELECT planning_goal, accommodation_style, food_style, transport_style,
+              activity_style, shopping_style, date_flexible, trip_length_flexible,
+              must_have_experience, updated_at
+       FROM traveler_profiles
+       WHERE user_id = ?
+       LIMIT 1`,
       [userId],
     ),
   ]);
@@ -60,5 +69,6 @@ export async function getProfile(userId) {
     readyTrips: readinessTrips.filter(
       (trip) => trip.readiness_stage === "ready",
     ),
+    travelPreferences: travelerProfileResult[0][0] || null,
   };
 }

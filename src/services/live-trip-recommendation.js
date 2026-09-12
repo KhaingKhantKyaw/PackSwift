@@ -88,6 +88,24 @@ function activityScore(activity, input, profile) {
   const budgetDistance = budgetRanks[activity.budgetTier] - budgetRanks[profile.tier];
   score += budgetDistance === 0 ? 18 : budgetDistance < 0 ? 10 : -12 * budgetDistance;
   if (activity.costUsd > profile.perPersonDayUsd * 1.5) score -= 12;
+  if (["make-possible", "fixed-budget"].includes(input.planningGoal)) {
+    score += activity.budgetTier === "budget" ? 24 : activity.budgetTier === "luxury" ? -24 : 2;
+  } else if (input.planningGoal === "luxury") {
+    score += activity.budgetTier === "luxury" ? 26 : activity.budgetTier === "budget" ? -8 : 8;
+  } else if (input.planningGoal === "once-in-lifetime") {
+    score += activity.budgetTier === "luxury" ? 12 : 5;
+  }
+  if (input.activityStyle === "free") score += activity.costUsd === 0 ? 28 : activity.budgetTier === "budget" ? 12 : -18;
+  if (input.activityStyle === "premium") score += activity.budgetTier === "luxury" ? 22 : -4;
+  if (input.shoppingStyle === "none" && activity.experienceTags.includes("shopping")) score -= 30;
+  if (["planned", "priority"].includes(input.shoppingStyle) && activity.experienceTags.includes("shopping")) {
+    score += input.shoppingStyle === "priority" ? 28 : 16;
+  }
+  if (input.mustHaveExperience) {
+    const wanted = input.mustHaveExperience.toLowerCase().split(/\s+/).filter((word) => word.length > 3);
+    const searchable = `${activity.title} ${activity.description} ${activity.experienceTags.join(" ")}`.toLowerCase();
+    score += wanted.filter((word) => searchable.includes(word)).length * 16;
+  }
 
   const preferredTags = groupExperienceTags[input.group] || [];
   score += activity.experienceTags.filter((tag) => preferredTags.includes(tag)).length * 8;

@@ -23,6 +23,7 @@ import {
 } from "../repositories/readiness-repository.js";
 import {
   buildPackingList,
+  buildTripBudgetScenarios,
   currencyRatesToUsd,
   createTravelPlan,
   destinationCatalog,
@@ -122,8 +123,14 @@ tripsRouter.post(
     body("end_date").isString().isLength({ min: 10, max: 10 }),
     body("adults_count").isInt({ min: 1, max: 12 }).toInt(),
     body("children_count").optional().isInt({ min: 0, max: 8 }).toInt(),
-    body("currency").isIn(["THB", "USD", "MMK"]),
+    body("currency").isIn(["THB", "USD", "MMK", "SGD", "CNY"]),
     body("budget").optional().isFloat({ min: 1, max: 10000000 }).toFloat(),
+    body("planning_goal").optional().isIn(["make-possible", "fixed-budget", "best-value", "comfort-first", "luxury", "once-in-lifetime"]),
+    body("accommodation_style").optional().isIn(["hostel", "budget", "comfortable", "boutique", "luxury"]),
+    body("food_style").optional().isIn(["street", "local", "mixed", "fine"]),
+    body("transport_style").optional().isIn(["public", "mixed", "private", "premium"]),
+    body("activity_style").optional().isIn(["free", "essential", "balanced", "premium"]),
+    body("shopping_style").optional().isIn(["none", "light", "planned", "priority"]),
   ],
   validateRequest,
   (request, response, next) => {
@@ -142,7 +149,18 @@ tripsRouter.post(
       const scope = origin.country === destination.country ? "domestic" : "international";
       const details = minimumTripBudgetDetails(scope, origin, destination, { travelers, days });
       const rateToUsd = currencyRatesToUsd[request.body.currency];
-      const minimumAmount = Math.round((details.minimumBudgetUsd / rateToUsd) * 100) / 100;
+      const scenarios = buildTripBudgetScenarios({
+        scope, origin, destination, adults: request.body.adults_count,
+        children: request.body.children_count || 0, days,
+        budgetUsd: Number(request.body.budget || 0) * rateToUsd,
+        planningGoal: request.body.planning_goal,
+        accommodationStyle: request.body.accommodation_style,
+        foodStyle: request.body.food_style,
+        transportStyle: request.body.transport_style,
+        activityStyle: request.body.activity_style,
+        shoppingStyle: request.body.shopping_style,
+      });
+      const minimumAmount = Math.round((scenarios.viableUsd / rateToUsd) * 100) / 100;
       const transitAmount = Math.round((details.transitCostPerPersonUsd / rateToUsd) * 100) / 100;
       const submitted = Number(request.body.budget);
       response.json({
@@ -158,6 +176,13 @@ tripsRouter.post(
           amount: minimumAmount,
           currency: request.body.currency,
           usd: details.minimumBudgetUsd,
+        },
+        budget_paths: {
+          minimum_viable: Math.round((scenarios.viableUsd / rateToUsd) * 100) / 100,
+          lifestyle_matched: Math.round((scenarios.recommendedUsd / rateToUsd) * 100) / 100,
+          comfort_upgrade: Math.round((scenarios.comfortUsd / rateToUsd) * 100) / 100,
+          currency: request.body.currency,
+          fit: scenarios.fit,
         },
         ...(Number.isFinite(submitted)
           ? {
@@ -219,6 +244,15 @@ function recommendationPlannerInput(recommendation) {
     travelerDemographic: recommendationGroupMap[recommendation.travel_group],
     pace: recommendationPaceMap[recommendation.travel_pace],
     smartPace: { lateRiser: false, middayRest: false, clusterNearby: true },
+    planningGoal: recommendation.planning_goal || "best-value",
+    accommodationStyle: recommendation.accommodation_style || "comfortable",
+    foodStyle: recommendation.food_style || "mixed",
+    transportStyle: recommendation.transport_style || "mixed",
+    activityStyle: recommendation.activity_style || "balanced",
+    shoppingStyle: recommendation.shopping_style || "light",
+    dateFlexible: recommendation.date_flexible === true,
+    tripLengthFlexible: recommendation.trip_length_flexible === true,
+    mustHaveExperience: recommendation.must_have_experience || "",
   };
 }
 

@@ -163,6 +163,10 @@ activitiesRouter.post(
     body("late_riser").optional().isBoolean(),
     body("midday_rest").optional().isBoolean(),
     body("cluster_nearby").optional().isBoolean(),
+    body("planning_goal").optional().isIn(["make-possible", "fixed-budget", "best-value", "comfort-first", "luxury", "once-in-lifetime"]),
+    body("activity_style").optional().isIn(["free", "essential", "balanced", "premium"]),
+    body("shopping_style").optional().isIn(["none", "light", "planned", "priority"]),
+    body("must_have_experience").optional({ checkFalsy: true }).trim().isLength({ min: 2, max: 180 }),
     body("trip_id").optional({ checkFalsy: true }).isUUID(4),
     body("saved_place_ids").optional().isArray({ max: 100 }),
     body("saved_place_ids.*").optional().isString().isLength({ min: 3, max: 255 }),
@@ -197,6 +201,10 @@ activitiesRouter.post(
         lateRiser: request.body.late_riser === true,
         middayRest: request.body.midday_rest === true,
         clusterNearby: request.body.cluster_nearby === true,
+        planningGoal: request.body.planning_goal || "best-value",
+        activityStyle: request.body.activity_style || "balanced",
+        shoppingStyle: request.body.shopping_style || "light",
+        mustHaveExperience: String(request.body.must_have_experience || "").trim(),
       };
 
       let activities = [];

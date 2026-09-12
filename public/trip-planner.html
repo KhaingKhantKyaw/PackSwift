@@ -73,7 +73,77 @@
               <datalist id="destination-options"></datalist>
               <span id="destination-field-hint" class="field-hint">Arrival city or country.</span>
             </div>
-            <div class="form-section-heading"><h3>Budget</h3><p>Enter the total amount available for this trip.</p></div>
+            <div class="form-section-heading"><h3>Travel intention</h3><p>Tell PackSwift how you want the budget to shape the experience.</p></div>
+            <fieldset class="form-field form-field-wide planning-goal-fieldset">
+              <legend class="form-legend">What matters most for this trip?</legend>
+              <div class="planning-goal-grid">
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="make-possible"><span><strong>Make the trip possible</strong><small>Build the safest realistic version at the lowest cost.</small></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="fixed-budget"><span><strong>Stay within my exact budget</strong><small>Treat my amount as a firm spending ceiling.</small></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="best-value" checked><span><strong>Best value</strong><small>Balance memorable experiences, comfort, and cost.</small></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="comfort-first"><span><strong>Comfort first</strong><small>Prioritize reliable stays, easy transport, and rest.</small></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="luxury"><span><strong>Luxury experience</strong><small>Prefer premium stays, dining, and private services.</small></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="once-in-lifetime"><span><strong>Once-in-a-lifetime trip</strong><small>Protect must-do experiences and save elsewhere.</small></span></label>
+              </div>
+            </fieldset>
+            <div class="form-section-heading"><h3>Travel lifestyle</h3><p>Choose the level that feels natural to you. These are preferences, not restrictions.</p></div>
+            <div class="form-field">
+              <label class="form-label" for="accommodation-style">Accommodation</label>
+              <select class="field-control" id="accommodation-style" name="accommodationStyle">
+                <option value="hostel">Hostel / shared stay</option>
+                <option value="budget">Budget hotel</option>
+                <option value="comfortable" selected>Comfortable hotel</option>
+                <option value="boutique">Boutique stay</option>
+                <option value="luxury">Luxury resort or hotel</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="food-style">Food</label>
+              <select class="field-control" id="food-style" name="foodStyle">
+                <option value="street">Street food &amp; local stalls</option>
+                <option value="local">Local restaurants</option>
+                <option value="mixed" selected>Mixed casual dining</option>
+                <option value="fine">Fine dining</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="transport-style">Local transport</label>
+              <select class="field-control" id="transport-style" name="transportStyle">
+                <option value="public">Public transport</option>
+                <option value="mixed" selected>Public + ride-hailing</option>
+                <option value="private">Private car / driver</option>
+                <option value="premium">Premium private transfers</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="activity-style">Activities</label>
+              <select class="field-control" id="activity-style" name="activityStyle">
+                <option value="free">Mostly free highlights</option>
+                <option value="essential">Essential paid highlights</option>
+                <option value="balanced" selected>Balanced selection</option>
+                <option value="premium">Premium experiences</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="extras-style">Personal extras</label>
+              <select class="field-control" id="extras-style" name="extrasStyle">
+                <option value="none">No extra allowance</option>
+                <option value="light" selected>Small souvenir allowance</option>
+                <option value="planned">Planned personal extras</option>
+                <option value="priority">Personal extras are a trip priority</option>
+              </select>
+            </div>
+            <div class="form-field form-field-wide lifestyle-flexibility-panel">
+              <span class="form-label">Planning flexibility</span>
+              <div class="choice-row">
+                <label class="choice"><input type="checkbox" name="dateFlexible" value="true"><span>My travel dates are flexible</span></label>
+                <label class="choice"><input type="checkbox" name="tripLengthFlexible" value="true"><span>My trip length can change</span></label>
+              </div>
+            </div>
+            <div class="form-field form-field-wide">
+              <label class="form-label" for="must-have-experience">One experience I do not want to miss <span class="label-optional">Optional</span></label>
+              <input class="field-control" id="must-have-experience" name="mustHaveExperience" type="text" maxlength="180" placeholder="e.g. See Wat Arun at sunrise or spend one day at the beach">
+            </div>
+            <div class="form-section-heading"><h3>Budget</h3><p>Enter your total amount. PackSwift will adapt the plan instead of judging it.</p></div>
             <div class="form-field form-field-wide">
               <div class="budget-label-row"><label class="form-label" for="budget">Total trip budget</label><span id="budget-currency-label" class="form-label">Currency</span></div>
               <div class="budget-field">
@@ -188,6 +258,7 @@
                 <span id="live-tag-destination">Worldwide</span>
                 <span id="live-tag-dates">Dates pending</span>
                 <span id="live-tag-budget">Budget pending</span>
+                <span id="live-tag-goal">Best value</span>
                 <span id="live-tag-group">Couples</span>
                 <span id="live-tag-pace">Balanced &amp; Steady ⚖️</span>
                 <span id="live-tag-smart-pace" hidden></span>
@@ -197,10 +268,15 @@
                 <div><dt>Travel dates</dt><dd id="live-dates">Select your dates</dd></div>
                 <div><dt>Budget</dt><dd id="live-budget">USD 1,500</dd></div>
                 <div><dt>Budget category</dt><dd id="live-budget-category">Calculating…</dd></div>
+                <div><dt>Planning priority</dt><dd id="live-planning-goal">Best value</dd></div>
                 <div><dt>Travellers</dt><dd id="live-travellers">2 travellers</dd></div>
                 <div><dt>Trip style</dt><dd id="live-style">Leisure &amp; Relaxation · Balanced &amp; Steady ⚖️ · Couples</dd></div>
               </dl>
               <div id="live-notices" class="planner-live-notices" aria-live="polite"></div>
+              <section class="live-budget-paths" aria-labelledby="live-budget-paths-title">
+                <div class="live-preview-section-heading"><div><span>Choice, not judgement</span><h3 id="live-budget-paths-title">Three ways to make this trip work</h3></div></div>
+                <div id="live-budget-options" class="live-budget-options"></div>
+              </section>
               <section class="live-activity-section" aria-labelledby="live-activity-title">
                 <div class="live-preview-section-heading">
                   <div><span>Matched instantly</span><h3 id="live-activity-title">Activities for your choices</h3></div>

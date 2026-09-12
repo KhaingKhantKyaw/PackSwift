@@ -6558,6 +6558,191 @@ html:not([data-theme="dark"]) body[data-page="planner"] .selected-place-thumbnai
   }
 }
 
+/* Traveler intention and lifestyle planner */
+.planning-goal-fieldset {
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+
+.planning-goal-grid {
+  display: grid;
+  gap: 9px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.planning-goal-choice {
+  position: relative;
+  min-width: 0;
+}
+
+.planning-goal-choice input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.planning-goal-choice > span {
+  display: flex;
+  min-height: 78px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  color: #0d1b2a;
+  background: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.planning-goal-choice strong {
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.planning-goal-choice small {
+  color: #64748b;
+  font-size: 0.64rem;
+  line-height: 1.45;
+}
+
+.planning-goal-choice input:checked + span {
+  border-color: #00a8b5;
+  background: rgba(0, 168, 181, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(0, 168, 181, 0.2), 0 8px 24px rgba(0, 168, 181, 0.08);
+}
+
+.planning-goal-choice input:checked + span strong {
+  color: #006b75;
+}
+
+.planning-goal-choice input:focus-visible + span {
+  outline: 4px solid rgba(0, 168, 181, 0.22);
+  outline-offset: 2px;
+}
+
+.planning-goal-choice:hover > span {
+  transform: translateY(-1px);
+}
+
+.lifestyle-flexibility-panel {
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  background: rgba(229, 246, 248, 0.46);
+}
+
+.live-budget-paths {
+  margin-top: 22px;
+}
+
+.live-budget-options {
+  display: grid;
+  margin-top: 11px;
+  gap: 9px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.live-budget-option {
+  display: grid;
+  min-width: 0;
+  min-height: 132px;
+  padding: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 17px;
+  align-content: start;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.live-budget-option.is-recommended {
+  border-color: rgba(0, 229, 255, 0.48);
+  background: rgba(0, 168, 181, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.09);
+}
+
+.live-budget-option > span {
+  color: #74e4eb;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.live-budget-option strong {
+  color: #fff;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.live-budget-option small {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.live-budget-option em {
+  margin-top: auto;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.64rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+html:not([data-theme="dark"]) body[data-page="planner"] .live-budget-option {
+  border-color: #d3e3e6;
+  background: #f5fafb;
+}
+
+html:not([data-theme="dark"]) body[data-page="planner"] .live-budget-option.is-recommended {
+  border-color: rgba(0, 168, 181, 0.5);
+  background: #e7f7f8;
+}
+
+html:not([data-theme="dark"]) body[data-page="planner"] .live-budget-option > span,
+html:not([data-theme="dark"]) body[data-page="planner"] .live-budget-option strong,
+html:not([data-theme="dark"]) body[data-page="planner"] .live-budget-option em {
+  color: #0d1b2a;
+}
+
+html:not([data-theme="dark"]) body[data-page="planner"] .live-budget-option small {
+  color: #475569;
+}
+
+html[data-theme="dark"] .planning-goal-choice > span,
+html[data-theme="dark"] .lifestyle-flexibility-panel {
+  border-color: rgba(148, 163, 184, 0.28);
+  color: #f8fafc;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+html[data-theme="dark"] .planning-goal-choice small {
+  color: #b8c5d3;
+}
+
+html[data-theme="dark"] .planning-goal-choice input:checked + span {
+  border-color: #00e5ff;
+  background: rgba(0, 168, 181, 0.2);
+}
+
+html[data-theme="dark"] .planning-goal-choice input:checked + span strong {
+  color: #7cecf2;
+}
+
+@media (max-width: 760px) {
+  .planning-goal-grid,
+  .live-budget-options {
+    grid-template-columns: 1fr;
+  }
+
+  .live-budget-option {
+    min-height: 0;
+  }
+}
+
 /* Minimal PackSwift homepage — one message, one action, one clear path. */
 body[data-page="home"] .home-background-slide img {
   filter: saturate(0.72) contrast(0.94);

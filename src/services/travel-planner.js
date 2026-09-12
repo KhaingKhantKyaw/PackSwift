@@ -80,6 +80,108 @@ const purposeLabels = {
   family: "family",
 };
 
+export const planningGoalLabels = Object.freeze({
+  "make-possible": "Make the trip possible",
+  "fixed-budget": "Stay within my exact budget",
+  "best-value": "Best value",
+  "comfort-first": "Comfort first",
+  luxury: "Luxury experience",
+  "once-in-lifetime": "Once-in-a-lifetime trip",
+});
+
+const travelStyleOptions = Object.freeze({
+  accommodationStyle: new Set(["hostel", "budget", "comfortable", "boutique", "luxury"]),
+  foodStyle: new Set(["street", "local", "mixed", "fine"]),
+  transportStyle: new Set(["public", "mixed", "private", "premium"]),
+  activityStyle: new Set(["free", "essential", "balanced", "premium"]),
+  shoppingStyle: new Set(["none", "light", "planned", "priority"]),
+});
+const styleDefaults = Object.freeze({
+  planningGoal: "best-value",
+  accommodationStyle: "comfortable",
+  foodStyle: "mixed",
+  transportStyle: "mixed",
+  activityStyle: "balanced",
+  shoppingStyle: "light",
+});
+const lifestyleDailyRatesUsd = Object.freeze({
+  accommodationStyle: { hostel: 13, budget: 25, comfortable: 45, boutique: 75, luxury: 170 },
+  foodStyle: { street: 9, local: 17, mixed: 30, fine: 85 },
+  transportStyle: { public: 5, mixed: 14, private: 42, premium: 85 },
+  activityStyle: { free: 3, essential: 16, balanced: 32, premium: 95 },
+  shoppingStyle: { none: 0, light: 5, planned: 15, priority: 40 },
+});
+const planningGoalSettings = Object.freeze({
+  "make-possible": { dailyMultiplier: 0.72, activityReserveUsd: 0 },
+  "fixed-budget": { dailyMultiplier: 0.9, activityReserveUsd: 0 },
+  "best-value": { dailyMultiplier: 1, activityReserveUsd: 0 },
+  "comfort-first": { dailyMultiplier: 1.22, activityReserveUsd: 0 },
+  luxury: { dailyMultiplier: 1.85, activityReserveUsd: 0 },
+  "once-in-lifetime": { dailyMultiplier: 1.05, activityReserveUsd: 90 },
+});
+
+export function normalizeTravelStyle(input = {}) {
+  const planningGoal = Object.hasOwn(planningGoalLabels, input.planningGoal)
+    ? input.planningGoal : styleDefaults.planningGoal;
+  const normalized = { planningGoal };
+  for (const [field, options] of Object.entries(travelStyleOptions)) {
+    const value = String(input[field] || styleDefaults[field]).toLowerCase();
+    normalized[field] = options.has(value) ? value : styleDefaults[field];
+  }
+  return {
+    ...normalized,
+    dateFlexible: input.dateFlexible === true || input.dateFlexible === "true" || input.dateFlexible === "on",
+    tripLengthFlexible: input.tripLengthFlexible === true || input.tripLengthFlexible === "true" || input.tripLengthFlexible === "on",
+    mustHaveExperience: String(input.mustHaveExperience || "").trim().slice(0, 180),
+  };
+}
+
+export function lifestyleDailyRateUsd(style = {}) {
+  const normalized = normalizeTravelStyle(style);
+  const base = Object.entries(lifestyleDailyRatesUsd).reduce(
+    (total, [field, rates]) => total + rates[normalized[field]],
+    0,
+  );
+  return Math.max(22, Math.round(base * planningGoalSettings[normalized.planningGoal].dailyMultiplier));
+}
+
+export function buildTripBudgetScenarios({
+  scope = "international", origin = null, destination = null,
+  adults = 1, children = 0, days = 1, budgetUsd = 0, ...styleInput
+} = {}) {
+  const style = normalizeTravelStyle(styleInput);
+  const adultCount = Math.max(1, Math.min(12, Math.round(Number(adults) || 1)));
+  const childCount = Math.max(0, Math.min(8, Math.round(Number(children) || 0)));
+  const travelers = adultCount + childCount;
+  const travelerUnits = adultCount + childCount * 0.65;
+  const normalizedDays = Math.max(1, Math.min(30, Math.round(Number(days) || 1)));
+  const transitPerPersonUsd = estimateTransitCostUsd(origin, destination);
+  const transitTotalUsd = transitPerPersonUsd * travelers;
+  const lifestyleRate = lifestyleDailyRateUsd(style);
+  const mustHaveReserve = style.mustHaveExperience
+    ? (planningGoalSettings[style.planningGoal].activityReserveUsd || 55) * travelers
+    : 0;
+  const viableUsd = transitTotalUsd + 24 * travelerUnits * normalizedDays;
+  const recommendedUsd = transitTotalUsd + lifestyleRate * travelerUnits * normalizedDays + mustHaveReserve;
+  const comfortUsd = transitTotalUsd + Math.max(105, lifestyleRate * 1.35) * travelerUnits * normalizedDays + mustHaveReserve;
+  const available = Math.max(0, Number(budgetUsd) || 0);
+  const fit = available >= comfortUsd ? "comfort"
+    : available >= recommendedUsd ? "recommended"
+      : available >= viableUsd ? "viable" : "stretch";
+  return {
+    scope,
+    travelers,
+    days: normalizedDays,
+    transitPerPersonUsd,
+    transitTotalUsd: Math.round(transitTotalUsd),
+    lifestyleDailyRateUsd: lifestyleRate,
+    viableUsd: Math.round(viableUsd),
+    recommendedUsd: Math.round(recommendedUsd),
+    comfortUsd: Math.round(comfortUsd),
+    fit,
+  };
+}
+
 function normalizeInterests(value) {
   if (Array.isArray(value)) {
     return value.map(String).map((item) => item.toLowerCase()).slice(0, 8);
@@ -219,6 +321,7 @@ function parseInput(input = {}) {
   const children = hasBreakdown ? Number(input.children ?? 0) : 0;
   const travelers = adults + children;
   const currency = String(input.currency || "USD").slice(0, 3).toUpperCase();
+  const travelStyle = normalizeTravelStyle(input);
 
   if (!currencyRatesToUsd[currency]) {
     throw new RangeError("Choose a supported currency.");
@@ -327,6 +430,7 @@ function parseInput(input = {}) {
     hotelAddress:
       String(input.hotelAddress || "").trim().slice(0, 255) || null,
     notes: String(input.notes || "").trim().slice(0, 600),
+    ...travelStyle,
   };
 }
 
@@ -435,9 +539,26 @@ function demographicFit(destination, demographic) {
   return 4;
 }
 
+function plannedDestinationDailyRateUsd(destination, input) {
+  const destinationRate = Math.max(20, Number(destination.dailyBudgetUsd) || 55);
+  const lifestyleRate = lifestyleDailyRateUsd(input);
+  const availableDaily = Math.max(
+    18,
+    (input.budgetUsd - (input.route?.totalTransitCostUsd || 0)) / Math.max(1, input.travelers * (input.route?.days || 1)),
+  );
+  if (input.planningGoal === "make-possible") return Math.max(22, Math.min(lifestyleRate, destinationRate * 0.58));
+  if (input.planningGoal === "fixed-budget") {
+    return Math.max(20, Math.min(lifestyleRate, destinationRate, availableDaily));
+  }
+  if (input.planningGoal === "comfort-first") return Math.max(lifestyleRate, destinationRate * 1.15);
+  if (input.planningGoal === "luxury") return Math.max(lifestyleRate, destinationRate * 1.8);
+  if (input.planningGoal === "once-in-lifetime") return Math.max(lifestyleRate, destinationRate);
+  return Math.max(22, Math.min(Math.max(lifestyleRate, destinationRate * 0.85), availableDaily));
+}
+
 function scoreDestination(destination, input, days, month, weather) {
   const perPersonBudgetUsd = input.budgetUsd / input.travelers;
-  const estimatedPerPerson = destination.dailyBudgetUsd * days;
+  const estimatedPerPerson = plannedDestinationDailyRateUsd(destination, input) * days;
   const budgetFit =
     estimatedPerPerson <= perPersonBudgetUsd
       ? 35 +
@@ -459,6 +580,12 @@ function scoreDestination(destination, input, days, month, weather) {
       : 3;
   const petFit = input.travelingWithPets ? destination.petScore : 5;
 
+  const intentionFit = input.planningGoal === "luxury"
+    ? Math.min(7, destination.dailyBudgetUsd / 25)
+    : input.planningGoal === "make-possible" || input.planningGoal === "fixed-budget"
+      ? Math.min(7, 140 / Math.max(25, destination.dailyBudgetUsd))
+      : 5;
+  const gatewayFit = Math.min(7, Number(destination.businessScore || 0) * 1.3);
   return Math.round(
     Math.min(
       100,
@@ -468,7 +595,7 @@ function scoreDestination(destination, input, days, month, weather) {
         monthFit +
         climateFit +
         demographicFit(destination, input.travelerDemographic) +
-        petFit,
+        petFit + intentionFit + gatewayFit,
     ),
   );
 }
@@ -486,12 +613,14 @@ function buildItinerary(destination, days, input) {
       title: index === 0 ? "Arrive and orient" : `Explore ${first}`,
       morning:
         index === 0
-          ? `${input.smartPace.lateRiser ? "10:30" : "08:30"} · Arrival, check-in, and a gentle neighbourhood walk`
+          ? `${input.smartPace.lateRiser ? "10:30" : "08:30"} · Arrival, ${["private", "premium"].includes(input.transportStyle) ? "pre-arranged private transfer" : "practical airport transfer"}, check-in, and orientation`
           : input.tripPurpose === "business" && index === 1
             ? "Protected work or meeting block"
             : `${input.smartPace.lateRiser ? "10:30" : "08:30"} · ${first}`,
       afternoon:
-        input.smartPace.middayRest
+        index === 1 && input.mustHaveExperience
+          ? `Protected priority · ${input.mustHaveExperience}`
+          : input.smartPace.middayRest
           ? `14:00–16:00 protected rest, then ${second}`
           : input.pace === "relaxed"
             ? `Unhurried visit to ${second}`
@@ -499,7 +628,9 @@ function buildItinerary(destination, days, input) {
       evening:
         index === dayCount - 1
           ? "Favourite-place revisit and trip reflection"
-          : input.tripPurpose === "family"
+          : input.foodStyle === "fine" || input.planningGoal === "luxury"
+            ? "Reserved signature dinner with an easy return transfer"
+            : input.tripPurpose === "family"
             ? "Early local dinner and a restful evening"
             : "Local dinner and an optional evening walk",
     });
@@ -587,6 +718,15 @@ export function buildPackingList(input = {}) {
   if (rain !== "low") list.Comfort.push("Compact umbrella", "Packable rain shell");
   if (purpose === "business") list.Essentials.push("Meeting documents", "Laptop and presentation adapter");
   if (purpose === "adventure") list.Comfort.push("Activity-ready footwear", "Compact torch");
+  if (input.accommodationStyle === "hostel") {
+    list.Comfort.push("Compact travel towel", "Small luggage lock", "Sleep mask and earplugs");
+  }
+  if (input.foodStyle === "fine" || input.planningGoal === "luxury") {
+    list.Clothing.push("Smart evening outfit");
+  }
+  if (input.transportStyle === "public") {
+    list.Comfort.push("Compact transit daypack", "Offline transit map");
+  }
   if (purpose === "family" || demographic === "family-with-children") {
     list.Essentials.push("Family document folder", "Child comfort and activity items");
   }
@@ -649,8 +789,31 @@ export function createTravelPlan(rawInput) {
     days: routeBudget.days,
     minimumBudgetUsd: routeBudget.minimumBudgetUsd,
   });
-  const estimatedCostUsd =
-    destination.dailyBudgetUsd * days * input.travelers;
+  const budgetScenarios = buildTripBudgetScenarios({
+    scope: input.tripScope,
+    origin: input.route.origin,
+    destination: selectedRouteDestination,
+    adults: input.adults,
+    children: input.children,
+    days,
+    budgetUsd: input.budgetUsd,
+    planningGoal: input.planningGoal,
+    accommodationStyle: input.accommodationStyle,
+    foodStyle: input.foodStyle,
+    transportStyle: input.transportStyle,
+    activityStyle: input.activityStyle,
+    shoppingStyle: input.shoppingStyle,
+    dateFlexible: input.dateFlexible,
+    tripLengthFlexible: input.tripLengthFlexible,
+    mustHaveExperience: input.mustHaveExperience,
+  });
+  const plannedDailyRateUsd = plannedDestinationDailyRateUsd(destination, input);
+  const mustHaveReserveUsd = input.mustHaveExperience
+    ? (planningGoalSettings[input.planningGoal].activityReserveUsd || 55) * input.travelers
+    : 0;
+  const estimatedCostUsd = input.route.totalTransitCostUsd +
+    plannedDailyRateUsd * days * (input.adults + input.children * 0.65) +
+    mustHaveReserveUsd;
   const estimatedCost = convertCurrency(estimatedCostUsd, "USD", input.currency);
   const bestTimeToVisit = destination.bestMonths
     .map((bestMonth) => monthNames[bestMonth - 1])
@@ -660,8 +823,10 @@ export function createTravelPlan(rawInput) {
   ) / 100;
   const withinBudget = estimatedCost <= input.budget;
   const budgetMessage = withinBudget
-    ? `The estimated local cost stays within your ${formatBudgetAmount(input.budget, input.currency)} budget, leaving about ${formatBudgetAmount(budgetDifference, input.currency)} for flexibility.`
-    : `The estimate is about ${formatBudgetAmount(budgetDifference, input.currency)} above your current budget; shorten the stay or compare the suggested alternatives.`;
+    ? `Your ${planningGoalLabels[input.planningGoal].toLowerCase()} plan stays within ${formatBudgetAmount(input.budget, input.currency)}, leaving about ${formatBudgetAmount(budgetDifference, input.currency)} for flexibility.`
+    : ["make-possible", "fixed-budget"].includes(input.planningGoal)
+      ? `${formatBudgetAmount(input.budget, input.currency)} remains accepted as your limit. PackSwift will protect essential experiences and suggest flexible dates, fewer nights, simpler stays, public transport, and free highlights to close the ${formatBudgetAmount(budgetDifference, input.currency)} gap.`
+      : `The lifestyle-matched version is about ${formatBudgetAmount(budgetDifference, input.currency)} above your current budget. The minimum viable and comfort alternatives show where to adjust without abandoning the trip.`;
 
   return {
     id: randomUUID(),
@@ -673,7 +838,7 @@ export function createTravelPlan(rawInput) {
     alternatives: ranked.slice(1, 4).map(
       ({ slug, name, country, region, score, dailyBudgetUsd }) => {
         const alternativeCost = convertCurrency(
-          dailyBudgetUsd * days * input.travelers,
+          input.route.totalTransitCostUsd + dailyBudgetUsd * days * input.travelers,
           "USD",
           input.currency,
         );
@@ -694,10 +859,19 @@ export function createTravelPlan(rawInput) {
       withinBudget,
       difference: budgetDifference,
       message: budgetMessage,
+      planningGoal: input.planningGoal,
+      fit: budgetScenarios.fit,
+    },
+    budgetScenarios: {
+      ...budgetScenarios,
+      viable: convertCurrency(budgetScenarios.viableUsd, "USD", input.currency),
+      recommended: convertCurrency(budgetScenarios.recommendedUsd, "USD", input.currency),
+      comfort: convertCurrency(budgetScenarios.comfortUsd, "USD", input.currency),
+      currency: input.currency,
     },
     bestTimeToVisit,
     summary: `${destination.name} is the strongest ${purposeLabels[input.tripPurpose] || input.tripPurpose} match for ${input.travelers} ${input.travelers === 1 ? "traveller" : "travellers"} in ${monthNames[month - 1]}. ${budgetMessage}`,
-    costNote: `Estimated local costs include accommodation, meals, daily transport, and typical activities. The minimum route budget uses about USD ${input.route.transitCostPerPersonUsd} transit per person plus USD ${input.route.dailyRatePerPersonUsd} per traveller per day.`,
+    costNote: `This estimate includes return transit, ${input.accommodationStyle} accommodation, ${input.foodStyle} dining, ${input.transportStyle} transport, ${input.activityStyle} activities, and a ${input.shoppingStyle} shopping allowance. The three budget paths are guidance—not a barrier to planning.`,
     weather: destination.weather,
     itinerary: buildItinerary(destination, days, input),
     activityPreviews: buildActivityPreviews(destination, input),
@@ -708,6 +882,10 @@ export function createTravelPlan(rawInput) {
       tripPurpose: input.tripPurpose,
       travelerDemographic: input.travelerDemographic,
       travelingWithPets: input.travelingWithPets,
+      planningGoal: input.planningGoal,
+      accommodationStyle: input.accommodationStyle,
+      foodStyle: input.foodStyle,
+      transportStyle: input.transportStyle,
     }),
     culturalNotes: destination.culturalNotes,
   };
