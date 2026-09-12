@@ -84,7 +84,8 @@ test("a destination opened from Home selects its exact pocket guide", () => {
 test("discovery hub has responsive cards, sidebar, and off-canvas styling", () => {
   assert.match(styles, /\.guide-filter-tabs/);
   assert.match(styles, /\.guide-discovery-card/);
-  assert.match(styles, /\.guide-insights-sidebar/);
+  assert.match(styles, /\.guide-insights-sidebar \{\s*position: static;\s*min-width: 0;\s*align-self: start;/);
+  assert.doesNotMatch(styles, /\.guide-insights-sidebar \{\s*position: sticky/);
   assert.match(styles, /\.guide-preview-drawer\[aria-hidden="false"\]/);
   assert.match(styles, /@media \(max-width: 900px\)[\s\S]*\.guide-discovery-grid/);
 });

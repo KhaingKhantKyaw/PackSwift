@@ -7768,8 +7768,9 @@ body[data-page="home"] .guide-local-insights {
 }
 
 .guide-insights-sidebar {
-  position: sticky;
-  top: 118px;
+  position: static;
+  min-width: 0;
+  align-self: start;
 }
 
 .guide-local-insights {
