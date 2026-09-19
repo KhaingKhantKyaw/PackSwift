@@ -5034,6 +5034,37 @@ html[data-theme="dark"] .visual-route-fact dt { color: #cbd5e1; }
   .visual-route-fallback { min-height: 140px; }
 }
 
+/* Destination-match card only: compact numbered day-tour infographic. */
+.destination-route { margin-top: 18px; min-width: 0; }
+.destination-route-scroll { max-height: 480px; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 4px 8px 4px 0; }
+.destination-route-scroll:focus-visible { outline: 2px solid #00a8b5; outline-offset: 3px; border-radius: 12px; }
+.destination-route-scroll .visual-route-stop { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 12px; padding: 0 0 24px; align-items: start; }
+.destination-route-scroll .visual-route-number { position: relative; z-index: 1; margin: 6px 0 0; padding: 8px 4px; background: #a65322; color: #fff; border-radius: 999px; text-align: center; font-size: 10px; letter-spacing: .05em; }
+.destination-route-scroll .visual-route-stop:not(:last-child)::before { left: 35px; top: 30px; bottom: -6px; width: 2px; background: #d49463; }
+.destination-route-scroll .visual-route-stop::after { display: none; }
+.destination-route-scroll .visual-route-stop:not(:last-child)::after { display: block; top: auto; bottom: 5px; left: 31px; width: 10px; height: 10px; background: transparent; border: 0; border-right: 2px solid #d49463; border-bottom: 2px solid #d49463; border-radius: 0; transform: rotate(45deg); }
+.destination-route-scroll .visual-route-card { grid-template-columns: 90px minmax(0, 1fr); }
+.destination-route-scroll .visual-route-details { padding: 12px; }
+.destination-route-scroll .visual-route-title::before { content: "⌖ "; color: #00838f; }
+.destination-route-scroll .visual-route-fact:nth-child(2) .visual-route-icon { color: #ad7600; }
+.destination-route-scroll .visual-route-media { min-height: 180px; }
+.route-edit-actions { display: flex; gap: 6px; margin-top: 10px; }
+.route-edit-actions button { display: inline-grid; place-items: center; width: 34px; height: 34px; border: 1px solid #cbd5e1; border-radius: 9px; background: #f8fafc; color: #0d1b2a; cursor: pointer; }
+.route-edit-actions button:hover:not(:disabled) { background: #e5f6f8; border-color: #00838f; }
+.route-edit-actions button:disabled { opacity: .4; cursor: not-allowed; }
+.route-edit-actions button:focus-visible { outline: 2px solid #00838f; outline-offset: 2px; }
+.route-add-place { margin-top: 12px; }
+.route-custom-form { display: grid; gap: 8px; padding: 16px; margin-top: 12px; border: 1px solid #a7cfd3; border-radius: 16px; }
+.route-custom-form[hidden] { display: none; }
+.route-custom-form label { font-size: 12px; font-weight: 600; }
+@media (max-width: 480px) {
+  .destination-route-scroll .visual-route-stop { grid-template-columns: 56px minmax(0, 1fr); gap: 8px; }
+  .destination-route-scroll .visual-route-stop:not(:last-child)::before { left: 27px; }
+  .destination-route-scroll .visual-route-stop:not(:last-child)::after { left: 23px; }
+  .destination-route-scroll .visual-route-card { grid-template-columns: 64px minmax(0, 1fr); }
+  .destination-route-scroll .visual-route-details { padding: 9px; }
+}
+
 /* Trip Planner above-the-fold spacing */
 @media (min-width: 981px) {
   body[data-page="planner"] .planner-page-shell {

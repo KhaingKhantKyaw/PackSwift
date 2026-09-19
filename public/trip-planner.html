@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/js/app.js" defer></script>
     <script src="/js/visual-itinerary.js" defer></script>
+    <script src="/js/destination-route-editor.js" defer></script>
     <script src="/js/trip-planner.js" defer></script>
   </head>
   <body data-page="planner">
@@ -313,29 +314,10 @@
           <div id="activity-plan-toast" class="activity-plan-toast" role="status" aria-live="polite" hidden></div>
           <div id="plan-result" class="plan-result" hidden>
             <div class="result-topline"><span class="result-kicker">Your destination match</span><span id="result-score" class="result-score">—</span></div>
-            <h2 id="result-destination"></h2>
-            <p id="result-summary" class="plan-summary"></p>
-            <div class="result-stats">
-              <div class="result-stat"><span>Likely weather</span><strong id="result-weather"></strong></div>
-              <div class="result-stat"><span>Estimated trip cost</span><strong id="result-budget"></strong></div>
-              <div class="result-stat"><span>Trip length</span><strong id="result-days"></strong></div>
-              <div class="result-stat"><span>Best time to visit</span><strong id="result-best-time"></strong></div>
-            </div>
-            <p id="result-cost-note" class="result-note"></p>
-            <div class="result-guidance">
-              <div><h3>Suggested attractions</h3><p id="result-attractions"></p></div>
-              <div><h3>Cultural guidance</h3><p id="result-culture"></p></div>
-              <div><h3>Packing focus</h3><p id="result-packing"></p></div>
-            </div>
-            <section class="activity-preview-section">
-              <div class="activity-preview-heading"><h3>Activities matched to you</h3><span>Preview</span></div>
-              <div id="result-activities" class="activity-preview-grid"></div>
+            <section class="destination-route" aria-label="Day tour itinerary">
+              <p id="destination-route-status" class="visual-route-note" role="status"></p>
+              <div id="destination-route-timeline" class="destination-route-scroll" tabindex="0" aria-label="Scroll through day tour stops"></div>
             </section>
-            <section id="alternative-preview" class="alternative-preview">
-              <h3>Other city matches</h3>
-              <div id="result-alternatives" class="alternative-city-list"></div>
-            </section>
-            <div class="itinerary-preview"><h3>First itinerary</h3><div id="itinerary-list"></div></div>
             <div class="result-actions">
               <button id="save-trip-button" class="button button-primary" type="button">Save to My Trips</button>
               <a id="create-packing-list-button" class="button button-secondary" href="/packing-list">Create packing list</a>

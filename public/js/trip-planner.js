@@ -1973,67 +1973,15 @@ function setFeaturedState(destinationName) {
 }
 
 function renderPlan(plan) {
-  const destination = plan.destination;
-  const code = destination.code || destination.slug.slice(0, 3).toUpperCase();
-  document.querySelector("#result-score").textContent = `${destination.score}%`;
-  document.querySelector("#result-destination").textContent = `${destination.name}, ${destination.country}`;
-  document.querySelector("#result-summary").textContent = plan.summary;
-  document.querySelector("#result-weather").textContent =
-    `${plan.weather.low}–${plan.weather.high}°C · ${plan.weather.rain} rain`;
-  document.querySelector("#result-budget").textContent =
-    `${formatMoney(plan.estimatedCost, plan.input.currency)} est.`;
-  document.querySelector("#result-days").textContent =
-    `${plan.days} ${plan.days === 1 ? "day" : "days"}`;
-  document.querySelector("#result-best-time").textContent = plan.bestTimeToVisit;
-  document.querySelector("#result-cost-note").textContent = plan.costNote;
-  document.querySelector("#result-attractions").textContent =
-    destination.attractions.slice(0, 4).join(" · ");
-  document.querySelector("#result-culture").textContent =
-    plan.culturalNotes.slice(0, 2).join(" ");
-  document.querySelector("#result-packing").textContent =
-    Object.values(plan.packingList).flat().slice(0, 6).join(" · ");
-  plan.destination.code = code;
-
-  const activityList = document.querySelector("#result-activities");
-  activityList.replaceChildren();
-  for (const activity of plan.activityPreviews || []) {
-    const card = document.createElement("article");
-    card.className = "activity-preview-card";
-    const category = document.createElement("span");
-    const title = document.createElement("strong");
-    const description = document.createElement("p");
-    const cost = document.createElement("small");
-    category.textContent = activity.category;
-    title.textContent = activity.title;
-    description.textContent = activity.description;
-    cost.textContent = `Typical add-on · ${formatMoney(activity.estimatedCost, activity.currency)}`;
-    card.append(category, title, description, cost);
-    activityList.append(card);
-  }
-
-  const alternatives = document.querySelector("#result-alternatives");
-  alternatives.replaceChildren();
-  document.querySelector("#alternative-preview").hidden =
-    Boolean(focusedDestination);
-  for (const alternative of plan.alternatives || []) {
-    const item = document.createElement("span");
-    item.className = "alternative-city";
-    const city = document.createElement("b");
-    city.textContent = alternative.name;
-    item.append(
-      city,
-      document.createTextNode(
-        ` · ${formatMoney(alternative.estimatedCost, plan.input.currency)} ` +
-        (alternative.withinBudget ? "fits" : "estimate"),
-      ),
-    );
-    alternatives.append(item);
-  }
-
-  renderItineraryDays(plan.itinerary.slice(0, 4), "itinerary-list", plan.input.currency);
-
+  document.querySelector("#result-score").textContent = `${plan.destination.score}%`;
+  plan.destination.code ||= plan.destination.slug?.slice(0, 3).toUpperCase();
   emptyResult.hidden = true;
   planResult.hidden = false;
+  renderDestinationRoute(plan);
+}
+
+function renderDestinationRoute(plan) {
+  return window.PackSwiftRouteEditor.load(plan);
 }
 
 function handleLivePlannerEdit() {
@@ -2551,6 +2499,7 @@ async function ensureAuthenticatedPlan(plan) {
   const authenticatedPlan = {
     ...result.plan,
     persistence: result.persistence,
+    ...(plan.visualDayTour ? { visualDayTour: structuredClone(plan.visualDayTour), itinerary: structuredClone(plan.itinerary) } : {}),
   };
   savePlanLocally(authenticatedPlan);
   return authenticatedPlan;
