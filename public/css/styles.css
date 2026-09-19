@@ -5020,6 +5020,9 @@ html[data-theme="dark"] .budget-info-callout.is-warning p span {
 .visual-route-fact dt { color: #475569; font-size: 11px; }
 .visual-route-fact dd { margin: 0; color: #0d1b2a; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
 .visual-route-note { font-size: 12px; line-height: 1.5; }
+.visual-route-map-link { color: #007f89; font-size: 12px; text-decoration: underline; }
+html[data-theme="dark"] .visual-route-map-link { color: #83e4eb; }
+.visual-route-days[aria-busy="true"] { min-height: 180px; padding: 20px; border-radius: 16px; background: linear-gradient(110deg, #00a8b512, #00a8b533, #00a8b512); }
 html:not([data-theme="dark"]) .visual-route-number { color: #007f89; }
 html[data-theme="dark"] .visual-route-card { background: #142638; border-color: #345365; }
 html[data-theme="dark"] .result-panel .visual-route-title,

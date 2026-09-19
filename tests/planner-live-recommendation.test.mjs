@@ -120,7 +120,7 @@ test("Trip Planner connects live UI, debounced API, photos, and MySQL schema", (
   assert.match(html, /id="live-activity-grid"/);
   assert.match(html, /id="live-itinerary-list"/);
   assert.match(html, /id="live-budget-category"/);
-  assert.match(client, /setTimeout\(async \(\) => \{[\s\S]*?140\)/);
+  assert.match(client, /setTimeout\(async \(\) => \{[\s\S]*?500\)/);
   assert.match(client, /\/api\/activities\/recommend/);
   assert.match(client, /late_riser: input\.smartPace\.lateRiser/);
   assert.match(client, /nearby stops clustered/);

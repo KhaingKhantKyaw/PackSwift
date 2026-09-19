@@ -45,9 +45,9 @@ function renderItinerary(data, containerId) {
     details.append(node("h4", "visual-route-title", stop.placeName || stop.title || stop.name || "Planned stop"));
     const facts = node("dl", "visual-route-facts");
     for (const [icon, label, value] of [
-      ["◷", "Hours", stop.openingHours || "Check current opening hours"],
-      ["◇", "Entry / expenses", stop.ticketPrice || stop.priceRange || "Confirm locally"],
-      ["⌛", "Suggested stay", stop.suggestedStay || "Flexible — allow time for transit"],
+      ["◷", "Hours", stop.openingHours || stop.hours || "Check current opening hours"],
+      ["◇", "Entry / expenses", stop.ticketPrice || stop.ticket || stop.priceRange || "Confirm locally"],
+      ["⌛", "Suggested stay", stop.suggestedStay || stop.stay || "Flexible — allow time for transit"],
     ]) {
       const fact = node("div", "visual-route-fact");
       const symbol = node("span", "visual-route-icon", icon);
@@ -56,6 +56,13 @@ function renderItinerary(data, containerId) {
       facts.append(fact);
     }
     details.append(facts);
+    if (stop.rating) details.append(node("p", "visual-route-note", `Google Maps rating: ${stop.rating}/5`));
+    const mapsUrl = safeUrl(stop.googleMapsUri);
+    if (mapsUrl) {
+      const link = node("a", "visual-route-map-link", "View on Google Maps");
+      link.href = mapsUrl; link.target = "_blank"; link.rel = "noopener noreferrer";
+      details.append(link);
+    }
     card.append(media, details);
     row.append(card);
     list.append(row);

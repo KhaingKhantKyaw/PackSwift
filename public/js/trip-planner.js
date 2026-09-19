@@ -1172,21 +1172,57 @@ function renderLiveRecommendation(recommendation, input) {
     : "No exact matches yet";
   liveItineraryDensity.textContent =
     `${recommendation.activitiesPerDay} ${recommendation.activitiesPerDay === 1 ? "activity" : "activities"} per day`;
-  // Preserve smart pace context: nearby stops clustered and midday rest.
-  renderItineraryDays((recommendation.itinerary || []).map(day => ({
-    ...day,
-    startTime: day.startTime || recommendation.schedule?.startTime || "08:30",
-    middayRest: day.middayRest || recommendation.schedule?.middayRest,
-    clusterNearby: day.clusterNearby || recommendation.schedule?.clusterNearby,
-  })), "live-itinerary-list", input.currency);
+  // Visual itinerary has its own live provider request; nearby stops clustered
+  // and midday rest remain part of that preview's scheduling context.
+}
+
+let visualItineraryController;
+document.getElementById("visual-travel-style").addEventListener("change", updateLiveTripPreview);
+async function refreshVisualItinerary(input, sequence) {
+  const destination = String(input.destination || "").trim();
+  if (!destination) {
+    liveItineraryList.textContent = "Choose a destination to generate a visual route.";
+    return;
+  }
+  visualItineraryController = new AbortController();
+  const duration = Math.min(14, getDays(input.startDate, input.endDate) || 1);
+  const dailyBudget = input.budgetUsd / Math.max(1, input.travelers * duration);
+  const automaticType = input.children > 0 || input.travelerDemographic === "family-with-children" ? "Family with Kids"
+    : input.tripPurpose === "food" || input.pace === "culinary" ? "Food & Culinary"
+    : input.tripPurpose === "cultural" || input.pace === "cultural" ? "Culture & Heritage"
+    : dailyBudget < 60 ? "Budget / Backpacker" : "Solo / Aesthetic";
+  const userType = document.getElementById("visual-travel-style").value || automaticType;
+  liveItineraryList.setAttribute("aria-busy", "true");
+  liveItineraryList.textContent = "Finding places and building your route…";
+  try {
+    const response = await fetch("/api/generate-itinerary", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      signal: visualItineraryController.signal,
+      body: JSON.stringify({ destination, userType, duration, budgetCategory: dailyBudget < 60 ? "budget" : dailyBudget > 200 ? "luxury" : "mid", pace: input.pace }),
+    });
+    if (!response.ok) throw new Error("Could not load route");
+    const result = await response.json();
+    if (sequence !== liveRecommendationSequence) return;
+    renderItineraryDays(result.days.map(day => ({ ...day, startTime: input.smartPace.lateRiser ? "10:30" : "08:30", middayRest: input.smartPace.middayRest })), "live-itinerary-list", input.currency);
+    const notice = document.createElement("p");
+    notice.className = "visual-route-note";
+    notice.textContent = result.message + (result.partial ? " Fewer matches available; some days need additional stops." : "");
+    liveItineraryList.prepend(notice);
+  } catch (error) {
+    if (error.name !== "AbortError" && sequence === liveRecommendationSequence) liveItineraryList.textContent = "The route could not load. Change a preference to retry.";
+  } finally {
+    if (sequence === liveRecommendationSequence) liveItineraryList.setAttribute("aria-busy", "false");
+  }
 }
 
 function scheduleLiveRecommendation(input) {
+  visualItineraryController?.abort();
   activateActivityContext(input);
   clearTimeout(liveRecommendationTimer);
   liveActivityStatus.textContent = "Updating…";
   const sequence = ++liveRecommendationSequence;
   liveRecommendationTimer = setTimeout(async () => {
+    refreshVisualItinerary(input, sequence);
     const destination = resolveLiveDestination(input);
     liveRecommendationDestination = destination;
     try {
@@ -1198,10 +1234,9 @@ function scheduleLiveRecommendation(input) {
       if (sequence === liveRecommendationSequence) {
         liveActivityStatus.textContent = "Choose a supported destination";
         liveActivityGrid.replaceChildren();
-        liveItineraryList.replaceChildren();
       }
     }
-  }, 140);
+  }, 500);
 }
 
 function renderLiveBudgetOptions(scenarios, currency, planningGoal) {

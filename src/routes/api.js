@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { generateItineraryRouter } from "./generate-itinerary.js";
 import {
   buildPackingList,
 } from "../services/travel-planner.js";
@@ -19,6 +20,7 @@ import { tripsRouter } from "./trips.js";
 import { tripPlanRouter } from "./trip-plan.js";
 
 export const apiRouter = Router();
+apiRouter.use(generateItineraryRouter);
 
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/ai", aiRouter);

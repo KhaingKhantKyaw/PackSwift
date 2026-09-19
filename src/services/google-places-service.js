@@ -294,6 +294,12 @@ export function normalizeGooglePlace(place, { destination, index = 0 } = {}) {
     paceLevel: paceLevelForTypes(types),
     experienceTags: experienceTagsForPlace(place, types),
     sortOrder: index,
+    types,
+    coordinates: place.location || null,
+    openingHours: place.currentOpeningHours?.weekdayDescriptions?.join(" · ") || "",
+    priceLevel: place.priceLevel || null,
+    googleMapsUri: place.googleMapsUri || "",
+    hasPhoto: Boolean(photo),
   };
 }
 
@@ -314,6 +320,7 @@ export async function searchGooglePlaces(
     limit = 12,
     searchQuery,
     destinationCatalog = [],
+    itineraryDetails = false,
   },
   { fetchImpl = globalThis.fetch, apiKey = process.env.GOOGLE_PLACES_API_KEY } = {},
 ) {
@@ -328,6 +335,7 @@ export async function searchGooglePlaces(
       limit,
       searchQuery,
       destinationCatalog,
+      itineraryDetails,
     },
     { fetchImpl, apiKey },
   );
@@ -346,6 +354,7 @@ export async function searchGooglePlacesPage(
     searchQuery,
     pageToken,
     destinationCatalog = [],
+    itineraryDetails = false,
   },
   { fetchImpl = globalThis.fetch, apiKey = process.env.GOOGLE_PLACES_API_KEY } = {},
 ) {
@@ -364,7 +373,9 @@ export async function searchGooglePlacesPage(
     headers: {
       "content-type": "application/json",
       "x-goog-api-key": apiKey,
-      "x-goog-fieldmask": searchFieldMask,
+      "x-goog-fieldmask": itineraryDetails
+        ? `${searchFieldMask},places.location,places.currentOpeningHours`
+        : searchFieldMask,
     },
     body: JSON.stringify({
       textQuery: searchQuery || strategy.query || `${purposeQueries[purpose] || purposeQueries.leisure} in ${destination}`,
