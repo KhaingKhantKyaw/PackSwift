@@ -4999,6 +4999,38 @@ html[data-theme="dark"] .budget-info-callout.is-warning p span {
   }
 }
 
+/* Visual itinerary shares the preview panel's scrollbar. */
+.visual-route-days { display: grid; gap: 24px; min-width: 0; text-align: left; container-type: inline-size; }
+.visual-route-days > section > h3 { margin: 0 0 14px; font-size: 16px; }
+.visual-route { list-style: none; padding: 0; margin: 0; }
+.visual-route-stop { position: relative; padding: 0 0 20px 26px; }
+.visual-route-stop:not(:last-child)::before { content: ""; position: absolute; top: 10px; bottom: -10px; left: 6px; width: 2px; background: #78c9d0; }
+.visual-route-stop::after { content: ""; position: absolute; top: 4px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: #00a8b5; border: 3px solid #e5f6f8; box-sizing: border-box; }
+.visual-route-number { display: block; margin-bottom: 8px; color: #a5f3fc; font-size: 11px; font-weight: 700; letter-spacing: .1em; }
+.visual-route-card { display: grid; grid-template-columns: 110px minmax(0, 1fr); overflow: hidden; border: 1px solid #dce9ed; border-radius: 16px; background: #fff; box-shadow: 0 4px 14px #0d1b2a0d; }
+.visual-route-media { position: relative; min-height: 180px; background: #e5f6f8; }
+.visual-route-image { display: block; width: 100%; height: 100%; object-fit: cover; }
+.visual-route-fallback { display: grid; height: 100%; min-height: 180px; place-items: center; padding: 12px; color: #475569; font-size: 12px; text-align: center; }
+.visual-route-credit { position: absolute; bottom: 0; left: 0; right: 0; padding: 4px; background: #0d1b2acc; color: white; font-size: 10px; overflow-wrap: anywhere; }
+.visual-route-details { min-width: 0; padding: 14px; }
+.result-panel .visual-route-title { margin: 0 0 12px; color: #0d1b2a; font-size: 15px; line-height: 1.4; }
+.visual-route-facts { display: grid; gap: 10px; margin: 0; }
+.visual-route-fact { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 2px 7px; }
+.visual-route-icon { grid-row: 1 / 3; color: #007f89; }
+.visual-route-fact dt { color: #475569; font-size: 11px; }
+.visual-route-fact dd { margin: 0; color: #0d1b2a; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.visual-route-note { font-size: 12px; line-height: 1.5; }
+html:not([data-theme="dark"]) .visual-route-number { color: #007f89; }
+html[data-theme="dark"] .visual-route-card { background: #142638; border-color: #345365; }
+html[data-theme="dark"] .result-panel .visual-route-title,
+html[data-theme="dark"] .visual-route-fact dd { color: #f1f5f9; }
+html[data-theme="dark"] .visual-route-fact dt { color: #cbd5e1; }
+@container (max-width: 360px) {
+  .visual-route-card { grid-template-columns: minmax(0, 1fr); }
+  .visual-route-media { height: 140px; min-height: 140px; }
+  .visual-route-fallback { min-height: 140px; }
+}
+
 /* Trip Planner above-the-fold spacing */
 @media (min-width: 981px) {
   body[data-page="planner"] .planner-page-shell {

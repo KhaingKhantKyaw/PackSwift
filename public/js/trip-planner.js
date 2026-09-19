@@ -1172,27 +1172,13 @@ function renderLiveRecommendation(recommendation, input) {
     : "No exact matches yet";
   liveItineraryDensity.textContent =
     `${recommendation.activitiesPerDay} ${recommendation.activitiesPerDay === 1 ? "activity" : "activities"} per day`;
-  liveItineraryList.replaceChildren();
-  for (const day of recommendation.itinerary || []) {
-    const row = document.createElement("article");
-    const label = document.createElement("span");
-    label.textContent = `Day ${day.day}`;
-    const content = document.createElement("div");
-    const activities = document.createElement("p");
-    activities.textContent = day.activities.map((activity) => activity.title).join(" · ");
-    const timing = document.createElement("small");
-    const scheduleNotes = [`Starts ${day.startTime || recommendation.schedule?.startTime || "08:30"}`];
-    if (day.middayRest || recommendation.schedule?.middayRest) {
-      scheduleNotes.push("2-hour midday rest");
-    }
-    if (day.clusterNearby || recommendation.schedule?.clusterNearby) {
-      scheduleNotes.push("nearby stops clustered");
-    }
-    timing.textContent = scheduleNotes.join(" · ");
-    content.append(activities, timing);
-    row.append(label, content);
-    liveItineraryList.append(row);
-  }
+  // Preserve smart pace context: nearby stops clustered and midday rest.
+  renderItineraryDays((recommendation.itinerary || []).map(day => ({
+    ...day,
+    startTime: day.startTime || recommendation.schedule?.startTime || "08:30",
+    middayRest: day.middayRest || recommendation.schedule?.middayRest,
+    clusterNearby: day.clusterNearby || recommendation.schedule?.clusterNearby,
+  })), "live-itinerary-list", input.currency);
 }
 
 function scheduleLiveRecommendation(input) {
@@ -2009,23 +1995,7 @@ function renderPlan(plan) {
     alternatives.append(item);
   }
 
-  const itineraryList = document.querySelector("#itinerary-list");
-  itineraryList.replaceChildren();
-  for (const item of plan.itinerary.slice(0, 4)) {
-    const row = document.createElement("div");
-    row.className = "itinerary-day";
-    const day = document.createElement("span");
-    day.className = "day-number";
-    day.textContent = `D${item.day}`;
-    const details = document.createElement("div");
-    const title = document.createElement("strong");
-    const note = document.createElement("span");
-    title.textContent = item.title;
-    note.textContent = `${item.morning} · ${item.afternoon}`;
-    details.append(title, note);
-    row.append(day, details);
-    itineraryList.append(row);
-  }
+  renderItineraryDays(plan.itinerary.slice(0, 4), "itinerary-list", plan.input.currency);
 
   emptyResult.hidden = true;
   planResult.hidden = false;
