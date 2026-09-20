@@ -19,11 +19,18 @@
   }
   const money = value => new Intl.NumberFormat("en", { style: "currency", currency: context().code, currencyDisplay: "code", maximumFractionDigits: 0 }).format(value);
   function commit(start, end) {
-    setPlannerDate("start", iso(start)); setPlannerDate("end", iso(end));
+    setPlannerDate("start", iso(start)); setPlannerDate("end", end ? iso(end) : "");
     handleLivePlannerEdit(); updateBudgetMinimum();
   }
   function render() {
+    const adults = Number(el("adults").value), children = Number(el("children").value);
+    el("embedded-traveller-summary").textContent = `${adults} ${adults === 1 ? "adult" : "adults"}, ${children} ${children === 1 ? "child" : "children"}`;
     const start = parse(el("start-date").value), end = parse(el("end-date").value);
+    const pretty = date => date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    el("demand-selection").textContent = choosingEnd ? "Choose your departure date after the start date." : "Choose a start date, then an end date.";
+    el("demand-range-summary").textContent = start && end && end > start
+      ? `Selected: ${pretty(start)} – ${pretty(end)} (${Math.round((Date.UTC(end.getFullYear(), end.getMonth(), end.getDate()) - Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())) / 86400000)} nights)`
+      : start ? `Start: ${pretty(start)} · Choose an end date` : "Select your travel dates";
     el("demand-month").textContent = month.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
     el("demand-prev").disabled = month.getFullYear() === today().getFullYear() && month.getMonth() === today().getMonth();
     const grid = el("demand-days"); grid.replaceChildren();
@@ -34,12 +41,26 @@
       const button = document.createElement("button"); button.type = "button"; button.className = `demand-day demand-${data.tier}`;
       const selected = start && end && date >= start && date <= end;
       button.setAttribute("aria-pressed", String(Boolean(selected))); button.disabled = date < today();
+      button.dataset.date = iso(date);
+      button.classList.toggle("range-start", Boolean(start && iso(start) === iso(date)));
+      button.classList.toggle("range-end", Boolean(end && iso(end) === iso(date)));
+      button.classList.toggle("range-between", Boolean(selected && date > start && date < end));
       button.setAttribute("aria-label", `${date.toLocaleDateString("en-GB")}, ${data.tier} estimated demand, ${money(data.amount)} per traveller`);
       const label = document.createElement("span"); label.textContent = number;
       const price = document.createElement("small"); price.textContent = `${context().symbol}${new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(data.amount)}`;
-      button.append(label, price);
+      const dot = document.createElement("span"); dot.className = "demand-dot"; dot.setAttribute("aria-hidden", "true");
+      button.append(label, price, dot);
+      const preview = () => {
+        if (!choosingEnd || !start) return;
+        grid.querySelectorAll("[data-date]").forEach(cell => {
+          const value = parse(cell.dataset.date);
+          cell.classList.toggle("range-hover", value >= start && value <= date);
+        });
+      };
+      button.addEventListener("pointerenter", preview);
+      button.addEventListener("focus", preview);
       button.addEventListener("click", () => {
-        if (!choosingEnd || !start || date < start) { choosingEnd = true; commit(date, date); }
+        if (!choosingEnd || !start || date <= start) { choosingEnd = true; commit(date, null); }
         else { choosingEnd = false; commit(start, date); }
         el("demand-selection").textContent = choosingEnd ? "Now choose the end date." : "Date range selected.";
         render();
@@ -49,6 +70,7 @@
 
   }
   for (const [id, delta] of [["demand-prev", -1], ["demand-next", 1]]) el(id).addEventListener("click", () => { month = new Date(month.getFullYear(), month.getMonth() + delta, 1, 12); render(); });
+  el("demand-days").addEventListener("pointerleave", () => el("demand-days").querySelectorAll(".range-hover").forEach(cell => cell.classList.remove("range-hover")));
   window.refreshDemandCalendar = render;
   render();
 })();

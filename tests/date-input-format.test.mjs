@@ -8,13 +8,13 @@ const [html, client, styles] = await Promise.all([
   readFile(new URL("../public/css/styles.css", import.meta.url), "utf8"),
 ]);
 
-test("Trip Planner displays both travel dates in strict DD/MM/YYYY format", () => {
+test("Trip Planner embeds the calendar and retains hidden ISO date state", () => {
   for (const type of ["start", "end"]) {
-    assert.match(html, new RegExp(`id="${type}-date-display"[\\s\\S]*?placeholder="DD/MM/YYYY"`));
-    assert.match(html, new RegExp(`id="${type}-date" name="${type}Date" type="hidden"`));
-    assert.match(html, new RegExp(`id="${type}-date-picker" type="date"`));
+    assert.match(html, new RegExp(`type="hidden" id="${type}-date" name="${type}Date"`));
   }
   assert.match(client, /function isoToDisplayDate/);
+  assert.match(html, /id="demand-range-summary"/);
+  assert.ok(!html.includes("Open price &amp; crowd calendar"));
   assert.match(client, /`\$\{match\[3\]\}\/\$\{match\[2\]\}\/\$\{match\[1\]\}`/);
   assert.match(client, /function displayToIsoDate/);
   assert.match(client, /Enter a valid date in DD\/MM\/YYYY format\./);

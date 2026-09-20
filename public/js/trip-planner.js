@@ -343,6 +343,7 @@ function setupFormattedDateControl(type) {
   const displayInput = isStart ? startDateDisplay : endDateDisplay;
   const pickerInput = isStart ? startDatePicker : endDatePicker;
   const button = document.querySelector(`[data-date-picker="${type}"]`);
+  if (!button) return; // Embedded calendar owns date selection.
 
   displayInput.addEventListener("input", () => {
     displayInput.value = formatDateTyping(displayInput.value);

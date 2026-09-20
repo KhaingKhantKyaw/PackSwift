@@ -176,43 +176,30 @@
               </div>
             </div>
             <div class="form-section-heading"><h3>Dates &amp; travellers</h3><p>Set the travel window and the exact group size.</p></div>
-            <div class="form-field">
-              <label class="form-label" for="start-date-display">Start date</label>
-              <div class="formatted-date-control">
-                <input class="field-control date-display-input" id="start-date-display" type="text" inputmode="numeric" autocomplete="off" placeholder="DD/MM/YYYY" maxlength="10" aria-describedby="start-date-format" required>
-                <button class="date-picker-button" type="button" data-date-picker="start" aria-label="Choose start date"><span aria-hidden="true">▦</span></button>
-                <input class="native-date-proxy" id="start-date-picker" type="date" tabindex="-1" aria-hidden="true">
-                <input id="start-date" name="startDate" type="hidden">
-              </div>
-              <small class="form-help" id="start-date-format">DD/MM/YYYY</small>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="end-date-display">End date</label>
-              <div class="formatted-date-control">
-                <input class="field-control date-display-input" id="end-date-display" type="text" inputmode="numeric" autocomplete="off" placeholder="DD/MM/YYYY" maxlength="10" aria-describedby="end-date-format" required>
-                <button class="date-picker-button" type="button" data-date-picker="end" aria-label="Choose end date"><span aria-hidden="true">▦</span></button>
-                <input class="native-date-proxy" id="end-date-picker" type="date" tabindex="-1" aria-hidden="true">
-                <input id="end-date" name="endDate" type="hidden">
-              </div>
-              <small class="form-help" id="end-date-format">DD/MM/YYYY</small>
-            </div>
+            <input type="hidden" id="start-date" name="startDate">
+            <input type="hidden" id="end-date" name="endDate">
+            <input type="hidden" id="start-date-display">
+            <input type="hidden" id="end-date-display">
+            <input type="hidden" id="start-date-picker">
+            <input type="hidden" id="end-date-picker">
             <div class="form-field form-field-wide">
+              <span class="form-label">Travellers</span>
+              <details class="embedded-travellers"><summary id="embedded-traveller-summary">1 adult, 0 children</summary>
+              <div class="traveller-counter-grid">
+                <div class="traveller-counter"><span><strong>Adults</strong><small>Age 12+</small></span><div><button type="button" data-counter="adults" data-step="-1" aria-label="Remove one adult">−</button><output id="adult-count">1</output><button type="button" data-counter="adults" data-step="1" aria-label="Add one adult">+</button></div><input id="adults" name="adults" type="hidden" value="1"></div>
+                <div class="traveller-counter"><span><strong>Children</strong><small>Age 0–11</small></span><div><button type="button" data-counter="children" data-step="-1" aria-label="Remove one child">−</button><output id="child-count">0</output><button type="button" data-counter="children" data-step="1" aria-label="Add one child">+</button></div><input id="children" name="children" type="hidden" value="0"></div>
+              </div>
+              </details>
               <section class="demand-calendar" aria-labelledby="demand-title">
                 <h3 id="demand-title">Find a budget-friendly window</h3>
                 <p class="demand-note">Demo estimates per traveller/day, based only on weekdays and weekends. Not live fares, hotel quotes, holiday data, or measured crowds.</p>
-                <details><summary>Open price &amp; crowd calendar</summary>
                   <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
                   <p id="demand-selection" role="status">Choose a start date, then an end date.</p>
                   <div class="demand-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
                   <div id="demand-days" class="demand-days" role="group" aria-label="Travel date choices"></div>
                   <p class="demand-legend"><span>🟢 Low / budget</span><span>🟡 Moderate</span><span>🔴 Peak / weekend</span></p>
-                </details>
+                <p id="demand-range-summary" class="demand-range-summary" role="status"></p>
               </section>
-              <span class="form-label">Travellers</span>
-              <div class="traveller-counter-grid">
-                <div class="traveller-counter"><span><strong>Adults</strong><small>Age 12+</small></span><div><button type="button" data-counter="adults" data-step="-1" aria-label="Remove one adult">−</button><output id="adult-count">1</output><button type="button" data-counter="adults" data-step="1" aria-label="Add one adult">+</button></div><input id="adults" name="adults" type="hidden" value="1"></div>
-                <div class="traveller-counter"><span><strong>Children</strong><small>Age 0–11</small></span><div><button type="button" data-counter="children" data-step="-1" aria-label="Remove one child">−</button><output id="child-count">0</output><button type="button" data-counter="children" data-step="1" aria-label="Add one child">+</button></div><input id="children" name="children" type="hidden" value="0"></div>
-              </div>
             </div>
             <div class="form-section-heading"><h3>Trip preferences</h3><p>Choose the purpose, group style, and pace for tailored suggestions.</p></div>
             <div class="form-field">
