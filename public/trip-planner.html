@@ -55,7 +55,7 @@
             </dl>
           </section>
           <div class="form-grid">
-            <div class="form-section-heading"><h3>Destination &amp; route</h3><p>Choose the trip scope, departure point, and destination.</p></div>
+            <div class="form-section-heading"><h3>Trip Scope</h3><p>Choose the trip scope, departure point, and destination.</p></div>
             <fieldset class="form-field form-field-wide featured-destinations">
               <legend class="form-legend">Most Popular Destinations</legend>
               <div id="popular-destination-grid" class="featured-preset-grid" aria-label="Popular destination quick selections"></div>
@@ -79,6 +79,27 @@
               <datalist id="destination-options"></datalist>
               <span id="destination-field-hint" class="field-hint">Arrival city or country.</span>
             </div>
+            <div class="form-section-heading"><h3>Dates</h3><p>Select your arrival and departure dates.</p></div>
+            <input type="hidden" id="start-date" name="startDate">
+            <input type="hidden" id="end-date" name="endDate">
+            <input type="hidden" id="start-date-display">
+            <input type="hidden" id="end-date-display">
+            <input type="hidden" id="start-date-picker">
+            <input type="hidden" id="end-date-picker">
+            <div class="form-field form-field-wide">
+              <input id="adults" name="adults" type="hidden" value="1">
+              <input id="children" name="children" type="hidden" value="0">
+              <section class="demand-calendar" aria-labelledby="demand-title">
+                <h3 id="demand-title">Find a budget-friendly window</h3>
+                <p class="demand-note">Demo estimates per traveller/day, based only on weekdays and weekends. Not live fares, hotel quotes, holiday data, or measured crowds.</p>
+                  <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
+                  <p id="demand-selection" role="status">Choose a start date, then an end date.</p>
+                  <div class="demand-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+                  <div id="demand-days" class="demand-days" role="group" aria-label="Travel date choices"></div>
+                  <p class="demand-legend"><span>🟢 Low / budget</span><span>🟡 Moderate</span><span>🔴 Peak / weekend</span></p>
+                <p id="demand-range-summary" class="demand-range-summary" role="status"></p>
+              </section>
+            </div>
             <div class="form-section-heading"><h3>Travel intention</h3><p>Tell PackSwift how you want the budget to shape the experience.</p></div>
             <fieldset class="form-field form-field-wide planning-goal-fieldset">
               <legend class="form-legend">What matters most for this trip?</legend>
@@ -91,7 +112,7 @@
                 <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="once-in-lifetime"><span><strong>Once-in-a-lifetime trip</strong><small>Protect must-do experiences and save elsewhere.</small></span></label>
               </div>
             </fieldset>
-            <div class="form-section-heading"><h3>Travel lifestyle</h3><p>Choose the level that feels natural to you. These are preferences, not restrictions.</p></div>
+            <div class="form-section-heading"><h3>Trip Preferences</h3><p>Choose the level that feels natural to you. These are preferences, not restrictions.</p></div>
             <p id="lifestyle-preset-feedback" class="form-help form-field-wide" role="status" aria-live="polite"></p>
             <div class="form-field">
               <label class="form-label" for="accommodation-style">Accommodation</label>
@@ -150,6 +171,47 @@
               <label class="form-label" for="must-have-experience">One experience I do not want to miss <span class="label-optional">Optional</span></label>
               <input class="field-control" id="must-have-experience" name="mustHaveExperience" type="text" maxlength="180" placeholder="e.g. See Wat Arun at sunrise or spend one day at the beach">
             </div>
+            <div class="form-field">
+              <label class="form-label" for="trip-purpose">Travel Purpose</label>
+              <select class="field-control" id="trip-purpose" name="tripPurpose">
+                <option value="leisure">Leisure &amp; Relaxation</option>
+                <option value="cultural">Cultural &amp; Historical</option>
+                <option value="adventure">Adventure &amp; Outdoor</option>
+                <option value="food">Food &amp; Culinary</option>
+                <option value="business">Business / Workation</option>
+                <option value="events">Special Events &amp; Celebrations</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="traveler-demographic">Travel Groups</label>
+              <select class="field-control" id="traveler-demographic" name="travelerDemographic">
+                <option value="solo">Solo</option>
+                <option value="couples" selected>Couples</option>
+                <option value="family-with-children">Family</option>
+                <option value="friends-group">Friends / Group</option>
+                <option value="business-duo">Digital Nomad / Business Duo</option>
+                <option value="senior">Senior Travelers</option>
+              </select>
+            </div>
+            <div class="form-section-heading"><h3>Travel Pace</h3><p>Choose your daily rhythm.</p></div>
+            <fieldset class="form-field form-field-wide" style="border:0;padding:0;margin:0">
+              <legend class="form-legend">Travel Pace</legend>
+              <div class="pace-option-grid">
+                <label class="pace-choice"><input type="radio" name="pace" value="relaxed"><span><strong>Slow &amp; Relaxed 🌿</strong><small>1–2 spots/day</small></span></label>
+                <label class="pace-choice"><input type="radio" name="pace" value="balanced" checked><span><strong>Balanced &amp; Steady ⚖️</strong><small>3–4 spots/day</small></span></label>
+                <label class="pace-choice"><input type="radio" name="pace" value="packed"><span><strong>Packed &amp; Fast ⚡</strong><small>5+ spots/day</small></span></label>
+                <label class="pace-choice"><input type="radio" name="pace" value="cultural"><span><strong>Cultural Deep Dive 🎨</strong><small>Museums &amp; history focus</small></span></label>
+                <label class="pace-choice"><input type="radio" name="pace" value="culinary"><span><strong>Culinary &amp; Foodie 🍜</strong><small>Market &amp; café focus</small></span></label>
+              </div>
+              <div class="smart-pace-panel" aria-labelledby="smart-pace-title">
+                <div><strong id="smart-pace-title">Smart pace</strong><small>Fine-tune the daily timing</small></div>
+                <div class="smart-pace-toggles">
+                  <label class="smart-pace-toggle"><span><strong>Late Riser</strong><small>Start after 10 AM</small></span><input type="checkbox" name="lateRiser" value="true"><i aria-hidden="true"></i></label>
+                  <label class="smart-pace-toggle"><span><strong>Midday Rest</strong><small>2-hour afternoon gap</small></span><input type="checkbox" name="middayRest" value="true"><i aria-hidden="true"></i></label>
+                  <label class="smart-pace-toggle"><span><strong>Cluster Nearby</strong><small>Minimize transit time</small></span><input type="checkbox" name="clusterNearby" value="true"><i aria-hidden="true"></i></label>
+                </div>
+              </div>
+            </fieldset>
             <div class="form-section-heading"><h3>Budget</h3><p>Enter your total amount. PackSwift will adapt the plan instead of judging it.</p></div>
             <div class="form-field form-field-wide">
               <div class="budget-label-row"><label class="form-label" for="budget">Total trip budget</label><span id="budget-currency-label" class="form-label">Currency</span></div>
@@ -175,73 +237,6 @@
                 <div><strong id="budget-info-title">Route Budget Estimate</strong><p>Minimum budget for <b id="budget-info-route">Yangon → Bangkok</b>: <b id="budget-info-amount">$380.00</b> <span id="budget-info-detail">577 km route. ~USD 100 transit/person × 1 traveller + USD 40/day × 1 × 7 days.</span></p></div>
               </div>
             </div>
-            <div class="form-section-heading"><h3>Dates &amp; travellers</h3><p>Set the travel window and the exact group size.</p></div>
-            <input type="hidden" id="start-date" name="startDate">
-            <input type="hidden" id="end-date" name="endDate">
-            <input type="hidden" id="start-date-display">
-            <input type="hidden" id="end-date-display">
-            <input type="hidden" id="start-date-picker">
-            <input type="hidden" id="end-date-picker">
-            <div class="form-field form-field-wide">
-              <span class="form-label">Travellers</span>
-              <details class="embedded-travellers"><summary id="embedded-traveller-summary">1 adult, 0 children</summary>
-              <div class="traveller-counter-grid">
-                <div class="traveller-counter"><span><strong>Adults</strong><small>Age 12+</small></span><div><button type="button" data-counter="adults" data-step="-1" aria-label="Remove one adult">−</button><output id="adult-count">1</output><button type="button" data-counter="adults" data-step="1" aria-label="Add one adult">+</button></div><input id="adults" name="adults" type="hidden" value="1"></div>
-                <div class="traveller-counter"><span><strong>Children</strong><small>Age 0–11</small></span><div><button type="button" data-counter="children" data-step="-1" aria-label="Remove one child">−</button><output id="child-count">0</output><button type="button" data-counter="children" data-step="1" aria-label="Add one child">+</button></div><input id="children" name="children" type="hidden" value="0"></div>
-              </div>
-              </details>
-              <section class="demand-calendar" aria-labelledby="demand-title">
-                <h3 id="demand-title">Find a budget-friendly window</h3>
-                <p class="demand-note">Demo estimates per traveller/day, based only on weekdays and weekends. Not live fares, hotel quotes, holiday data, or measured crowds.</p>
-                  <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
-                  <p id="demand-selection" role="status">Choose a start date, then an end date.</p>
-                  <div class="demand-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-                  <div id="demand-days" class="demand-days" role="group" aria-label="Travel date choices"></div>
-                  <p class="demand-legend"><span>🟢 Low / budget</span><span>🟡 Moderate</span><span>🔴 Peak / weekend</span></p>
-                <p id="demand-range-summary" class="demand-range-summary" role="status"></p>
-              </section>
-            </div>
-            <div class="form-section-heading"><h3>Trip preferences</h3><p>Choose the purpose, group style, and pace for tailored suggestions.</p></div>
-            <div class="form-field">
-              <label class="form-label" for="trip-purpose">Travel Purpose</label>
-              <select class="field-control" id="trip-purpose" name="tripPurpose">
-                <option value="leisure">Leisure &amp; Relaxation</option>
-                <option value="cultural">Cultural &amp; Historical</option>
-                <option value="adventure">Adventure &amp; Outdoor</option>
-                <option value="food">Food &amp; Culinary</option>
-                <option value="business">Business / Workation</option>
-                <option value="events">Special Events &amp; Celebrations</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="traveler-demographic">Travel Groups</label>
-              <select class="field-control" id="traveler-demographic" name="travelerDemographic">
-                <option value="solo">Solo</option>
-                <option value="couples" selected>Couples</option>
-                <option value="family-with-children">Family</option>
-                <option value="friends-group">Friends / Group</option>
-                <option value="business-duo">Digital Nomad / Business Duo</option>
-                <option value="senior">Senior Travelers</option>
-              </select>
-            </div>
-            <fieldset class="form-field form-field-wide" style="border:0;padding:0;margin:0">
-              <legend class="form-legend">Travel Pace</legend>
-              <div class="pace-option-grid">
-                <label class="pace-choice"><input type="radio" name="pace" value="relaxed"><span><strong>Slow &amp; Relaxed 🌿</strong><small>1–2 spots/day</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="balanced" checked><span><strong>Balanced &amp; Steady ⚖️</strong><small>3–4 spots/day</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="packed"><span><strong>Packed &amp; Fast ⚡</strong><small>5+ spots/day</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="cultural"><span><strong>Cultural Deep Dive 🎨</strong><small>Museums &amp; history focus</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="culinary"><span><strong>Culinary &amp; Foodie 🍜</strong><small>Market &amp; café focus</small></span></label>
-              </div>
-              <div class="smart-pace-panel" aria-labelledby="smart-pace-title">
-                <div><strong id="smart-pace-title">Smart pace</strong><small>Fine-tune the daily timing</small></div>
-                <div class="smart-pace-toggles">
-                  <label class="smart-pace-toggle"><span><strong>Late Riser</strong><small>Start after 10 AM</small></span><input type="checkbox" name="lateRiser" value="true"><i aria-hidden="true"></i></label>
-                  <label class="smart-pace-toggle"><span><strong>Midday Rest</strong><small>2-hour afternoon gap</small></span><input type="checkbox" name="middayRest" value="true"><i aria-hidden="true"></i></label>
-                  <label class="smart-pace-toggle"><span><strong>Cluster Nearby</strong><small>Minimize transit time</small></span><input type="checkbox" name="clusterNearby" value="true"><i aria-hidden="true"></i></label>
-                </div>
-              </div>
-            </fieldset>
             <div class="form-field form-field-wide">
               <label class="form-label" for="trip-notes">Trip notes <span class="label-optional">Optional</span></label>
               <textarea class="field-control" id="trip-notes" name="notes" rows="3" maxlength="600" placeholder="e.g. Add a beach day and vegetarian food options"></textarea>

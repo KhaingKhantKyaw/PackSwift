@@ -23,8 +23,6 @@
     handleLivePlannerEdit(); updateBudgetMinimum();
   }
   function render() {
-    const adults = Number(el("adults").value), children = Number(el("children").value);
-    el("embedded-traveller-summary").textContent = `${adults} ${adults === 1 ? "adult" : "adults"}, ${children} ${children === 1 ? "child" : "children"}`;
     const start = parse(el("start-date").value), end = parse(el("end-date").value);
     const pretty = date => date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
     el("demand-selection").textContent = choosingEnd ? "Choose your departure date after the start date." : "Choose a start date, then an end date.";

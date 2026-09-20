@@ -586,11 +586,8 @@ function updateBudgetMinimum() {
 function setTravellerCount(type, value) {
   const isAdult = type === "adults";
   const input = isAdult ? adultInput : childInput;
-  const minimum = isAdult ? 1 : 0;
-  const maximum = isAdult ? 12 : 8;
-  const next = Math.max(minimum, Math.min(maximum, Number(value) || minimum));
+  const next = isAdult ? 1 : 0; // Date-only planner uses one traveller, including restored plans.
   input.value = String(next);
-  document.querySelector(isAdult ? "#adult-count" : "#child-count").textContent = String(next);
 }
 
 function isDomesticTrip() {
