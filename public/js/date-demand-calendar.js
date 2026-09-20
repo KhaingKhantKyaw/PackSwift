@@ -8,6 +8,34 @@
   let month = parse(el("start-date").value) || today();
   month = new Date(month.getFullYear(), month.getMonth(), 1, 12);
   let choosingEnd = false, proposed = null;
+  const tooltip = document.createElement("div");
+  tooltip.id = "demand-price-tooltip";
+  tooltip.className = "demand-price-tooltip";
+  tooltip.setAttribute("role", "tooltip");
+  tooltip.hidden = true;
+  document.body.append(tooltip);
+  let activeBar = null;
+  function hideTooltip() {
+    activeBar?.removeAttribute("aria-describedby");
+    activeBar = null; tooltip.hidden = true;
+  }
+  function showTooltip(button, text) {
+    hideTooltip(); activeBar = button;
+    tooltip.textContent = text; tooltip.hidden = false;
+    button.setAttribute("aria-describedby", tooltip.id);
+    const rect = button.getBoundingClientRect();
+    const width = tooltip.offsetWidth;
+    const left = Math.max(8, Math.min(window.innerWidth - width - 8, rect.left + rect.width / 2 - width / 2));
+    const above = rect.top > tooltip.offsetHeight + 16;
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${above ? rect.top - tooltip.offsetHeight - 10 : rect.bottom + 10}px`;
+    tooltip.style.setProperty("--arrow-x", `${Math.max(12, Math.min(width - 12, rect.left + rect.width / 2 - left))}px`);
+    tooltip.dataset.position = above ? "above" : "below";
+  }
+  document.addEventListener("keydown", event => { if (event.key === "Escape") hideTooltip(); });
+  document.addEventListener("pointerdown", event => { if (!event.target.closest(".demand-trend-column")) hideTooltip(); });
+  window.addEventListener("resize", hideTooltip);
+  document.addEventListener("scroll", hideTooltip, true);
   function context() {
     const local = PackSwiftCurrency.resolve(el("destination-search")?.value || document.querySelector('[name="destination"]')?.value);
     const base = { THB: 1500, EUR: 100, JPY: 12000, SGD: 120, MMK: 100000, CNY: 450, USD: 80 }[local.code];
@@ -49,15 +77,24 @@
     }
     const anchor = start && start >= today() ? start : today();
     const first = add(anchor, -3) < today() ? today() : add(anchor, -3);
-    const trend = el("demand-trend"); trend.replaceChildren();
+    const trend = el("demand-trend"); hideTooltip(); trend.replaceChildren();
     for (let i = 0; i < 10; i++) {
       const date = add(first, i), data = estimate(date);
-      const column = document.createElement("div"); column.className = `demand-trend-column demand-${data.tier}`;
-      column.title = `${date.toLocaleDateString("en-GB")}: ${money(data.amount)}`;
-      const bar = document.createElement("span"); bar.className = "demand-bar"; bar.style.height = `${data.amount / (context().base * 1.35) * 60}px`; bar.setAttribute("aria-hidden", "true");
-      const label = document.createElement("small"); label.textContent = date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-      const price = document.createElement("small"); price.textContent = money(data.amount);
-      column.append(bar, label, price); trend.append(column);
+      const column = document.createElement("button"); column.type = "button"; column.className = `demand-trend-column demand-${data.tier}`;
+      const crowd = { low: "Off-peak", standard: "Moderate", peak: "Peak / weekend" }[data.tier];
+      const description = `${date.toLocaleDateString("en-GB", { day: "numeric", month: "short", weekday: "short" })} • ${money(data.amount)} • ${crowd} (demo estimate)`;
+      column.setAttribute("aria-label", description);
+      const track = document.createElement("span"); track.className = "demand-bar-track";
+      const bar = document.createElement("span"); bar.className = "demand-bar"; bar.style.height = `${data.amount / (context().base * 1.35) * 64}px`; bar.setAttribute("aria-hidden", "true");
+      track.append(bar);
+      const weekday = document.createElement("span"); weekday.className = "demand-bar-weekday"; weekday.textContent = date.toLocaleDateString("en-GB", { weekday: "short" });
+      const number = document.createElement("span"); number.className = "demand-bar-date"; number.textContent = date.getDate();
+      column.addEventListener("pointerenter", event => { if (event.pointerType !== "touch") showTooltip(column, description); });
+      column.addEventListener("pointerleave", () => { if (document.activeElement !== column) hideTooltip(); });
+      column.addEventListener("focus", () => showTooltip(column, description));
+      column.addEventListener("blur", hideTooltip);
+      column.addEventListener("click", () => showTooltip(column, description));
+      column.append(track, weekday, number); trend.append(column);
     }
     proposed = null; el("demand-apply").hidden = true;
     if (!start || !end || end < start || start < today()) { el("demand-cheapest").textContent = "Select valid travel dates to compare nearby windows."; return; }
