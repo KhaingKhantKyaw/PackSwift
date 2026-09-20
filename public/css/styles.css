@@ -5090,6 +5090,10 @@ html[data-theme="dark"] .visual-route-fact dt { color: #cbd5e1; }
 .demand-bar { width: 65%; border-radius: 4px 4px 0 0; background: var(--demand-fill); }
 html[data-theme="dark"] .demand-calendar { color: #e2e8f0; }
 
+.dynamic-budget-warning { display: block; margin-top: 8px; color: #8a4a05; font-size: 12px; }
+html[data-theme="dark"] .dynamic-budget-warning { color: #fcd085; }
+#dynamic-budget-badge { font-size: 12px; line-height: 1.6; }
+
 /* Trip Planner above-the-fold spacing */
 @media (min-width: 981px) {
   body[data-page="planner"] .planner-page-shell {
