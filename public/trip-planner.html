@@ -39,9 +39,7 @@
       </section>
 
       <section class="planner-layout">
-        <form id="trip-planner-form" class="panel form-panel" novalidate>
-          <h2 class="panel-title">Your trip preferences</h2>
-          <p class="panel-copy">Choose a popular destination or define an exact route. Every choice remains editable.</p>
+        <form id="trip-planner-form" class="panel form-panel" aria-label="Trip preferences" novalidate>
           <section id="focused-destination-context" class="focused-destination-context" aria-labelledby="focused-destination-name" hidden>
             <span class="focused-lock">Destination locked</span>
             <div>
@@ -55,7 +53,6 @@
             </dl>
           </section>
           <div class="form-grid">
-            <div class="form-section-heading"><h3>Trip Scope</h3><p>Choose the trip scope, departure point, and destination.</p></div>
             <fieldset class="form-field form-field-wide featured-destinations">
               <legend class="form-legend">Most Popular Destinations</legend>
               <div id="popular-destination-grid" class="featured-preset-grid" aria-label="Popular destination quick selections"></div>
@@ -89,9 +86,7 @@
             <div class="form-field form-field-wide">
               <input id="adults" name="adults" type="hidden" value="1">
               <input id="children" name="children" type="hidden" value="0">
-              <section class="demand-calendar" aria-labelledby="demand-title">
-                <h3 id="demand-title">Find a budget-friendly window</h3>
-                <p class="demand-note">Demo estimates per traveller/day, based only on weekdays and weekends. Not live fares, hotel quotes, holiday data, or measured crowds.</p>
+              <section class="demand-calendar" aria-label="Travel date range calendar">
                   <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
                   <p id="demand-selection" role="status">Choose a start date, then an end date.</p>
                   <div class="demand-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>

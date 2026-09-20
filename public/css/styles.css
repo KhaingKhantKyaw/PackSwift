@@ -1346,6 +1346,10 @@ img {
   padding: 28px;
 }
 
+#trip-planner-form { padding-top: 20px; }
+#trip-planner-form > .form-grid { margin-top: 0; }
+#trip-planner-form > .focused-destination-context:not([hidden]) { margin-bottom: 18px; }
+
 .panel-title {
   margin: 0;
   font-size: 1.25rem;
@@ -5067,10 +5071,9 @@ html[data-theme="dark"] .visual-route-fact dt { color: #cbd5e1; }
 
 /* Demo date-demand calendar: labels accompany every colour indicator. */
 .demand-calendar { margin-bottom: 20px; padding: 16px; border: 1px solid #b7d9dd; border-radius: 18px; background: var(--surface); color: var(--ink); }
-.demand-calendar h3 { margin: 0 0 8px; font-size: 16px; }
-.demand-note, #demand-selection { font-size: 12px; line-height: 1.6; }
+#demand-selection { font-size: 12px; line-height: 1.6; }
 .demand-calendar summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
-.demand-month-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0; }
+.demand-month-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 10px; }
 .demand-month-nav button { border: 1px solid #b7d9dd; border-radius: 10px; padding: 8px 14px; background: #e5f6f8; color: #0d1b2a; cursor: pointer; }
 .demand-weekdays, .demand-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .demand-weekdays { text-align: center; font-size: 10px; margin-bottom: 7px; }
