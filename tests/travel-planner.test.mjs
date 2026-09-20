@@ -60,7 +60,7 @@ test("normalizes every supported budget currency", () => {
       interests: ["culture", "food"],
     });
     assert.ok(Math.abs(plan.input.budgetUsd - 2000) < 0.02);
-    assert.equal(plan.input.currency, currency);
+    assert.equal(plan.input.currency, "JPY");
   }
 });
 

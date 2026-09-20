@@ -41,7 +41,7 @@ window.PackSwiftRouteEditor = (() => {
     status.textContent = route.source === "sample"
       ? "Bangkok sample route — not live data. Photos are illustrative; verify hours and prices. This sample does not change your selected destination."
       : `${plan.destination.name} · Arrange your day tour. Confirm current hours and prices before visiting.`;
-    renderItinerary(route.stops, target.id);
+    renderItinerary(route.stops, target.id, window.PackSwiftCurrency?.resolve(plan.destination).code || plan.input?.currency);
     const rows = target.querySelectorAll(".visual-route-stop");
     rows.forEach((row, index) => {
       const controls = document.createElement("div");

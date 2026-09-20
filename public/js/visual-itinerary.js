@@ -1,5 +1,5 @@
 /* Safe DOM rendering shared by the live and generated itinerary previews. */
-function renderItinerary(data, containerId) {
+function renderItinerary(data, containerId, localCurrency) {
   const container = document.getElementById(containerId);
   if (!container) return;
   const node = (tag, className, text) => {
@@ -44,9 +44,12 @@ function renderItinerary(data, containerId) {
     const details = node("div", "visual-route-details");
     details.append(node("h4", "visual-route-title", stop.placeName || stop.title || stop.name || "Planned stop"));
     const facts = node("dl", "visual-route-facts");
+    let ticket = stop.ticketPrice || stop.ticket || stop.priceRange || "Confirm locally";
+    const statedCurrency = ticket.match(/\b(USD|THB|EUR|JPY|SGD|MMK|CNY|GBP)\b/)?.[1];
+    if (localCurrency && statedCurrency && statedCurrency !== localCurrency) ticket = `Confirm ticket price in ${localCurrency}`;
     for (const [icon, label, value] of [
       ["◷", "Hours", stop.openingHours || stop.hours || "Check current opening hours"],
-      ["◇", "Entry / expenses", stop.ticketPrice || stop.ticket || stop.priceRange || "Confirm locally"],
+      ["◇", "Entry / expenses", ticket],
       ["⌛", "Suggested stay", stop.suggestedStay || stop.stay || "Flexible — allow time for transit"],
     ]) {
       const fact = node("div", "visual-route-fact");
@@ -104,6 +107,6 @@ function renderItineraryDays(days, containerId, currency = "USD") {
         if (rate) ticketPrice = `Est. ${new Intl.NumberFormat("en", { style: "currency", currency }).format(Number(activity.costUsd) / rate)} / person`;
       }
       return { ...activity, ticketPrice, suggestedStay: activity.suggestedStay || (activity.durationMinutes ? `${activity.durationMinutes} minutes` : null) };
-    }), target.id);
+    }), target.id, currency);
   }
 }

@@ -114,8 +114,19 @@ const currencyRatesToUsd = {
   MMK: 1 / 2100,
   CNY: 1 / 7.2,
   SGD: 1 / 1.35,
+  EUR: 1.08,
+  JPY: 0.0067,
 };
-const currencySymbols = { USD: "$", THB: "฿", MMK: "Ks", CNY: "¥", SGD: "S$" };
+const currencySymbols = Object.fromEntries(Object.entries(PackSwiftCurrency.currencies).map(([code, item]) => [code, item.symbol]));
+const formatCurrency = PackSwiftCurrency.formatCurrency;
+function syncDestinationCurrency() {
+  const local = PackSwiftCurrency.resolve(resolveRouteLocation(destinationSearch.value) || destinationSearch.value);
+  currencyInput.value = local.code;
+  for (const option of currencyInput.options) option.disabled = option.value !== local.code;
+  currencyInput.title = "Currency follows your destination";
+  budgetInput.placeholder = `e.g. ${local.suggested.toLocaleString("en")}`;
+  syncBudgetCurrencySymbol();
+}
 const minimumDailyBudgetUsd = 40;
 const regionalRoundTripTransitUsd = new Map([
   ["bangkok::yangon", 100],
@@ -541,6 +552,7 @@ function minimumBudgetForCurrentRoute() {
 }
 
 function updateBudgetMinimum() {
+  syncDestinationCurrency();
   const rule = minimumBudgetForCurrentRoute();
   budgetInput.dataset.minimum = String(rule.minimumAmount);
   const routeText = rule.origin && rule.destination
@@ -559,8 +571,8 @@ function updateBudgetMinimum() {
     ? `${new Intl.NumberFormat("en-US").format(rule.distanceKm)} km route. `
     : "";
   const estimateFormula =
-    `${distanceLabel}~USD ${rule.transitCostPerPersonUsd} transit/person × ${rule.travelers} ${travellerLabel} + ` +
-    `a minimum USD 24/day travel baseline across ${rule.days} days.`;
+    `${distanceLabel}~${formatMoney(rule.transitCostPerPersonUsd / currencyRatesToUsd[rule.currency], rule.currency)} transit/person × ${rule.travelers} ${travellerLabel} + ` +
+    `a minimum ${formatMoney(24 / currencyRatesToUsd[rule.currency], rule.currency)}/day travel baseline across ${rule.days} days.`;
   budgetInfoDetail.textContent = isBelowMinimum
     ? `${formatMoney(amount, rule.currency)} is still accepted. PackSwift will suggest fewer days, flexible dates, lower-cost stays, public transit, and free highlights. ${estimateFormula}`
     : `${estimateFormula} Your lifestyle-matched recommendation is ${formatMoney(rule.recommendedUsd / currencyRatesToUsd[rule.currency], rule.currency)}.`;
@@ -1292,6 +1304,7 @@ function renderLiveBudgetOptions(scenarios, currency, planningGoal) {
 }
 
 function updateLiveTripPreview() {
+  syncDestinationCurrency();
   const data = new FormData(plannerForm);
   const origin = String(data.get("origin") || "").trim();
   const destination = String(data.get("destination") || "").trim();
@@ -1540,6 +1553,7 @@ async function loadDestinationCatalog() {
 }
 
 function collectInput() {
+  syncDestinationCurrency();
   const formData = new FormData(plannerForm);
   const travelStyle = travelStyleFromFormData(formData);
   const currency = String(formData.get("currency"));
@@ -1951,6 +1965,7 @@ function formatMoney(amount, currency) {
     return new Intl.NumberFormat(undefined, {
       style: "currency",
       currency,
+      currencyDisplay: "code",
       maximumFractionDigits: currency === "JPY" || currency === "KRW" ? 0 : 2,
     }).format(amount);
   } catch {
@@ -2142,8 +2157,12 @@ function restorePlannerFormFromPlan(plan) {
     input.destinationQuery ||
     plan.destination?.name ||
     "";
-  if (input.budget) setBudgetValue(input.budget);
-  if (input.currency) currencyInput.value = input.currency;
+  const localCurrency = PackSwiftCurrency.resolve(plan.destination || destinationSearch.value).code;
+  if (input.budget) {
+    const oldRate = currencyRatesToUsd[input.currency] || currencyRatesToUsd[localCurrency];
+    setBudgetValue(Math.round(input.budget * oldRate / currencyRatesToUsd[localCurrency]));
+  }
+  currencyInput.value = localCurrency;
   setTravellerCount("adults", input.adults || input.travelers || 1);
   setTravellerCount("children", input.children || 0);
   const scope = input.tripScope || input.route?.scope || "international";

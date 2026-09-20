@@ -17,7 +17,7 @@ test("budget input is a unified formatted amount and full currency control", () 
   assert.match(styles, /\.budget-field \{[\s\S]*?grid-template-columns: auto minmax\(0, 1fr\) minmax\(132px, auto\)/);
   assert.match(styles, /\.budget-currency-select \{[\s\S]*?min-width: 132px/);
   assert.match(client, /function formatBudgetValue/);
-  assert.match(client, /currencySymbols = \{ USD: "\$", THB: "฿", MMK: "Ks", CNY: "¥", SGD: "S\$" \}/);
+  assert.match(client, /Object.entries\(PackSwiftCurrency.currencies\)/);
 });
 
 test("minimum budget callout and warning state are driven by the route rule", () => {

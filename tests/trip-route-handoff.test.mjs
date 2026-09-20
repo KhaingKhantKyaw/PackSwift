@@ -78,7 +78,8 @@ test("minimum budget uses distance, transit per person, trip days, and party siz
     startDate: "2027-01-10",
     endDate: "2027-01-16",
   });
-  assert.equal(tightBudgetPlan.input.budget, 2354);
+  assert.ok(Math.abs(tightBudgetPlan.input.budgetUsd - 2354) < 0.01);
+  assert.equal(tightBudgetPlan.input.currency, "JPY");
   assert.equal(tightBudgetPlan.input.route.minimumBudgetUsd, 2355);
   assert.equal(tightBudgetPlan.budgetFit.withinBudget, true);
   assert.equal(tightBudgetPlan.input.planningGoal, "best-value");

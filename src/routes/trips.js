@@ -123,7 +123,7 @@ tripsRouter.post(
     body("end_date").isString().isLength({ min: 10, max: 10 }),
     body("adults_count").isInt({ min: 1, max: 12 }).toInt(),
     body("children_count").optional().isInt({ min: 0, max: 8 }).toInt(),
-    body("currency").isIn(["THB", "USD", "MMK", "SGD", "CNY"]),
+    body("currency").isIn(["THB", "USD", "MMK", "SGD", "CNY", "EUR", "JPY"]),
     body("budget").optional().isFloat({ min: 1, max: 10000000 }).toFloat(),
     body("planning_goal").optional().isIn(["make-possible", "fixed-budget", "best-value", "comfort-first", "luxury", "once-in-lifetime"]),
     body("accommodation_style").optional().isIn(["hostel", "budget", "comfortable", "boutique", "luxury"]),

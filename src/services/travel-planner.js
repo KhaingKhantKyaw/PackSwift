@@ -1,3 +1,4 @@
+import { destinationCurrency } from "./destination-currency.js";
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 
@@ -315,12 +316,14 @@ export function minimumTripBudgetUsd(scope, origin, destination, options = {}) {
 }
 
 function parseInput(input = {}) {
-  const budget = Number(input.budget);
+  const localCurrency = destinationCurrency(input.destination).code;
+  const sourceCurrency = String(input.currency || localCurrency).toUpperCase();
+  const budget = Number(input.budget) * (currencyRatesToUsd[sourceCurrency] || currencyRatesToUsd[localCurrency]) / currencyRatesToUsd[localCurrency];
   const hasBreakdown = input.adults !== undefined || input.children !== undefined;
   const adults = hasBreakdown ? Number(input.adults ?? 1) : Number(input.travelers ?? 1);
   const children = hasBreakdown ? Number(input.children ?? 0) : 0;
   const travelers = adults + children;
-  const currency = String(input.currency || "USD").slice(0, 3).toUpperCase();
+  const currency = destinationCurrency(input.destination).code;
   const travelStyle = normalizeTravelStyle(input);
 
   if (!currencyRatesToUsd[currency]) {
