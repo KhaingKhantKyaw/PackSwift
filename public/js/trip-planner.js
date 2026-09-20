@@ -2690,6 +2690,50 @@ budgetInput.addEventListener("input", () => {
   budgetInput.value = amount ? formatBudgetValue(amount) : "";
 });
 
+// Use existing backend-supported values so saved plans remain compatible.
+const intentionLifestylePresets = {
+  "make-possible": ["hostel", "street", "public", "free", "none"],
+  "fixed-budget": ["budget", "local", "mixed", "essential", "light"],
+  "best-value": ["comfortable", "mixed", "mixed", "balanced", "light"],
+  "comfort-first": ["boutique", "local", "private", "premium", "planned"],
+  "luxury": ["luxury", "fine", "premium", "premium", "priority"],
+  "once-in-lifetime": ["boutique", "local", "premium", "premium", "priority"],
+};
+const lifestyleSelectIds = ["accommodation-style", "food-style", "transport-style", "activity-style", "extras-style"];
+const lifestylePresetLabels = {
+  "make-possible": ["Hostel / Shared room", "Street food & local stalls", "Public transit only", "Free & low-cost self-guided", "None / Strict essentials"],
+  "fixed-budget": ["Budget hotel / Private room", "Local eateries & casual dining", "Public transit + occasional ride-hailing", "Select must-dos only", "Small souvenir allowance"],
+  "best-value": ["Comfortable hotel (3–4 star)", "Mixed casual dining", "Public + ride-hailing", "Balanced selection", "Small souvenir allowance"],
+  "comfort-first": ["Comfortable / Boutique hotel", "Quality restaurants & cafes", "Ride-hailing / Private taxis", "Curated experiences with skip-the-line", "Comfort extras & treats"],
+  "luxury": ["5-star / Luxury resort", "Fine dining & chef experiences", "Private chauffeur / Private transfer", "VIP & exclusive private tours", "Generous shopping & leisure"],
+  "once-in-lifetime": ["Unique stays (scenic/boutique)", "Signature local specialties & iconic restaurants", "Fastest / Most scenic options", "Top bucket-list & signature experiences", "Flexible discretionary fund"],
+};
+const originalLifestyleLabels = new Map(lifestyleSelectIds.map(id => [id, [...document.getElementById(id).options].map(option => option.textContent)]));
+let lifestyleHighlightTimer;
+function applyIntentionLifestyle(intention) {
+  const preset = intentionLifestylePresets[intention];
+  if (!preset) return;
+  clearTimeout(lifestyleHighlightTimer);
+  lifestyleSelectIds.forEach((id, index) => {
+    const select = document.getElementById(id);
+    [...select.options].forEach((option, optionIndex) => { option.textContent = originalLifestyleLabels.get(id)[optionIndex]; });
+    select.value = preset[index];
+    select.selectedOptions[0].textContent = lifestylePresetLabels[intention][index];
+    select.classList.remove("lifestyle-preset-highlight");
+    void select.offsetWidth;
+    select.classList.add("lifestyle-preset-highlight");
+  });
+  document.getElementById("lifestyle-preset-feedback").textContent = "Lifestyle suggestions updated. You can adjust any choice below.";
+  lifestyleHighlightTimer = setTimeout(() => lifestyleSelectIds.forEach(id => document.getElementById(id).classList.remove("lifestyle-preset-highlight")), 1000);
+  updateBudgetMinimum();
+  handleLivePlannerEdit();
+}
+// Capture input before the form's preview listener. Radio input also supports
+// keyboard selection; initial loading/restoration never overwrites saved tweaks.
+plannerForm.addEventListener("input", event => {
+  if (event.target.matches('input[name="planningGoal"]') && event.target.checked) applyIntentionLifestyle(event.target.value);
+}, true);
+
 for (const input of [
   budgetInput,
   currencyInput,

@@ -5093,6 +5093,16 @@ html[data-theme="dark"] .dynamic-budget-warning { color: #fcd085; }
 .cost-demand-badge[data-level="low"] { background: #e0f5e7; color: #19572e; }
 .cost-demand-badge[data-level="peak"] { background: #ffe5df; color: #8b281e; }
 
+.lifestyle-preset-highlight { animation: lifestyle-preset-pulse 1s ease-out; }
+@keyframes lifestyle-preset-pulse {
+  0%, 35% { border-color: #00a8b5; box-shadow: 0 0 0 3px rgba(0,168,181,.2); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+#lifestyle-preset-feedback:empty { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .lifestyle-preset-highlight { animation: none; outline: 2px solid #00a8b5; outline-offset: 2px; }
+}
+
 /* Trip Planner above-the-fold spacing */
 @media (min-width: 981px) {
   body[data-page="planner"] .planner-page-shell {
