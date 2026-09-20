@@ -5068,8 +5068,7 @@ html[data-theme="dark"] .visual-route-fact dt { color: #cbd5e1; }
 /* Demo date-demand calendar: labels accompany every colour indicator. */
 .demand-calendar { margin-bottom: 20px; padding: 16px; border: 1px solid #b7d9dd; border-radius: 18px; background: var(--surface); color: var(--ink); }
 .demand-calendar h3 { margin: 0 0 8px; font-size: 16px; }
-.demand-calendar h4 { font-size: 13px; margin: 18px 0 10px; }
-.demand-note, #demand-selection, #demand-cheapest { font-size: 12px; line-height: 1.6; }
+.demand-note, #demand-selection { font-size: 12px; line-height: 1.6; }
 .demand-calendar summary { cursor: pointer; font-weight: 600; padding: 10px 0; }
 .demand-month-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0; }
 .demand-month-nav button { border: 1px solid #b7d9dd; border-radius: 10px; padding: 8px 14px; background: #e5f6f8; color: #0d1b2a; cursor: pointer; }
@@ -5083,25 +5082,7 @@ html[data-theme="dark"] .visual-route-fact dt { color: #cbd5e1; }
 .demand-day[aria-pressed="true"] { border: 2px solid #007c87; box-shadow: inset 0 0 0 1px white; font-weight: 700; }
 .demand-day:disabled, .demand-month-nav button:disabled { opacity: .4; cursor: not-allowed; }
 .demand-calendar button:focus-visible, .demand-calendar summary:focus-visible { outline: 2px solid #00838f; outline-offset: 2px; }
-.demand-legend { display: flex; flex-wrap: wrap; gap: 8px; font-size: 10px; }
-.demand-trend { display: flex; align-items: flex-end; gap: 12px; overflow-x: auto; padding: 10px 4px; scrollbar-width: thin; }
-.demand-trend-column { display: flex; flex: 1 0 28px; flex-direction: column; align-items: center; gap: 3px; margin: 0; padding: 4px 0; border: 0; border-radius: 5px; background: transparent; color: #334155; cursor: pointer; font: inherit; }
-.demand-trend-column.demand-low { --demand-fill: #10b981; }
-.demand-trend-column.demand-standard { --demand-fill: #f59e0b; }
-.demand-trend-column.demand-peak { --demand-fill: #f43f5e; }
-.demand-bar-track { display: flex; align-items: flex-end; justify-content: center; height: 72px; width: 100%; border-bottom: 1px solid #cbd5e166; margin-bottom: 5px; }
-.demand-bar { display: block; width: 10px; border-radius: 4px 4px 0 0; background: var(--demand-fill); transition: height .25s ease, opacity .15s ease; }
-.demand-trend-column:hover .demand-bar, .demand-trend-column:focus-visible .demand-bar { opacity: .75; }
-.demand-bar-weekday { font-size: 11px; color: #64748b; line-height: 1.4; }
-.demand-bar-date { font-size: 12px; line-height: 1.4; font-weight: 600; }
-.demand-price-tooltip { position: fixed; z-index: 300; max-width: min(280px, calc(100vw - 16px)); padding: 9px 12px; border-radius: 10px; background: rgba(15,23,42,.94); color: #fff; box-shadow: 0 5px 18px #0f172a26; font-size: 12px; line-height: 1.5; text-align: center; pointer-events: none; animation: demand-tooltip-in .15s ease-out; }
-.demand-price-tooltip[hidden] { display: none; }
-.demand-price-tooltip::after { content: ""; position: absolute; left: var(--arrow-x, 50%); top: 100%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: rgba(15,23,42,.94); }
-.demand-price-tooltip[data-position="below"]::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: rgba(15,23,42,.94); }
-html[data-theme="dark"] .demand-trend-column { color: #e2e8f0; }
-html[data-theme="dark"] .demand-bar-weekday { color: #aebed1; }
-@keyframes demand-tooltip-in { from { opacity: 0; } to { opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .demand-bar { transition: none; } .demand-price-tooltip { animation: none; } }
+.demand-legend { margin-bottom: 0; display: flex; flex-wrap: wrap; gap: 8px; font-size: 10px; }
 html[data-theme="dark"] .demand-calendar { color: #e2e8f0; }
 
 .dynamic-budget-warning { display: block; margin-top: 8px; color: #8a4a05; font-size: 12px; }
