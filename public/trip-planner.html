@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="/css/styles.css">
     <script src="/js/app.js" defer></script>
     <script src="/js/destination-currency.js" defer></script>
-    <script src="/js/budget-baseline.js" defer></script>
+    <script src="/js/costEngine.js" defer></script>
     <script src="/js/visual-itinerary.js" defer></script>
     <script src="/js/destination-route-editor.js" defer></script>
     <script src="/js/trip-planner.js" defer></script>
@@ -166,6 +166,7 @@
                 </select>
               </div>
               <div id="dynamic-budget-badge" class="budget-info-callout" role="status"></div>
+              <span id="cost-demand-badge" class="cost-demand-badge" role="status"></span>
               <small id="dynamic-budget-warning" class="dynamic-budget-warning" role="status"></small>
               <p class="form-help">Destination/date/style changes reset the recommendation. You can then enter your own amount. Ground costs only; flights, visas and insurance are excluded. Built-in values are planning estimates, not guaranteed minimums.</p>
               <div id="budget-minimum-hint" class="budget-info-callout" aria-live="polite">
@@ -291,6 +292,7 @@
                 <div><dt>Destination</dt><dd id="live-destination">Anywhere worldwide</dd></div>
                 <div><dt>Travel dates</dt><dd id="live-dates">Select your dates</dd></div>
                 <div><dt>Budget</dt><dd id="live-budget">USD 1,500</dd></div>
+                <div><dt>Estimated ground trip cost</dt><dd id="live-cost-estimate">Choose dates</dd></div>
                 <div><dt>Budget category</dt><dd id="live-budget-category">Calculating…</dd></div>
                 <div><dt>Planning priority</dt><dd id="live-planning-goal">Best value</dd></div>
                 <div><dt>Travellers</dt><dd id="live-travellers">2 travellers</dd></div>

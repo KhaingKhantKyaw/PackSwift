@@ -10,7 +10,11 @@
   }
   function show(result, input, updateAmount) {
     current = result;
-    badge.textContent = `Recommended for ${input.destination} (${result.days} days, ${result.travellers} traveller(s), ${input.style}): ${money(result.recommended, result.currency)} · ${money(result.dailyCostPerPerson, result.currency)}/person/day before surge. ${result.weekendDays} Fri–Sun day(s) +15%. Source: ${result.source}. End date excluded.`;
+    badge.textContent = `Recommended for ${input.destination} (${result.totalNights} nights, ${result.travellers} traveller(s), ${input.style}): ${money(result.totalEstimate, result.currency)} · average ${money(result.dailyAverage, result.currency)}/person/night including demand adjustments. ${result.weekendDays} Fri/Sat night(s) +15%. Source: ${result.source}. Departure date excluded.`;
+    const demand = document.getElementById("cost-demand-badge");
+    demand.dataset.level = result.demandLevel === "Peak Season" ? "peak" : result.demandLevel === "Moderate" ? "moderate" : "low";
+    demand.textContent = `${result.demandLevel} · ${Math.abs(result.percentageVsBase)}% ${result.percentageVsBase < 0 ? "below" : "above"} base benchmark (estimated)`;
+    document.getElementById("live-cost-estimate").textContent = money(result.totalEstimate, result.currency);
     if (updateAmount) {
       setBudgetValue(result.recommended);
       updateBudgetMinimum();
@@ -27,14 +31,14 @@
     signature = next;
     clearTimeout(timer); controller?.abort(); current = null;
     let local;
-    try { if (!input.destination) throw Error("Choose a destination."); local = PackSwiftBudgetBaseline.calculate(input); }
-    catch (error) { badge.textContent = error.message; warning.textContent = ""; return; }
+    try { local = PackSwiftCostEngine.calculateTripEstimate(input.destination, input.startDate, input.endDate, input.travellers, input.style); }
+    catch (error) { badge.textContent = error.message; warning.textContent = ""; document.getElementById("cost-demand-badge").textContent = ""; document.getElementById("live-cost-estimate").textContent = "Choose valid dates"; return; }
     show(local, input, true);
     const savedRevision = revision;
     timer = setTimeout(async () => {
       controller = new AbortController();
       try {
-        const response = await fetch("/api/budget-baseline", { method: "POST", headers: { "Content-Type": "application/json" }, signal: controller.signal, body: JSON.stringify(input) });
+        const response = await fetch("/api/cost-estimate", { method: "POST", headers: { "Content-Type": "application/json" }, signal: controller.signal, body: JSON.stringify(input) });
         if (!response.ok) return;
         const result = await response.json();
         if (signature !== next || !Number.isFinite(result.recommended)) return;

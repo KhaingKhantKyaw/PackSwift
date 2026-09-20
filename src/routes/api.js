@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { costEstimateRouter } from "./cost-estimate.js";
 import { budgetBaselineRouter } from "./budget-baseline.js";
 import { generateItineraryRouter } from "./generate-itinerary.js";
 import {
@@ -21,6 +22,7 @@ import { tripsRouter } from "./trips.js";
 import { tripPlanRouter } from "./trip-plan.js";
 
 export const apiRouter = Router();
+apiRouter.use(costEstimateRouter);
 apiRouter.use(budgetBaselineRouter);
 apiRouter.use(generateItineraryRouter);
 

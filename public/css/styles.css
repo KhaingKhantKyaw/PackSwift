@@ -5093,6 +5093,10 @@ html[data-theme="dark"] .demand-calendar { color: #e2e8f0; }
 .dynamic-budget-warning { display: block; margin-top: 8px; color: #8a4a05; font-size: 12px; }
 html[data-theme="dark"] .dynamic-budget-warning { color: #fcd085; }
 #dynamic-budget-badge { font-size: 12px; line-height: 1.6; }
+.cost-demand-badge { display: inline-block; margin-top: 8px; padding: 6px 10px; border-radius: 999px; font-size: 12px; background: #fff2ca; color: #735400; }
+.cost-demand-badge:empty { display: none; }
+.cost-demand-badge[data-level="low"] { background: #e0f5e7; color: #19572e; }
+.cost-demand-badge[data-level="peak"] { background: #ffe5df; color: #8b281e; }
 
 /* Trip Planner above-the-fold spacing */
 @media (min-width: 981px) {
