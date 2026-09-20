@@ -18,6 +18,7 @@
     <script src="/js/visual-itinerary.js" defer></script>
     <script src="/js/destination-route-editor.js" defer></script>
     <script src="/js/trip-planner.js" defer></script>
+    <script src="/js/date-demand-calendar.js" defer></script>
   </head>
   <body data-page="planner">
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -189,6 +190,19 @@
               <small class="form-help" id="end-date-format">DD/MM/YYYY</small>
             </div>
             <div class="form-field form-field-wide">
+              <section class="demand-calendar" aria-labelledby="demand-title">
+                <h3 id="demand-title">Find a budget-friendly window</h3>
+                <p class="demand-note">Demo estimates per traveller/day, based only on weekdays and weekends. Not live fares, hotel quotes, holiday data, or measured crowds.</p>
+                <details><summary>Open price &amp; crowd calendar</summary>
+                  <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
+                  <p id="demand-selection" role="status">Choose a start date, then an end date.</p>
+                  <div class="demand-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+                  <div id="demand-days" class="demand-days" role="group" aria-label="Travel date choices"></div>
+                  <p class="demand-legend"><span>🟢 Low / budget</span><span>🟡 Moderate</span><span>🔴 Peak / weekend</span></p>
+                </details>
+                <h4>10-day price trend</h4><div id="demand-trend" class="demand-trend" aria-label="Estimated daily prices"></div>
+                <p id="demand-cheapest" role="status"></p><button id="demand-apply" type="button" class="button button-secondary" hidden>Use cheaper dates</button>
+              </section>
               <span class="form-label">Travellers</span>
               <div class="traveller-counter-grid">
                 <div class="traveller-counter"><span><strong>Adults</strong><small>Age 12+</small></span><div><button type="button" data-counter="adults" data-step="-1" aria-label="Remove one adult">−</button><output id="adult-count">1</output><button type="button" data-counter="adults" data-step="1" aria-label="Add one adult">+</button></div><input id="adults" name="adults" type="hidden" value="1"></div>

@@ -1305,6 +1305,7 @@ function renderLiveBudgetOptions(scenarios, currency, planningGoal) {
 
 function updateLiveTripPreview() {
   syncDestinationCurrency();
+  window.refreshDemandCalendar?.();
   const data = new FormData(plannerForm);
   const origin = String(data.get("origin") || "").trim();
   const destination = String(data.get("destination") || "").trim();
