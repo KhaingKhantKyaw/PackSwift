@@ -53,18 +53,81 @@
     catch { el("slider-feedback").textContent = "This browser could not save the idea."; }
   });
   const search = el("destination-slider-search"), results = el("slider-search-results");
-  search.addEventListener("input", () => {
-    const query = search.value.trim().toLowerCase(); results.replaceChildren(); results.hidden = !query;
-    if (!query) return;
-    destinations.forEach((destination, index) => {
-      if (!`${destination.name} ${destination.country} ${destination.spots}`.toLowerCase().includes(query)) return;
-      const button = document.createElement("button"); button.type = "button"; button.textContent = `${destination.name} · ${destination.country}`;
-      button.addEventListener("click", () => { select(index, true); results.hidden = true; search.value = ""; }); results.append(button);
-    });
-    if (!results.children.length) { const message = document.createElement("p"); message.textContent = "No featured matches. Use Plan Trip to explore another destination."; results.append(message); }
+  // Use the shared worldwide catalog, with offline coverage for popular regional cities.
+  let catalog = [...destinations,
+    { name: "Yangon", country: "Myanmar", spots: "RGN YGN Shwedagon" },
+    { name: "Phuket", country: "Thailand", spots: "HKT Patong beaches" },
+    { name: "Chiang Mai", country: "Thailand", spots: "CNX Doi Suthep" },
+    { name: "Da Nang", country: "Vietnam", spots: "DAD My Khe Golden Bridge" },
+    { name: "Kuala Lumpur", country: "Malaysia", spots: "KUL Petronas" },
+  ];
+  const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  let highlighted = -1;
+  function closeSearch() {
+    results.hidden = true;
+    search.setAttribute("aria-expanded", "false");
+    search.removeAttribute("aria-activedescendant");
+    highlighted = -1;
+  }
+  function chooseDestination(destination) {
+    closeSearch();
+    search.value = destination.name;
+    const index = destinations.findIndex(item => normalize(item.name) === normalize(destination.name));
+    if (index >= 0) select(index, true);
+    else location.assign(`/trip-planner?destination=${encodeURIComponent(destination.name)}`);
+  }
+  function renderSearch() {
+    const query = normalize(search.value.trim());
+    results.replaceChildren(); closeSearch();
+    if (!query) { el("slider-search-status").textContent = ""; return; }
+    const matches = catalog.filter(item => normalize(`${item.name} ${item.country} ${item.spots || ""} ${(item.attractions || []).join(" ")}`).includes(query))
+      .sort((a, b) => Number(normalize(b.name).startsWith(query)) - Number(normalize(a.name).startsWith(query)))
+      .slice(0, 8);
+    for (const [index, destination] of matches.entries()) {
+      const button = document.createElement("button");
+      button.type = "button"; button.tabIndex = -1; button.id = `destination-option-${index}`;
+      button.setAttribute("role", "option"); button.setAttribute("aria-selected", "false");
+      const title = document.createElement("strong"), detail = document.createElement("small");
+      title.textContent = destination.name;
+      detail.textContent = `${destination.country} · ${destinations.some(item => item.name === destination.name) ? "Explore destination" : "Plan a trip"}`;
+      button.append(title, detail);
+      button.addEventListener("click", () => chooseDestination(destination));
+      results.append(button);
+    }
+    if (!matches.length) {
+      const message = document.createElement("p"); message.textContent = "No matches. Try a city, country, or attraction."; results.append(message);
+    }
+    results.hidden = false; search.setAttribute("aria-expanded", "true");
+    el("slider-search-status").textContent = `${matches.length} destination suggestions`;
+  }
+  search.addEventListener("input", renderSearch);
+  search.addEventListener("focus", renderSearch);
+  search.addEventListener("keydown", event => {
+    if (event.key === "Escape" || event.key === "Tab") { closeSearch(); return; }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault(); if (results.hidden) renderSearch();
+      const options = [...results.querySelectorAll("button")]; if (!options.length) return;
+      highlighted = (highlighted + (event.key === "ArrowDown" ? 1 : -1) + options.length) % options.length;
+      options.forEach((option, index) => option.setAttribute("aria-selected", String(index === highlighted)));
+      search.setAttribute("aria-activedescendant", options[highlighted].id);
+      options[highlighted].scrollIntoView({ block: "nearest" });
+    }
+    if (event.key === "Enter" && !results.hidden) {
+      event.preventDefault(); results.querySelectorAll("button")[Math.max(0, highlighted)]?.click();
+    }
   });
-  search.addEventListener("keydown", event => { if (event.key === "Escape") results.hidden = true; if (event.key === "ArrowDown") { event.preventDefault(); results.querySelector("button")?.focus(); } if (event.key === "Enter") results.querySelector("button")?.click(); });
-  document.addEventListener("click", event => { if (!event.target.closest(".slider-search-wrap")) results.hidden = true; });
+  document.addEventListener("click", event => { if (!event.target.closest(".slider-search-wrap")) closeSearch(); });
+  fetch("/data/destinations.json")
+    .then(response => { if (!response.ok) throw new Error("Catalog unavailable"); return response.json(); })
+    .then(data => {
+      if (!Array.isArray(data)) return;
+      const merged = new Map(catalog.map(item => [normalize(item.name), item]));
+      data.filter(item => typeof item.name === "string" && typeof item.country === "string").forEach(item => {
+        const key = normalize(item.name); merged.set(key, { ...merged.get(key), ...item });
+      });
+      catalog = [...merged.values()];
+      if (document.activeElement === search) renderSearch();
+    }).catch(() => { /* Regional suggestions remain usable if the catalog cannot load. */ });
   cards(); updateSave();
   const requested = new URLSearchParams(location.search).get("destination");
   if (requested) { const index = destinations.findIndex(d => d.id === requested.toLowerCase() || d.name.toLowerCase() === requested.toLowerCase()); if (index >= 0) select(index); }

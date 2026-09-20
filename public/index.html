@@ -19,7 +19,7 @@
       <span data-auth="guest"><a href="/signup">Sign Up</a><a href="/login">Login</a></span>
       <span data-auth="user" hidden><a href="/profile" data-profile-name>Profile</a><button type="button" data-logout>Logout</button></span>
     </div>
-    <div class="slider-search-wrap"><label for="destination-slider-search">Find your next escape</label><div class="slider-search"><span aria-hidden="true">⌕</span><input id="destination-slider-search" type="search" placeholder="Search tourist spots or cities..." autocomplete="off"><span aria-hidden="true">↗</span></div><div id="slider-search-results" class="slider-search-results" hidden></div></div>
+    <div class="slider-search-wrap"><label for="destination-slider-search">Find your next escape</label><div class="slider-search"><span aria-hidden="true">⌕</span><input id="destination-slider-search" type="search" placeholder="Search tourist spots or cities..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="slider-search-results" aria-expanded="false"><span aria-hidden="true">↗</span></div><div id="slider-search-results" class="slider-search-results" role="listbox" aria-label="Destinations" hidden></div><span id="slider-search-status" class="slider-search-status" role="status"></span></div>
   </header>
   <main id="main-content" class="destination-stage">
     <section class="destination-story" aria-labelledby="slider-title">
