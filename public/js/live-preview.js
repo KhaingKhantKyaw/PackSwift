@@ -44,10 +44,9 @@
       .replace(/\b(?:please\s+)?(?:visit|include|add|explore)\s+/gi, '')
       .split(/[,;\n]|\s+and\s+/i).map(s => s.trim().replace(/[.!]+$/, ''))
       .filter(s => s && s.length <= 140 && !noteThemes.test(s)).slice(0, 15);
-    const pool = new Map([...recommended,...noteMatches].map(p => [String(p.title || p.name).toLowerCase(), normalizeMetadata(p)]));
-    if (/bangkok|\bbkk\b/i.test(input.destination || '') && /\bbeach(?:es)?\b/i.test(notes) && !/\b(?:no|avoid|without)\s+beach/i.test(notes)) {
-      coastalTrips.forEach(p=>pool.set(p.title.toLowerCase(),{...p,customRequest:true,category:'Coastal day trip from Bangkok'}));
-    }
+    const tags=window.PackSwiftTripEngine.parseTags(notes);
+    const regional=window.PackSwiftTripEngine.knowledge(input.destination).filter(p=>tags.some(t=>p.tags.includes(t)));
+    const pool = new Map([...regional,...recommended,...noteMatches].map(p => [String(p.title || p.name).toLowerCase(), normalizeMetadata(p)]));
     const theme=notes.match(noteThemes)?.[1]?.toLowerCase().replace(/s$/, '');
     if(theme)pool.forEach(p=>{if(String(`${p.title} ${p.category}`).toLowerCase().includes(theme))p.customRequest=true;});
     requested.forEach(title => {
@@ -58,22 +57,25 @@
     places = [...pool.values()];
   }
   function schedule() {
-    const pace = String(input.pace || '').toLowerCase();
-    const cap = /slow|relax/.test(pace) ? 2 : /fast|packed/.test(pace) ? 5 : 3;
-    const days = Math.max(1, Math.min(30, nights()+1));
-    const selected = places.filter(p => !excluded.has(key(p))).sort((a,b)=>Number(Boolean(b.customRequest))-Number(Boolean(a.customRequest)));
-    const routes=Array.from({length:days},()=>[]),loads=Array(days).fill(0),unscheduled=[];
-    selected.forEach(p=>{const weight=p.dayWeight || 1/cap;const candidates=routes.map((_,i)=>i).filter(i=>routes[i].length<cap && loads[i]+weight<=1.001).sort((a,b)=>loads[a]-loads[b]);const day=candidates[0];if(day===undefined)unscheduled.push(p);else{routes[day].push(p);loads[day]+=weight;}});
-    return {routes,unscheduled,cap};
+    return window.PackSwiftTripEngine.generateDynamicTrip(input.destination,nights()+1,input.notes,input.pace,{places,excluded:[...excluded],currency:input.currency,travelers:input.travelers,level:/luxury/.test(input.planningGoal)?'luxury':/budget|possible/.test(input.planningGoal)?'budget':'comfort'});
   }
   function renderBoard() {
-    const list=$('preview-timeline'), {routes,unscheduled,cap}=schedule();list.replaceChildren();
+    const list=$('preview-timeline'), {routes,unscheduled,cap,days,expenses}=schedule();list.replaceChildren();
     routes.forEach((stops,day)=>{
-      const heading=document.createElement('h3');heading.textContent=`ROUTE ${day+1} · Day ${day+1}`;list.append(heading);
+      const heading=document.createElement('h3');heading.textContent=`ROUTE ${day+1} · Day ${day+1}: ${days[day].label}`;list.append(heading);
       if(!stops.length){const note=document.createElement('p');note.textContent='Free time';list.append(note);}
       stops.forEach((p,i)=>{const stop=document.createElement('div');stop.className='preview-stop';const badge=document.createElement('span');badge.textContent=`STOP ${String(i+1).padStart(2,'0')}`;stop.append(badge,card(p,false));list.append(stop);});
     });
     if(unscheduled.length){const note=document.createElement('p');note.textContent=`${unscheduled.length} places remain unscheduled (maximum ${cap} per day): ${unscheduled.map(p=>p.title || p.name).join(', ')}. Increase your pace or trip length to include them.`;list.append(note);}
+    list.append(expenseCard(expenses));
+  }
+  function expenseCard(expenses) {
+    const box=document.createElement('section');box.className='preview-expenses';
+    const heading=document.createElement('h3');heading.textContent='Estimated ground expenses';box.append(heading);
+    for(const [field,label] of [['accommodation','Accommodation'],['food','Food'],['localTransport','Local transport'],['attractionTickets','Known admission costs'],['total','Subtotal']]){
+      const line=document.createElement('p');line.textContent=`${label}: ${expenses[field]===null?'No destination benchmark available':new Intl.NumberFormat('en',{style:'currency',currency:expenses.currency,maximumFractionDigits:0}).format(expenses[field])}`;box.append(line);
+    }
+    const note=document.createElement('small');note.textContent=`${expenses.source}. ${expenses.unpricedAttractions} stops have unpriced admission; subtotal is incomplete when costs are missing.`;box.append(note);return box;
   }
   const key = p => String(p.placeId || p.place_id || p.id || p.title || p.name);
   const money = n => { try { return new Intl.NumberFormat('en', {style:'currency',currency:input.currency || 'USD',maximumFractionDigits:0}).format(n || 0); } catch { return String(n || 0); } };
@@ -93,6 +95,7 @@
   }
   function render() {
     $('preview-checklist').replaceChildren(...places.map(p=>card(p)));
+    if(places.length)$('preview-checklist').append(expenseCard(schedule().expenses));
     if(!places.length) $('preview-checklist').textContent='No matching places yet. Choose a destination or adjust your preferences.';
     const valid=Boolean(input.destination && input.startDate && input.endDate && nights()>0 && places.some(p=>!excluded.has(key(p))));
     $('preview-save').disabled=!valid;$('preview-board-open').disabled=!valid;
