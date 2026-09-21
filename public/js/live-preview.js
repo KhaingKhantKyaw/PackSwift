@@ -3,6 +3,36 @@
   let input = {}, places = [], destination = '', engaged = false, started = 0, timer, revision = 0;
   const excluded = new Set();
   let recommended = [], notesTimer, savedId;
+  let noteMatches=[],noteController;
+  async function searchNotePlaces(notes) {
+    noteController?.abort();noteMatches=[];
+    const theme=notes.match(noteThemes)?.[1]?.toLowerCase();
+    if(!theme || !input.destination)return;
+    const controller=new AbortController();noteController=controller;
+    const city=input.destination;
+    const userType=/market|cafe|café|nightlife/.test(theme)?'Food & Culinary':/temple/.test(theme)?'Culture & Heritage':/kid|children/.test(theme)?'Family with Kids':'Solo / Aesthetic';
+    try {
+      const response=await fetch('/api/generate-itinerary',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({destination:city,userType,duration:1,budgetCategory:'mid',pace:input.pace})});
+      if(!response.ok)return;const result=await response.json();
+      if(controller.signal.aborted || city!==input.destination || notes!==input.notes)return;
+      noteMatches=(result.days || []).flatMap(day=>day.activities || day.stops || []).filter(p=>!p.isSample).map(p=>({...p,customRequest:true}));
+      mergeNotes();render();
+    }catch(error){if(error.name!=='AbortError')$('preview-toast').textContent='Additional note matches are temporarily unavailable.';}
+  }
+  const noteThemes = /\b(beach(?:es)?|markets?|nightlife|temples?|caf[eé]s?|kids|children)\b/i;
+  const coastalTrips = [
+    {id:'bkk-bang-saen',title:'Bang Saen Beach Escape',hours:'Open 24 hours (public beach)',ticket:'Free entry; transport extra',stay:'Half day',dayWeight:0.5},
+    {id:'bkk-koh-larn',title:'Pattaya & Coral Island (Koh Larn) Day Tour',hours:'08:00–17:00 suggested tour window',ticket:'THB 800–1,200 / person · benchmark, not a live quote',stay:'Full day',dayWeight:1},
+    {id:'bkk-hua-hin',title:'Hua Hin Coastal Getaway',hours:'Open 24 hours (public beach)',ticket:'Free entry; transport extra',stay:'Full day',dayWeight:1},
+  ];
+  function normalizeMetadata(p) {
+    const category=String(p.category || p.type || '').toLowerCase();
+    const duration=/market|museum|temple/.test(category)?'60–120 min':/cafe|restaurant|food/.test(category)?'45–90 min':'60–90 min';
+    const opening=p.hours || p.openingHours;
+    return {...p,hours:Array.isArray(opening)?opening.join(' • '):opening,
+      ticket:p.ticket || p.ticketPrice || p.priceRange,
+      stay:p.stay || p.suggestedStay || (p.durationMinutes?`${p.durationMinutes} min`:p.duration) || `${duration} · suggested`};
+  }
   function resetSaved() {
     $('preview-save').textContent = 'Save My Trip Plan';
     $('preview-save').classList.remove('is-saved');
@@ -13,12 +43,17 @@
     const requested = notes.replace(/\b(?:i\s+)?(?:want|would like|hope)\s+to\s+(?:visit|see|explore)\s*/gi, '')
       .replace(/\b(?:please\s+)?(?:visit|include|add|explore)\s+/gi, '')
       .split(/[,;\n]|\s+and\s+/i).map(s => s.trim().replace(/[.!]+$/, ''))
-      .filter(s => s && s.length <= 140).slice(0, 15);
-    const pool = new Map(recommended.map(p => [String(p.title || p.name).toLowerCase(), {...p}]));
+      .filter(s => s && s.length <= 140 && !noteThemes.test(s)).slice(0, 15);
+    const pool = new Map([...recommended,...noteMatches].map(p => [String(p.title || p.name).toLowerCase(), normalizeMetadata(p)]));
+    if (/bangkok|\bbkk\b/i.test(input.destination || '') && /\bbeach(?:es)?\b/i.test(notes) && !/\b(?:no|avoid|without)\s+beach/i.test(notes)) {
+      coastalTrips.forEach(p=>pool.set(p.title.toLowerCase(),{...p,customRequest:true,category:'Coastal day trip from Bangkok'}));
+    }
+    const theme=notes.match(noteThemes)?.[1]?.toLowerCase().replace(/s$/, '');
+    if(theme)pool.forEach(p=>{if(String(`${p.title} ${p.category}`).toLowerCase().includes(theme))p.customRequest=true;});
     requested.forEach(title => {
       const existing = [...pool.keys()].find(name => name === title.toLowerCase() || title.toLowerCase().includes(name));
       if (existing) pool.get(existing).customRequest = true;
-      else pool.set(title.toLowerCase(), {id:`custom:${title.toLowerCase()}`,title,customRequest:true,category:'Custom Request',hours:'Confirm with venue',ticket:'Confirm with venue',stay:'Flexible'});
+      else pool.set(title.toLowerCase(), {id:`custom:${title.toLowerCase()}`,title,customRequest:true,category:'Custom Request',stay:'60–90 min · suggested'});
     });
     places = [...pool.values()];
   }
@@ -27,10 +62,9 @@
     const cap = /slow|relax/.test(pace) ? 2 : /fast|packed/.test(pace) ? 5 : 3;
     const days = Math.max(1, Math.min(30, nights()+1));
     const selected = places.filter(p => !excluded.has(key(p))).sort((a,b)=>Number(Boolean(b.customRequest))-Number(Boolean(a.customRequest)));
-    const planned = selected.slice(0,days*cap), routes = Array.from({length:days},()=>[]);
-    // Spread stops across the trip while respecting each day's maximum.
-    planned.forEach((p,i)=>routes[Math.min(days-1,Math.floor(i / Math.max(1,Math.ceil(planned.length/days))))].push(p));
-    return {routes,unscheduled:selected.slice(days*cap),cap};
+    const routes=Array.from({length:days},()=>[]),loads=Array(days).fill(0),unscheduled=[];
+    selected.forEach(p=>{const weight=p.dayWeight || 1/cap;const candidates=routes.map((_,i)=>i).filter(i=>routes[i].length<cap && loads[i]+weight<=1.001).sort((a,b)=>loads[a]-loads[b]);const day=candidates[0];if(day===undefined)unscheduled.push(p);else{routes[day].push(p);loads[day]+=weight;}});
+    return {routes,unscheduled,cap};
   }
   function renderBoard() {
     const list=$('preview-timeline'), {routes,unscheduled,cap}=schedule();list.replaceChildren();
@@ -52,8 +86,8 @@
     const row=document.createElement('article');row.className='preview-place';row.classList.toggle('is-excluded',excluded.has(key(p)));
     const img=document.createElement('img');img.src=p.imageUrl || p.photoUrl || p.image || '/images/packswift1.jpg';img.alt='';img.loading='lazy';img.addEventListener('error',()=>{img.hidden=true;},{once:true});
     const copy=document.createElement('div'); const title=document.createElement('strong');title.textContent=p.title || p.name || 'Place';copy.append(title);
-    if(p.customRequest){const badge=document.createElement('small');badge.className='preview-custom';badge.textContent='📌 Custom Request';copy.append(badge);}
-    [p.category || p.type, `🕒 Hours: ${p.hours || 'Confirm with venue'}`, `🎟️ Ticket: ${p.ticket || (p.estimatedCostPerPerson != null ? `${money(p.estimatedCostPerPerson)} estimated` : 'Confirm with venue')}`, `⏱️ Suggested stay: ${p.stay || p.duration || 'Flexible'}`].filter(Boolean).forEach(text=>{const small=document.createElement('small');small.textContent=String(text);copy.append(small);});
+    if(p.customRequest){const badge=document.createElement('small');badge.className='preview-custom';badge.textContent='📌 Added from your notes';copy.append(badge);}
+    [p.category || p.type, p.hours && `🕒 Hours: ${p.hours}`, p.ticket ? `🎟️ Ticket: ${p.ticket}` : p.estimatedCostPerPerson != null ? `🎟️ Ticket: ${money(p.estimatedCostPerPerson)} estimated` : null, `⏱️ Suggested stay: ${p.stay || '60–90 min · suggested'}`, !p.hours || !p.ticket ? 'Venue hours or admission price not supplied by the source.' : null].filter(Boolean).forEach(text=>{const small=document.createElement('small');small.textContent=String(text);copy.append(small);});
     row.append(img,copy);
     if(editable){const controls=document.createElement('div');controls.className='preview-place-controls';['include','exclude'].forEach(action=>{const button=document.createElement('button');button.type='button';button.dataset.place=key(p);button.dataset.action=action;button.setAttribute('aria-pressed',String(action==='include'?!excluded.has(key(p)):excluded.has(key(p))));button.setAttribute('aria-label',`${action} ${title.textContent}`);button.textContent=action==='include'?'✓':'✕';controls.append(button);});row.append(controls);}return row;
   }
@@ -68,7 +102,7 @@
     input=event.detail;
     resetSaved();
     if(!engaged && !new URLSearchParams(location.search).size)return;
-    if(destination!==input.destination){excluded.clear();places=[];destination=input.destination;}
+    if(destination!==input.destination){noteController?.abort();noteMatches=[];excluded.clear();places=[];destination=input.destination;}
     revision++;clearTimeout(timer);started=performance.now();
     $('preview-idle').hidden=true;$('preview-content').hidden=!$('preview-board').hidden;
     $('preview-thinking').hidden=false;$('preview-skeleton').hidden=false;$('preview-checklist').hidden=true;
@@ -81,7 +115,7 @@
     const token=revision;timer=setTimeout(()=>{if(token!==revision)return;$('preview-thinking').hidden=true;$('preview-skeleton').hidden=true;$('preview-checklist').hidden=false;snapshot();render();},Math.max(0,400-(performance.now()-started)));
   });
   const form=$('trip-planner-form');['input','change','click'].forEach(type=>form.addEventListener(type,()=>{engaged=true;},true));
-  $('trip-notes').addEventListener('input',event=>{clearTimeout(notesTimer);const value=event.target.value;notesTimer=setTimeout(()=>{input.notes=value;mergeNotes();resetSaved();render();},350);});
+  $('trip-notes').addEventListener('input',event=>{clearTimeout(notesTimer);noteController?.abort();noteMatches=[];const value=event.target.value;notesTimer=setTimeout(()=>{input.notes=value;mergeNotes();resetSaved();$('preview-skeleton').hidden=true;$('preview-checklist').hidden=false;render();searchNotePlaces(value);},300);});
   $('preview-checklist').addEventListener('click',event=>{const button=event.target.closest('[data-place]');if(!button)return;const id=button.dataset.place;button.dataset.action==='exclude'?excluded.add(id):excluded.delete(id);resetSaved();render();});
   $('preview-board-open').addEventListener('click',()=>{
     $('preview-content').hidden=true;$('preview-board').hidden=false;const list=$('preview-timeline');list.replaceChildren();
