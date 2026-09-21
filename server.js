@@ -26,7 +26,7 @@ app.use(
         styleSrc: ["'self'"],
         styleSrcAttr: ["'unsafe-inline'"],
         scriptSrcAttr: ["'none'"],
-        imgSrc: ["'self'", "data:"],
+        imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
         connectSrc: ["'self'"],
         fontSrc: ["'self'"],
         objectSrc: ["'none'"],
