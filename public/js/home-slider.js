@@ -37,12 +37,27 @@
     },
   ];
   const el = id => document.getElementById(id);
-  const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1920&q=80";
-  const FALLBACK_CARD_IMAGE = "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80";
+  const FALLBACK_IMAGE = "/images/packswift1.jpg";
+  const FALLBACK_CARD_IMAGE = FALLBACK_IMAGE;
+  // Plain URLs only: Markdown link syntax is not a valid image source.
+  const photoIds = { singapore: "777059", bali: "2166553", yangon: "1483053", bangkok: "1007427", hanoi: "2412603" };
+  destinations.forEach(destination => {
+    const base = `https://images.pexels.com/photos/${photoIds[destination.id]}/pexels-photo-${photoIds[destination.id]}.jpeg?auto=compress&cs=tinysrgb`;
+    destination.bgImage = `${base}&w=1920`;
+    destination.cardImage = `${base}&w=600`;
+  });
+  function installFallback(img, fallback) {
+    img.referrerPolicy = "no-referrer";
+    img.addEventListener("error", () => {
+      if (img.getAttribute("src") !== fallback) img.src = fallback;
+      else img.style.visibility = "hidden";
+    });
+    // An initial HTML image may have failed before this deferred script ran.
+    if (img.getAttribute("src") && img.complete && !img.naturalWidth) img.src = fallback;
+  }
   const layers = [...document.querySelectorAll(".destination-backdrop")];
-  layers.forEach(imageLayer => imageLayer.addEventListener("error", () => {
-    if (imageLayer.src !== FALLBACK_IMAGE) imageLayer.src = FALLBACK_IMAGE;
-  }));
+  layers.forEach(imageLayer => installFallback(imageLayer, FALLBACK_IMAGE));
+  layers[0].src = destinations[0].bgImage;
   let active = 0, layer = 0, sequence = 0;
   let saved = [];
   try { saved = JSON.parse(localStorage.getItem("packswift.destination-ideas") || "[]"); if (!Array.isArray(saved)) saved = []; } catch {}
@@ -59,7 +74,7 @@
       const index = (active + offset) % destinations.length, destination = destinations[index];
       const card = document.createElement("button"); card.type = "button"; card.className = "destination-thumbnail"; card.setAttribute("aria-label", `Explore ${destination.name}, ${destination.country}`);
       const img = document.createElement("img"); img.alt = ""; img.loading = "lazy";
-      img.addEventListener("error", () => { if (img.src !== FALLBACK_CARD_IMAGE) img.src = FALLBACK_CARD_IMAGE; });
+      installFallback(img, FALLBACK_CARD_IMAGE);
       img.src = destination.cardImage;
       const copy = document.createElement("span"), subtitle = document.createElement("small"), title = document.createElement("strong");
       subtitle.textContent = destination.country; title.textContent = destination.name; copy.append(subtitle, title); card.append(img, copy);
@@ -69,7 +84,7 @@
   }
   async function select(index, focus = false) {
     const token = ++sequence, destination = destinations[index];
-    const preload = new Image(); preload.src = image(destination);
+    const preload = new Image(); preload.referrerPolicy = "no-referrer"; preload.src = image(destination);
     let backgroundSource = image(destination);
     try { await preload.decode(); }
     catch {
