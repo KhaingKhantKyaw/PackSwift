@@ -1,4 +1,5 @@
 @font-face{font-family:Montserrat;src:local('Montserrat');font-weight:400 700;font-display:swap}
+.preview-place-controls{display:flex;gap:5px;flex:0!important}.preview-place-controls button[aria-pressed=true]{background:#e5f6f8;color:#006b75}.preview-custom{color:#00838f!important;font-weight:600}#preview-save{transition:opacity .4s ease,background .4s ease}#preview-save.is-saved{opacity:.6;pointer-events:none}
 .smart-preview{font-family:Montserrat,Arial,sans-serif;color:var(--text-main,#0d1b2a);text-align:left}
 .smart-preview h2{font-size:18px;font-weight:700;margin:0 0 24px}
 .smart-preview~#result-empty{display:none!important}

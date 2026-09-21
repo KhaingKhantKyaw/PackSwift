@@ -286,6 +286,28 @@ async function loadProfile() {
     const result = await window.PackSwift.api("/api/profile");
     renderProfile(result.profile);
     profileContent.hidden = false;
+    const localSection = document.createElement('section');
+    localSection.className = 'panel';
+    const localTitle = document.createElement('h2');
+    localTitle.textContent = 'Saved Preview Plans · This device';
+    localSection.append(localTitle);
+    try {
+      const plans = JSON.parse(localStorage.getItem(`packswift_saved_plans:${user.id}`) || '[]');
+      if (Array.isArray(plans) && plans.length) {
+        plans.forEach(plan => {
+          const details = document.createElement('details'), summary = document.createElement('summary');
+          summary.textContent = `${plan.destination} · ${plan.startDate} – ${plan.endDate}`;
+          details.append(summary);
+          (plan.routes || []).forEach((stops, index) => {
+            const line = document.createElement('p');
+            line.textContent = `Day ${index+1}: ${stops.map(p => p.title || p.name).join(' → ') || 'Free time'}`;
+            details.append(line);
+          });
+          localSection.append(details);
+        });
+        profileContent.append(localSection);
+      }
+    } catch { /* Other profile data remains available if local storage cannot be read. */ }
   } catch (error) {
     if (error.status === 401) profileGuest.hidden = false;
     else {
