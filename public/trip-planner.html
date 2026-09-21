@@ -18,6 +18,8 @@
     <script src="/js/costEngine.js" defer></script>
     <script src="/js/visual-itinerary.js" defer></script>
     <script src="/js/destination-route-editor.js" defer></script>
+    <link rel="stylesheet" href="/css/live-preview.css">
+    <script src="/js/live-preview.js" defer></script>
     <script src="/js/trip-planner.js" defer></script>
     <script src="/js/date-demand-calendar.js" defer></script>
     <script src="/js/dynamic-budget.js" defer></script>
@@ -248,6 +250,20 @@
         </form>
 
         <section class="panel result-panel" aria-live="polite">
+          <section id="smart-preview" class="smart-preview" aria-label="Live trip preview">
+            <h2>Live Trip Preview</h2>
+            <div id="preview-idle" class="preview-idle"><span class="preview-spark" aria-hidden="true">✧</span><p>Start configuring your trip on the left to see your live plan.</p><span class="preview-idle-hint" aria-hidden="true">Tell us where you want to go…<i></i></span></div>
+            <div id="preview-thinking" class="preview-thinking" role="status" hidden><span class="preview-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="preview-status"></span></div>
+            <div id="preview-content" hidden>
+              <div id="preview-snapshot" class="preview-snapshot"></div>
+              <div id="preview-skeleton" class="preview-skeleton" aria-hidden="true" hidden><i></i><i></i><i></i></div>
+              <div id="preview-checklist"></div>
+              <div class="preview-actions"><button id="preview-save" type="button">Save My Trip Plan</button><button id="preview-board-open" type="button">View Plan Board</button></div>
+              <small>Saved previews stay on this device.</small>
+            </div>
+            <div id="preview-board" hidden><button id="preview-back" type="button">← Back to Preview</button><div id="preview-timeline"></div></div>
+            <p id="preview-toast" role="status"></p>
+          </section>
           <div id="result-empty" class="result-empty">
             <div class="planner-live-preview">
               <div class="planner-live-heading">

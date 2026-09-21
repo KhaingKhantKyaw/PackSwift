@@ -1159,6 +1159,7 @@ function appendLiveActivityCard(activity, currency) {
 }
 
 function renderLiveRecommendation(recommendation, input) {
+  window.dispatchEvent(new CustomEvent("packswift:preview-results", { detail: { input, recommendation } }));
   liveRecommendationInput = input;
   liveRecommendationBackupQueue = [...(recommendation.backupQueue || [])];
   liveRecommendationNextPageToken = recommendation.nextPageToken || null;
@@ -1226,6 +1227,7 @@ async function refreshVisualItinerary(input, sequence) {
 }
 
 function scheduleLiveRecommendation(input) {
+  window.dispatchEvent(new CustomEvent("packswift:preview-thinking", { detail: input }));
   visualItineraryController?.abort();
   activateActivityContext(input);
   clearTimeout(liveRecommendationTimer);
@@ -1244,9 +1246,10 @@ function scheduleLiveRecommendation(input) {
       if (sequence === liveRecommendationSequence) {
         liveActivityStatus.textContent = "Choose a supported destination";
         liveActivityGrid.replaceChildren();
+        window.dispatchEvent(new CustomEvent("packswift:preview-results", { detail: { input, recommendation: { activities: [] } } }));
       }
     }
-  }, 500);
+  }, 350);
 }
 
 function renderLiveBudgetOptions(scenarios, currency, planningGoal) {
