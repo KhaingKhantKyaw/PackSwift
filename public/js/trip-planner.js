@@ -578,6 +578,8 @@ function updateBudgetMinimum() {
     ? `${formatMoney(amount, rule.currency)} is still accepted. PackSwift will suggest fewer days, flexible dates, lower-cost stays, public transit, and free highlights. ${estimateFormula}`
     : `${estimateFormula} Your lifestyle-matched recommendation is ${formatMoney(rule.recommendedUsd / currencyRatesToUsd[rule.currency], rule.currency)}.`;
   budgetMinimumHint.classList.toggle("is-warning", isBelowMinimum);
+  const routeWarning=document.getElementById('route-budget-warning');
+  if(routeWarning)routeWarning.textContent=isBelowMinimum?`Below route estimate: ${budgetInfoAmount.textContent}`:'';
   budgetField.classList.toggle("is-warning", isBelowMinimum);
   budgetInput.setCustomValidity("");
   return rule;

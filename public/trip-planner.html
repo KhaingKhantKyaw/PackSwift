@@ -213,7 +213,7 @@
                 </div>
               </div>
             </fieldset>
-            <div class="form-section-heading"><h3>Budget</h3><p>Enter your total amount. PackSwift will adapt the plan instead of judging it.</p></div>
+            <div class="form-section-heading"><h3>Budget</h3></div>
             <div class="form-field form-field-wide">
               <div class="budget-label-row"><label class="form-label" for="budget">Total trip budget</label><span id="budget-currency-label" class="form-label">Currency</span></div>
               <div class="budget-field">
@@ -230,13 +230,17 @@
                 </select>
               </div>
               <div id="dynamic-budget-badge" class="budget-info-callout" role="status"></div>
-              <span id="cost-demand-badge" class="cost-demand-badge" role="status"></span>
               <small id="dynamic-budget-warning" class="dynamic-budget-warning" role="status"></small>
-              <p class="form-help">Destination/date/style changes reset the recommendation. You can then enter your own amount. Ground costs only; flights, visas and insurance are excluded. Built-in values are planning estimates, not guaranteed minimums.</p>
+              <small id="route-budget-warning" class="dynamic-budget-warning" role="status"></small>
+              <p class="budget-scope-note">Ground costs only · Flights excluded</p>
+              <details class="budget-details"><summary>Budget details</summary>
+              <span id="cost-demand-badge" class="cost-demand-badge"></span>
+              <p class="form-help">Estimates update with your dates and preferences. You can edit the amount. Visas and insurance are excluded.</p>
               <div id="budget-minimum-hint" class="budget-info-callout" aria-live="polite">
                 <span class="budget-info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 8h.01"></path></svg></span>
                 <div><strong id="budget-info-title">Route Budget Estimate</strong><p>Minimum budget for <b id="budget-info-route">Yangon → Bangkok</b>: <b id="budget-info-amount">$380.00</b> <span id="budget-info-detail">577 km route. ~USD 100 transit/person × 1 traveller + USD 40/day × 1 × 7 days.</span></p></div>
               </div>
+              </details>
             </div>
             <div class="form-field form-field-wide">
               <label class="form-label" for="trip-notes">Trip notes <span class="label-optional">Optional</span></label>

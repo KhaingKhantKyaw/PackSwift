@@ -1,4 +1,12 @@
 /* Shared visual language for every PackSwift page. */
+body[data-page=planner] #dynamic-budget-badge{border:0!important;background:transparent!important;padding:0!important;margin:9px 0 0!important;box-shadow:none!important;font-size:12px!important;color:var(--ps-muted)!important;min-height:0}
+.budget-scope-note{font-size:11px!important;color:var(--ps-muted);margin:5px 0 10px!important}
+.budget-details{border-top:1px solid var(--ps-border);padding-top:10px;margin-top:8px}.budget-details summary{font-size:12px;cursor:pointer;color:var(--ps-muted);list-style-position:inside}
+body[data-page=planner] .budget-details .budget-info-callout{font-size:11px;padding:10px;margin-top:10px;box-shadow:none}
+body[data-page=planner] .budget-details .form-help,body[data-page=planner] .budget-details .cost-demand-badge{font-size:11px;line-height:1.6}
+.dynamic-budget-warning:empty{display:none}.budget-details .budget-info-icon{display:none}
+body[data-page=planner] .budget-field{min-height:46px;box-shadow:none!important;border-radius:12px!important}
+body[data-page=planner] .budget-amount,body[data-page=planner] .budget-currency-select{font-size:14px!important;padding-top:11px!important;padding-bottom:11px!important;min-height:44px!important}
 body[data-page=planner] .planning-goal-fieldset{margin:12px 0!important;border:0;padding:0}
 body[data-page=planner] .planning-goal-fieldset legend{font-size:14px!important;font-weight:600;margin-bottom:10px}
 body[data-page=planner] .planning-goal-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}

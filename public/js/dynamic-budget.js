@@ -6,14 +6,14 @@
   const money = (n, currency) => new Intl.NumberFormat("en", { style: "currency", currency, currencyDisplay: "code", maximumFractionDigits: 0 }).format(n);
   function warn() {
     const entered = Number(amount.value.replace(/,/g, ""));
-    warning.textContent = current && entered < current.minimumViable ? "Budget is below the estimated minimum viable ground cost for this duration." : "";
+    warning.textContent = current && entered < current.minimumViable ? `Below ground-cost estimate: ${money(current.minimumViable, current.currency)}` : "";
   }
   function show(result, input, updateAmount) {
     current = result;
-    badge.textContent = `Recommended for ${input.destination} (${result.totalNights} nights, ${result.travellers} traveller(s), ${input.style}): ${money(result.totalEstimate, result.currency)} · average ${money(result.dailyAverage, result.currency)}/person/night including demand adjustments. ${result.weekendDays} Fri/Sat night(s) +15%. Source: ${result.source}. Departure date excluded.`;
+    badge.textContent = `Suggested ${money(result.totalEstimate, result.currency)} · ${result.totalNights} nights`;
     const demand = document.getElementById("cost-demand-badge");
     demand.dataset.level = result.demandLevel === "Peak Season" ? "peak" : result.demandLevel === "Moderate" ? "moderate" : "low";
-    demand.textContent = `${result.demandLevel} · ${Math.abs(result.percentageVsBase)}% ${result.percentageVsBase < 0 ? "below" : "above"} base benchmark (estimated)`;
+    demand.textContent = `${result.demandLevel} · ${money(result.dailyAverage,result.currency)}/person/night · Estimated`;
     document.getElementById("live-cost-estimate").textContent = money(result.totalEstimate, result.currency);
     if (updateAmount) {
       setBudgetValue(result.recommended);
