@@ -96,7 +96,7 @@ for (const oldAction of document.querySelectorAll(".header-action")) {
   accountNavigation.innerHTML = `
     <span data-auth="guest" class="account-guest">
       <a class="account-link" href="/login">Login</a>
-      <a class="account-link" href="/signup">Sign Up</a>
+      <a class="account-link" href="/signup">Get Started</a>
     </span>
     <span data-auth="user" class="account-user" hidden>
       <a class="account-link" href="/profile"><span data-profile-name>Profile</span></a>
@@ -109,6 +109,9 @@ for (const oldAction of document.querySelectorAll(".header-action")) {
 }
 
 syncHeaderThemeToggles();
+for(const logo of document.querySelectorAll('.brand,.slider-brand')){
+  logo.innerHTML='<span class="unified-brand-mark" aria-hidden="true">◇</span><span>Pack<span class="unified-brand-accent">Swift</span></span>';
+}
 
 for (const link of document.querySelectorAll("[data-nav]")) {
   if (link.dataset.nav === page || (page === "trips" && link.dataset.nav === "profile")) {
