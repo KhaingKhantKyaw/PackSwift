@@ -98,19 +98,20 @@
                 <p id="demand-range-summary" class="demand-range-summary" role="status"></p>
               </section>
             </div>
-            <div class="form-section-heading"><h3>Travel intention</h3><p>Tell PackSwift how you want the budget to shape the experience.</p></div>
             <fieldset class="form-field form-field-wide planning-goal-fieldset">
-              <legend class="form-legend">What matters most for this trip?</legend>
+              <legend class="form-legend">Travel intention</legend>
               <div class="planning-goal-grid">
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="make-possible"><span><strong>Make the trip possible</strong><small>Build the safest realistic version at the lowest cost.</small></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="fixed-budget"><span><strong>Stay within my exact budget</strong><small>Treat my amount as a firm spending ceiling.</small></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="best-value" checked><span><strong>Best value</strong><small>Balance memorable experiences, comfort, and cost.</small></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="comfort-first"><span><strong>Comfort first</strong><small>Prioritize reliable stays, easy transport, and rest.</small></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="luxury"><span><strong>Luxury experience</strong><small>Prefer premium stays, dining, and private services.</small></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="once-in-lifetime"><span><strong>Once-in-a-lifetime trip</strong><small>Protect must-do experiences and save elsewhere.</small></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="make-possible"><span><strong>Lowest cost</strong></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="fixed-budget"><span><strong>Fixed budget</strong></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="best-value" checked><span><strong>Best value</strong></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="comfort-first"><span><strong>Comfort</strong></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="luxury"><span><strong>Luxury</strong></span></label>
+                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="once-in-lifetime"><span><strong>Bucket list</strong></span></label>
               </div>
             </fieldset>
-            <div class="form-section-heading"><h3>Trip Preferences</h3><p>Choose the level that feels natural to you. These are preferences, not restrictions.</p></div>
+            <details class="lifestyle-disclosure form-field-wide">
+              <summary>Customize preferences <span>Optional</span></summary>
+              <div class="lifestyle-detail-grid">
             <p id="lifestyle-preset-feedback" class="form-help form-field-wide" role="status" aria-live="polite"></p>
             <div class="form-field">
               <label class="form-label" for="accommodation-style">Accommodation</label>
@@ -191,6 +192,8 @@
                 <option value="senior">Senior Travelers</option>
               </select>
             </div>
+              </div>
+            </details>
             <div class="form-section-heading"><h3>Travel Pace</h3><p>Choose your daily rhythm.</p></div>
             <fieldset class="form-field form-field-wide" style="border:0;padding:0;margin:0">
               <legend class="form-legend">Travel Pace</legend>
