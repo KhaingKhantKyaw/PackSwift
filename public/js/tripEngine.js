@@ -20,7 +20,8 @@ globalThis.PackSwiftTripEngine = (() => {
   function generateDynamicTrip(destination,durationDays,tripNotes,travelPace,style={}) {
     if(typeof style==='string')style={level:style};
     const model=resolve(destination),tags=parseTags(tripNotes),pace=normalize(travelPace);
-    const cap=/slow|relax/.test(pace)?2:/fast|packed/.test(pace)?5:3;
+    const requestedCap=/slow|relax/.test(pace)?2:/fast|packed/.test(pace)?5:3;
+    const cap=style.accessibility && style.accessibility!=='standard'?Math.min(2,requestedCap):requestedCap;
     const count=Math.max(1,Math.min(90,Math.floor(Number(durationDays)||1)));
     const excluded=new Set(style.excluded || []);
     const identity=p=>String(p.placeId || p.place_id || p.id || p.title || p.name);

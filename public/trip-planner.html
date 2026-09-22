@@ -87,8 +87,13 @@
             <input type="hidden" id="start-date-picker">
             <input type="hidden" id="end-date-picker">
             <div class="form-field form-field-wide">
-              <input id="adults" name="adults" type="hidden" value="1">
-              <input id="children" name="children" type="hidden" value="0">
+              <fieldset class="traveller-fields"><legend>Who is travelling?</legend>
+                <div class="lifestyle-detail-grid">
+                  <div><label class="form-label" for="adults">Adults (18+)</label><input class="field-control" id="adults" name="adults" type="number" min="1" max="20" step="1" value="1" required></div>
+                  <div><label class="form-label" for="children">Children (under 18)</label><input class="field-control" id="children" name="children" type="number" min="0" max="19" step="1" value="0" required></div>
+                </div>
+                <p class="form-help">Up to 20 travellers. Budget is for the whole group.</p>
+              </fieldset>
               <section class="demand-calendar" aria-label="Travel date range calendar">
                   <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
                   <p id="demand-selection" role="status">Choose a start date, then an end date.</p>
@@ -184,8 +189,8 @@
             <div class="form-field">
               <label class="form-label" for="traveler-demographic">Travel Groups</label>
               <select class="field-control" id="traveler-demographic" name="travelerDemographic">
-                <option value="solo">Solo</option>
-                <option value="couples" selected>Couples</option>
+                <option value="solo" selected>Solo</option>
+                <option value="couples">Couples</option>
                 <option value="family-with-children">Family</option>
                 <option value="friends-group">Friends / Group</option>
                 <option value="business-duo">Digital Nomad / Business Duo</option>
@@ -243,6 +248,14 @@
               </details>
             </div>
             <div class="form-field form-field-wide">
+              <details class="lifestyle-disclosure"><summary>Comfort & dietary needs <span>Optional</span></summary>
+                <div class="lifestyle-detail-grid">
+                  <div><label class="form-label" for="walking-level">Walking preference</label><select class="field-control" id="walking-level" name="walkingLevel"><option value="standard">Regular walking</option><option value="limited">Short walks & frequent rests</option><option value="step-free">Step-free routes preferred</option></select></div>
+                  <div><label class="form-label" for="dietary-style">Food preference</label><select class="field-control" id="dietary-style" name="dietaryStyle"><option value="any">No preference</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="halal">Halal</option><option value="other">Other — add a note</option></select></div>
+                  <div class="form-field-wide"><label class="form-label" for="family-needs">Group needs</label><input class="field-control" id="family-needs" name="familyNeeds" maxlength="180" placeholder="e.g. toddler naps, stroller, older travellers, food allergies"></div>
+                </div>
+                <p class="form-help">Accessibility and dietary suitability must be checked with each venue.</p>
+              </details>
               <label class="form-label" for="trip-notes">Trip notes <span class="label-optional">Optional</span></label>
               <textarea class="field-control" id="trip-notes" name="notes" rows="3" maxlength="600" placeholder="e.g. Add a beach day and vegetarian food options"></textarea>
             </div>

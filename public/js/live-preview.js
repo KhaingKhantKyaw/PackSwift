@@ -57,7 +57,7 @@
     places = [...pool.values()];
   }
   function schedule() {
-    return window.PackSwiftTripEngine.generateDynamicTrip(input.destination,nights()+1,input.notes,input.pace,{places,excluded:[...excluded],currency:input.currency,travelers:input.travelers,level:/luxury/.test(input.planningGoal)?'luxury':/budget|possible/.test(input.planningGoal)?'budget':'comfort'});
+    return window.PackSwiftTripEngine.generateDynamicTrip(input.destination,nights()+1,input.notes,input.pace,{places,excluded:[...excluded],currency:input.currency,travelers:input.travelers,accessibility:input.accessibility,level:/luxury/.test(input.planningGoal)?'luxury':/budget|possible/.test(input.planningGoal)?'budget':'comfort'});
   }
   function renderBoard() {
     const list=$('preview-timeline'), {routes,unscheduled,cap,days,expenses}=schedule();list.replaceChildren();
@@ -83,6 +83,8 @@
   function snapshot() {
     const tags = [input.destination, input.startDate && input.endDate ? `${input.startDate} – ${input.endDate} • ${nights()} nights` : 'Choose dates', input.planningGoal, input.pace, `Budget: ${money(input.budget)} • ${money(input.budget / Math.max(1,nights()))}/day`].filter(Boolean);
     $('preview-snapshot').replaceChildren(...tags.map(text => { const node=document.createElement('span');node.textContent=text;return node; }));
+    const group=document.createElement('span');group.textContent=`${input.adults || 1} adults · ${input.children || 0} children`;$('preview-snapshot').append(group);
+    [input.accessibility && input.accessibility!=='standard'?input.accessibility:null,input.dietaryStyle && input.dietaryStyle!=='any'?input.dietaryStyle:null,input.familyNeeds].filter(Boolean).forEach(text=>{const tag=document.createElement('span');tag.textContent=text;$('preview-snapshot').append(tag);});
   }
   function card(p, editable=true) {
     const row=document.createElement('article');row.className='preview-place';row.classList.toggle('is-excluded',excluded.has(key(p)));

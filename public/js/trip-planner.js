@@ -588,7 +588,7 @@ function updateBudgetMinimum() {
 function setTravellerCount(type, value) {
   const isAdult = type === "adults";
   const input = isAdult ? adultInput : childInput;
-  const next = isAdult ? 1 : 0; // Date-only planner uses one traveller, including restored plans.
+  const next = Math.min(isAdult ? 20 : 19, Math.max(isAdult ? 1 : 0, Math.floor(Number(value) || 0)));
   input.value = String(next);
 }
 
@@ -1442,6 +1442,10 @@ function updateLiveTripPreview() {
     smartPace,
     travelerDemographic: groupValue,
     travelingWithPets: withPets,
+    notes: String(data.get('notes') || ''),
+    accessibility: String(data.get('walkingLevel') || 'standard'),
+    dietaryStyle: String(data.get('dietaryStyle') || 'any'),
+    familyNeeds: String(data.get('familyNeeds') || ''),
     ...travelStyle,
   });
 }
@@ -1590,11 +1594,15 @@ function collectInput() {
     travelingWithPets: formData.get("travelingWithPets") === "true",
     interests: [...(purposeInterests[tripPurpose] || purposeInterests.leisure)],
     notes: String(formData.get("notes") || "").trim(),
+    accessibility: String(formData.get('walkingLevel') || 'standard'),
+    dietaryStyle: String(formData.get('dietaryStyle') || 'any'),
+    familyNeeds: String(formData.get('familyNeeds') || ''),
     ...travelStyle,
   };
 }
 
 function validateInput(input) {
+  if (!Number.isInteger(input.adults) || !Number.isInteger(input.children) || input.adults < 1 || input.children < 0 || input.travelers > 20) return 'Choose 1–20 travellers, including at least one adult.';
   const origin = resolveRouteLocation(input.origin);
   const destination = resolveRouteLocation(input.destination);
   if (!origin) return "Choose a supported origin city or country.";

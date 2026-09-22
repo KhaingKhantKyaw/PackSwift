@@ -1,4 +1,5 @@
 /* Shared visual language for every PackSwift page. */
+.traveller-fields{border:0;padding:0;margin:0 0 16px}.traveller-fields legend{font-size:14px;font-weight:600}.traveller-fields .lifestyle-detail-grid{margin-top:10px}.traveller-fields .form-help{font-size:11px;margin:7px 0}
 body[data-page=planner] #dynamic-budget-badge{border:0!important;background:transparent!important;padding:0!important;margin:9px 0 0!important;box-shadow:none!important;font-size:12px!important;color:var(--ps-muted)!important;min-height:0}
 .budget-scope-note{font-size:11px!important;color:var(--ps-muted);margin:5px 0 10px!important}
 .budget-details{border-top:1px solid var(--ps-border);padding-top:10px;margin-top:8px}.budget-details summary{font-size:12px;cursor:pointer;color:var(--ps-muted);list-style-position:inside}
