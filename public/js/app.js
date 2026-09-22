@@ -63,18 +63,19 @@ if (typeof systemThemeQuery.addEventListener === "function") {
 }
 
 const page = document.body.dataset.page;
+const navigationStyles=document.createElement('link');navigationStyles.rel='stylesheet';navigationStyles.href='/css/navigation.css';document.head.append(navigationStyles);
 
 const mainNavigation = `
   <a class="nav-link" data-nav="home" href="/">Home</a>
   <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
-  <a class="nav-link" data-nav="about" href="/about">About</a>
-  <a class="nav-link" data-nav="support" href="/#support">Support</a>`;
+  <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/my-trips">My Trips</a>
+  <a class="nav-link" data-nav="help" href="/help">Help</a>`;
 
 const mobileNavigation = `
   <a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a>
   <a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a>
-  <a data-nav="about" href="/about"><span aria-hidden="true">i</span><span>About</span></a>
-  <a data-nav="support" href="/#support"><span aria-hidden="true">✉</span><span>Support</span></a>
+  <a data-nav="trips" data-auth="user" hidden href="/my-trips"><span aria-hidden="true">▤</span><span>My Trips</span></a>
+  <a data-nav="help" href="/help"><span aria-hidden="true">?</span><span>Help</span></a>
   <a data-nav="profile" href="/profile"><span aria-hidden="true">○</span><span>Account</span></a>`;
 
 for (const navigation of document.querySelectorAll(".desktop-nav")) {
@@ -83,6 +84,11 @@ for (const navigation of document.querySelectorAll(".desktop-nav")) {
 for (const navigation of document.querySelectorAll(".mobile-nav")) {
   navigation.innerHTML = mobileNavigation;
 }
+for (const navigation of document.querySelectorAll('.slider-menu')) navigation.innerHTML = mainNavigation;
+for (const signup of document.querySelectorAll('a[href="/signup"]')) signup.textContent = 'Get Started';
+const footer=document.querySelector('.site-footer .footer-inner, .slider-footer');
+if(footer){const links=document.createElement('nav');links.className='footer-help-links';links.setAttribute('aria-label','Information and support');for(const [label,url] of [['About PackSwift','/about'],['Contact & Feedback','/help#contact'],['Privacy','/help#privacy'],['Terms','/help#terms']]){const a=document.createElement('a');a.textContent=label;a.href=url;links.append(a);}footer.append(links);}
+document.addEventListener('click',event=>{if(event.target.closest('[data-open-concierge]'))window.PackSwift?.concierge?.open(true);});
 
 for (const oldAction of document.querySelectorAll(".header-action")) {
   const accountNavigation = document.createElement("div");

@@ -40,9 +40,9 @@
   const FALLBACK_IMAGE = "/images/packswift1.jpg";
   const FALLBACK_CARD_IMAGE = FALLBACK_IMAGE;
   // Plain URLs only: Markdown link syntax is not a valid image source.
-  const photoIds = { singapore: "777059", bali: "2166553", yangon: "1483053", bangkok: "1007427", hanoi: "2412603" };
+  const photoIds = { singapore: "1525625293386-3f8f99389edd", bali: "1537996194471-e657df975ab4", yangon: "1515832730975-869da433df66", bangkok: "1508009603885-50cf7c579365", hanoi: "1639484072046-6ac4984061e1" };
   destinations.forEach(destination => {
-    const base = `https://images.pexels.com/photos/${photoIds[destination.id]}/pexels-photo-${photoIds[destination.id]}.jpeg?auto=compress&cs=tinysrgb`;
+    const base = `https://images.unsplash.com/photo-${photoIds[destination.id]}?auto=format&fit=crop&q=80`;
     destination.bgImage = `${base}&w=1920`;
     destination.cardImage = `${base}&w=600`;
   });

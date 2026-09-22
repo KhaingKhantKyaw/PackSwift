@@ -156,6 +156,27 @@ function createTripCard(trip) {
     createTag(trip.destination?.climate || "Climate flexible"),
   );
   details.append(heading, dates, meta);
+  const views=document.createElement('div'),tabbar=document.createElement('div'),view=document.createElement('div');
+  tabbar.className='trip-detail-tabs';tabbar.setAttribute('role','tablist');tabbar.setAttribute('aria-label','Trip details');
+  view.className='trip-detail-view';view.setAttribute('role','tabpanel');
+  const display=label=>{
+    view.replaceChildren();
+    const paragraph=document.createElement('p');
+    if(label==='Overview')paragraph.textContent=`${heading.textContent} · ${dates.textContent}`;
+    if(label==='Budget')paragraph.textContent=`Your budget: ${formatMoney(trip.input?.budget || 0,trip.input?.currency || 'USD')}${trip.estimatedCost?` · Estimated cost: ${formatMoney(trip.estimatedCost,trip.input?.currency || 'USD')}`:''}`;
+    if(label==='Itinerary'){
+      paragraph.textContent=trip.itinerary?.length?`${trip.itinerary.length} planned days`:'No day-by-day itinerary saved yet.';
+      if(trip.tripSessionId){const link=document.createElement('a');link.href=`/trip-itinerary?trip=${encodeURIComponent(trip.tripSessionId)}`;link.textContent='Open itinerary';view.append(link);}
+      else (trip.itinerary || []).forEach((day,i)=>{const line=document.createElement('p');line.textContent=`Day ${i+1}: ${day.title || day.theme || day.summary || 'Saved itinerary'}`;view.append(line);});
+    }
+    if(label==='Preparation'){
+      paragraph.textContent=trip.tripSessionId?'Review documents, packing, and remaining preparation.':'Open your saved plan to begin preparing.';
+      if(trip.tripSessionId){const link=document.createElement('a');link.href=`/assist-trip?trip=${encodeURIComponent(trip.tripSessionId)}`;link.textContent='Open preparation checklist';view.append(link);}
+    }
+    view.prepend(paragraph);[...tabbar.children].forEach(button=>button.setAttribute('aria-selected',String(button.textContent===label)));
+  };
+  ['Overview','Itinerary','Preparation','Budget'].forEach(label=>{const button=document.createElement('button');button.type='button';button.textContent=label;button.setAttribute('role','tab');button.addEventListener('click',()=>display(label));tabbar.append(button);});
+  views.append(tabbar,view);details.append(views);display('Overview');
 
   const actions = document.createElement("div");
   actions.className = "trip-card-actions";

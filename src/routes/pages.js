@@ -13,6 +13,7 @@ const pages = new Map([
   ["/packing-list", "packing-list.html"],
   ["/my-trips", "my-trips.html"],
   ["/about", "about.html"],
+  ["/help", "help.html"],
   ["/login", "login.html"],
   ["/signup", "signup.html"],
   ["/profile", "profile.html"],
@@ -41,7 +42,7 @@ pageRouter.get("/travel-guide", (request, response) => {
 });
 
 pageRouter.get("/contact", (request, response) => {
-  response.redirect(302, "/#support");
+  response.redirect(302, "/help#contact");
 });
 
 for (const [route, file] of pages) {
