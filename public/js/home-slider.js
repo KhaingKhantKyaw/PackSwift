@@ -77,7 +77,7 @@
   }
   function cards() {
     const strip = el("destination-thumbnails"); strip.replaceChildren();
-    for (let offset = 1; offset <= Math.min(4,destinations.length-1); offset++) {
+    for (let offset = 1; offset < destinations.length; offset++) {
       const index = (active + offset) % destinations.length, destination = destinations[index];
       const card = document.createElement("button"); card.type = "button"; card.className = "destination-thumbnail"; card.setAttribute("aria-label", `Explore ${destination.name}, ${destination.country}`);
       const img = document.createElement("img"); img.alt = ""; img.loading = "lazy";
@@ -205,9 +205,27 @@
   const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
   let paused=motion.matches, hovering=false, rotating=false;
   const pause=document.createElement('button');pause.type='button';pause.className='slider-rotation-toggle';
-  const updatePause=()=>{pause.textContent=paused?'▶ Play slideshow':'Ⅱ Pause slideshow';pause.setAttribute('aria-pressed',String(paused));};
+  const updatePause=()=>{pause.textContent=paused?'▶':'Ⅱ';pause.setAttribute('aria-label',paused?'Play slideshow':'Pause slideshow');pause.title=paused?'Play slideshow':'Pause slideshow';pause.setAttribute('aria-pressed',String(paused));};
   pause.addEventListener('click',()=>{paused=!paused;updatePause();});updatePause();el('slider-next').after(pause);
   const carousel=el('destination-thumbnails');
+  carousel.setAttribute('aria-label','Destination cards. Drag horizontally or use the scrollbar to browse.');
+  let drag=null, suppressClick=false;
+  carousel.addEventListener('dragstart',event=>event.preventDefault());
+  carousel.addEventListener('pointerdown',event=>{
+    if(event.pointerType!=='mouse'||event.button!==0)return;
+    drag={id:event.pointerId,x:event.clientX,scroll:carousel.scrollLeft,moved:false};suppressClick=false;
+  });
+  carousel.addEventListener('pointermove',event=>{
+    if(!drag||drag.id!==event.pointerId)return;
+    const distance=event.clientX-drag.x;
+    if(!drag.moved&&Math.abs(distance)<6)return;
+    if(!drag.moved){drag.moved=true;carousel.setPointerCapture(event.pointerId);carousel.classList.add('is-dragging');}
+    event.preventDefault();carousel.scrollLeft=drag.scroll-distance;
+  });
+  function endDrag(){if(!drag)return;suppressClick=drag.moved;const id=drag.id;drag=null;carousel.classList.remove('is-dragging');if(carousel.hasPointerCapture(id))carousel.releasePointerCapture(id);}
+  carousel.addEventListener('pointerup',endDrag);carousel.addEventListener('pointercancel',endDrag);carousel.addEventListener('lostpointercapture',endDrag);
+  window.addEventListener('pointerup',endDrag);
+  carousel.addEventListener('click',event=>{if(suppressClick){event.preventDefault();event.stopImmediatePropagation();suppressClick=false;}},true);
   carousel.addEventListener('mouseenter',()=>{hovering=true;});carousel.addEventListener('mouseleave',()=>{hovering=false;});
   motion.addEventListener('change',event=>{if(event.matches){paused=true;updatePause();}});
   const rotation=setInterval(async()=>{

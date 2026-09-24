@@ -50,6 +50,17 @@ body:not(.slider-home) .eyebrow{color:var(--ps-accent)!important;font-weight:600
 .destination-story,.destination-thumbnails{opacity:1;transition:opacity .38s ease!important}
 .destination-story.is-fading,.destination-thumbnails.is-fading{opacity:0}
 .story-enter{animation:none!important}
+.slider-home .destination-thumbnails{cursor:grab;touch-action:pan-x pan-y;user-select:none;-webkit-user-select:none}
+.slider-home .destination-thumbnails.is-dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}
+.slider-home .destination-thumbnails.is-dragging *{cursor:grabbing!important}
+.slider-home .destination-thumbnails.is-dragging .destination-thumbnail{transform:none}
+.slider-home .destination-thumbnail img{-webkit-user-drag:none;pointer-events:none}
+.slider-home .slider-controls .slider-rotation-toggle{width:36px;height:36px;padding:0;border:0;background:transparent;color:#d0e3db;font-size:12px;border-radius:50%;opacity:.7}
+.slider-home .slider-controls .slider-rotation-toggle:hover,.slider-home .slider-controls .slider-rotation-toggle:focus-visible{opacity:1;background:#ffffff12}
+body .concierge-launcher{background:rgba(255,255,255,.16);color:#087e80;border:1px solid #087e8055;box-shadow:0 4px 18px #173d3e12;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+body .concierge-launcher::before,body .concierge-launcher::after{display:none}
+body.slider-home .concierge-launcher,html[data-theme=dark] .concierge-launcher{color:#d2f5e8;background:#102d3626;border-color:#ffffff65}
+body .concierge-launcher:hover,body .concierge-launcher:focus-visible{background:#bce9d933;box-shadow:0 5px 20px #173d3e20;transform:translateY(-2px)}
 /* Help uses the same soft cards and spacious hierarchy as the planner. */
 body[data-page=help] .page-shell{max-width:1040px;padding-bottom:40px}
 body[data-page=help] .page-heading{padding:24px 0 12px}
