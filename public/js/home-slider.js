@@ -100,13 +100,19 @@
       catch { el("slider-feedback").textContent = "Destination photo unavailable. Please try again."; return; }
     }
     if (token !== sequence) return;
+    const story = document.querySelector('.destination-story');
+    const strip = el('destination-thumbnails');
+    const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    story.classList.add('is-fading');strip.classList.add('is-fading');
+    if(!reduceMotion)await new Promise(resolve=>setTimeout(resolve,240));
+    if(token!==sequence)return;
     const next = 1 - layer; layers[next].src = backgroundSource; layers[next].classList.add("is-visible"); layers[layer].classList.remove("is-visible"); layer = next; active = index;
     el("slider-location").textContent = destination.pillLabel;
     el("slider-title").textContent = destination.city; el("slider-description").textContent = destination.description;
     el("slider-plan").href = `/trip-planner?destination=${encodeURIComponent(destination.name)}`;
     el("slider-position").textContent = `${String(index + 1).padStart(2, "0")} / ${String(destinations.length).padStart(2, "0")}`;
-    const story = document.querySelector(".destination-story"); story.classList.remove("story-enter"); void story.offsetWidth; story.classList.add("story-enter");
     el("slider-feedback").textContent = ""; updateSave(); cards();
+    requestAnimationFrame(()=>{story.classList.remove('is-fading');strip.classList.remove('is-fading');});
     if (focus) { el("slider-title").tabIndex = -1; el("slider-title").focus({ preventScroll: true }); }
   }
   el("slider-next").addEventListener("click", () => select((active + 1) % destinations.length));
@@ -194,6 +200,7 @@
     }).catch(() => { /* Regional suggestions remain usable if the catalog cannot load. */ });
   const explore=document.createElement('button');explore.type='button';explore.id='slider-explore';explore.className='slider-explore';explore.textContent='Explore destination';explore.addEventListener('click',()=>window.PackSwiftDestinationGuide.open(destinations[active]));el('slider-plan').before(explore);
   cards(); updateSave();
+  el('slider-position').textContent=`01 / ${String(destinations.length).padStart(2,'0')}`;
   // Rotate only while the visitor is not interacting. Respect reduced motion.
   const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
   let paused=motion.matches, hovering=false, rotating=false;
