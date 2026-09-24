@@ -78,7 +78,7 @@
       img.src = destination.cardImage;
       const copy = document.createElement("span"), subtitle = document.createElement("small"), title = document.createElement("strong");
       subtitle.textContent = destination.country; title.textContent = destination.name; copy.append(subtitle, title); card.append(img, copy);
-      card.addEventListener("click", () => select(index, true)); strip.append(card);
+      card.addEventListener("click", () => { select(index); window.PackSwiftDestinationGuide.open(destination); }); strip.append(card);
     }
     strip.scrollLeft = 0;
   }
@@ -130,8 +130,8 @@
     closeSearch();
     search.value = destination.name;
     const index = destinations.findIndex(item => normalize(item.name) === normalize(destination.name));
-    if (index >= 0) select(index, true);
-    else location.assign(`/trip-planner?destination=${encodeURIComponent(destination.name)}`);
+    if (index >= 0) select(index);
+    window.PackSwiftDestinationGuide.open(index >= 0 ? {...destination,...destinations[index]} : destination);
   }
   function renderSearch() {
     const query = normalize(search.value.trim());
@@ -146,7 +146,7 @@
       button.setAttribute("role", "option"); button.setAttribute("aria-selected", "false");
       const title = document.createElement("strong"), detail = document.createElement("small");
       title.textContent = destination.name;
-      detail.textContent = `${destination.country} · ${destinations.some(item => item.name === destination.name) ? "Explore destination" : "Plan a trip"}`;
+      detail.textContent = `${destination.country} · Explore destination`;
       button.append(title, detail);
       button.addEventListener("click", () => chooseDestination(destination));
       results.append(button);
@@ -185,6 +185,7 @@
       catalog = [...merged.values()];
       if (document.activeElement === search) renderSearch();
     }).catch(() => { /* Regional suggestions remain usable if the catalog cannot load. */ });
+  const explore=document.createElement('button');explore.type='button';explore.id='slider-explore';explore.className='slider-explore';explore.textContent='Explore destination';explore.addEventListener('click',()=>window.PackSwiftDestinationGuide.open(destinations[active]));el('slider-plan').before(explore);
   cards(); updateSave();
   const requested = new URLSearchParams(location.search).get("destination");
   if (requested) { const index = destinations.findIndex(d => d.id === requested.toLowerCase() || d.name.toLowerCase() === requested.toLowerCase()); if (index >= 0) select(index); }
