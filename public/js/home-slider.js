@@ -36,11 +36,18 @@
       cardImage: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80",
     },
   ];
+  destinations.push(
+    {id:'taipei',name:'Taipei',city:'TAIPEI',country:'Taiwan',pillLabel:'📍 Taipei, Taiwan',spots:'TPE Taiwan Taipei 101 night markets',description:'Mountain-framed streets, lively night markets and a skyline that invites you to look up. Discover Taiwan through Taipei.',attractions:['Taipei 101','National Palace Museum','Daan Forest Park','Raohe Street Night Market']},
+    {id:'tokyo',name:'Tokyo',city:'TOKYO',country:'Japan',pillLabel:'📍 Tokyo, Japan',spots:'TYO Japan Shibuya Senso-ji',description:'Quiet temple gardens meet bright city streets. Find small discoveries between Tokyo’s extraordinary neighbourhoods.'},
+    {id:'seoul',name:'Seoul',city:'SEOUL',country:'South Korea',pillLabel:'📍 Seoul, South Korea',spots:'ICN Korea palaces cafes',description:'Palace courtyards, creative cafés and streets full of flavour. Explore the many moods of Seoul.'},
+    {id:'paris',name:'Paris',city:'PARIS',country:'France',pillLabel:'📍 Paris, France',spots:'France Eiffel Louvre',description:'Riverside walks, neighbourhood bakeries and art around every corner. Make room for a slower kind of discovery.'}
+  );
   const el = id => document.getElementById(id);
   const FALLBACK_IMAGE = "/images/packswift1.jpg";
   const FALLBACK_CARD_IMAGE = FALLBACK_IMAGE;
   // Plain URLs only: Markdown link syntax is not a valid image source.
   const photoIds = { singapore: "1525625293386-3f8f99389edd", bali: "1537996194471-e657df975ab4", yangon: "1515832730975-869da433df66", bangkok: "1508009603885-50cf7c579365", hanoi: "1639484072046-6ac4984061e1" };
+  Object.assign(photoIds,{taipei:'1470004914212-05527e49370b',tokyo:'1503899036084-c55cdd92da26',seoul:'1517154421773-0529f29ea451',paris:'1502602898657-3e91760cbb34'});
   destinations.forEach(destination => {
     const base = `https://images.unsplash.com/photo-${photoIds[destination.id]}?auto=format&fit=crop&q=80`;
     destination.bgImage = `${base}&w=1920`;
@@ -70,7 +77,7 @@
   }
   function cards() {
     const strip = el("destination-thumbnails"); strip.replaceChildren();
-    for (let offset = 1; offset < destinations.length; offset++) {
+    for (let offset = 1; offset <= Math.min(4,destinations.length-1); offset++) {
       const index = (active + offset) % destinations.length, destination = destinations[index];
       const card = document.createElement("button"); card.type = "button"; card.className = "destination-thumbnail"; card.setAttribute("aria-label", `Explore ${destination.name}, ${destination.country}`);
       const img = document.createElement("img"); img.alt = ""; img.loading = "lazy";
@@ -187,6 +194,20 @@
     }).catch(() => { /* Regional suggestions remain usable if the catalog cannot load. */ });
   const explore=document.createElement('button');explore.type='button';explore.id='slider-explore';explore.className='slider-explore';explore.textContent='Explore destination';explore.addEventListener('click',()=>window.PackSwiftDestinationGuide.open(destinations[active]));el('slider-plan').before(explore);
   cards(); updateSave();
+  // Rotate only while the visitor is not interacting. Respect reduced motion.
+  const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  let paused=motion.matches, hovering=false, rotating=false;
+  const pause=document.createElement('button');pause.type='button';pause.className='slider-rotation-toggle';
+  const updatePause=()=>{pause.textContent=paused?'▶ Play slideshow':'Ⅱ Pause slideshow';pause.setAttribute('aria-pressed',String(paused));};
+  pause.addEventListener('click',()=>{paused=!paused;updatePause();});updatePause();el('slider-next').after(pause);
+  const carousel=el('destination-thumbnails');
+  carousel.addEventListener('mouseenter',()=>{hovering=true;});carousel.addEventListener('mouseleave',()=>{hovering=false;});
+  motion.addEventListener('change',event=>{if(event.matches){paused=true;updatePause();}});
+  const rotation=setInterval(async()=>{
+    if(paused||hovering||rotating||document.hidden||document.querySelector('dialog[open]')||document.activeElement?.closest('#destination-thumbnails,.slider-search-wrap'))return;
+    rotating=true;try{await select((active+1)%destinations.length);}finally{rotating=false;}
+  },6500);
+  window.addEventListener('pagehide',()=>clearInterval(rotation),{once:true});
   const requested = new URLSearchParams(location.search).get("destination");
   if (requested) { const index = destinations.findIndex(d => d.id === requested.toLowerCase() || d.name.toLowerCase() === requested.toLowerCase()); if (index >= 0) select(index); }
 })();

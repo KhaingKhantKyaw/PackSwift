@@ -32,3 +32,4 @@ body.slider-home{padding:0;margin:0;min-height:100vh;min-height:100svh;backgroun
   .destination-backdrop { transition: opacity .7s cubic-bezier(.4, 0, .2, 1); }
 }
 .slider-home .slider-account .theme-toggle-thumb { position: static; display: inline-grid; place-items: center; transform: none; width: 20px; height: 20px; color: #0d1b2a; font-size: 14px; }
+.slider-rotation-toggle{border:1px solid #ffffff55;border-radius:999px;background:#10263188;color:#fff;padding:9px 14px;font-size:11px;white-space:nowrap;cursor:pointer}.slider-rotation-toggle:focus-visible{outline:2px solid #a6e4d7;outline-offset:3px}
