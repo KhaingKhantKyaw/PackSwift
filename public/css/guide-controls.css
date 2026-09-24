@@ -1,0 +1,4 @@
+/* The close control belongs to the entire scrollport, not the hero. */
+.destination-guide .guide-close-toolbar{position:sticky;top:0;height:0;z-index:20;pointer-events:none}
+.destination-guide .guide-close-toolbar .guide-close{position:absolute;top:14px;right:14px;pointer-events:auto;display:grid;place-items:center;width:44px;height:44px;padding:0;background:#173039f2;color:#fff;border:1px solid #ffffff80;box-shadow:0 3px 12px #0003;backdrop-filter:blur(8px)}
+.destination-guide .guide-close:hover{background:#087e80}
