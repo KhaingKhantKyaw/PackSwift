@@ -66,6 +66,7 @@ const page = document.body.dataset.page;
 const navigationStyles=document.createElement('link');navigationStyles.rel='stylesheet';navigationStyles.href='/css/navigation.css';document.head.append(navigationStyles);
 const sharedStyles=document.createElement('link');sharedStyles.rel='stylesheet';sharedStyles.href='/css/site-design.css';document.head.append(sharedStyles);
 const journeyStyles=document.createElement('link');journeyStyles.rel='stylesheet';journeyStyles.href='/css/journey-theme.css';document.head.append(journeyStyles);
+const advisoryStyles=document.createElement('link');advisoryStyles.rel='stylesheet';advisoryStyles.href='/css/advisory-compact.css';document.head.append(advisoryStyles);
 
 const mainNavigation = `
   <a class="nav-link" data-nav="home" href="/">Home</a>

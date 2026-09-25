@@ -5,11 +5,15 @@
   const text=(tag,value)=>{const el=document.createElement(tag);el.textContent=value;return el;};
   function render(data){
     const icons={critical:'⛔',high:'⚠',caution:'△',information:'ⓘ',unknown:'?'};
-    box.dataset.level=data.severity;box.replaceChildren(text('strong',`${icons[data.severity]||'?'} ${data.country?data.country+' · ':''}${data.title}`),text('p',data.message||'Check the official advisory for details.'));
-    if(data.regionalNotice)box.append(text('p',data.regionalNotice));
-    const link=text('a','Read official travel advice ↗');link.href=data.url;link.target='_blank';link.rel='noopener noreferrer';box.append(link);
-    box.append(text('small',data.checkedAt?`Source: ${data.source} · Retrieved ${new Date(data.checkedAt).toLocaleString()}${data.sourceUpdatedAt?' · Source updated '+new Date(data.sourceUpdatedAt).toLocaleDateString():''}`:'Current advisory could not be retrieved.'));
-    box.append(text('small',data.disclaimer||'Unknown does not mean safe. Check your own government’s travel advice.'));
+    const titles={critical:'Do not travel',high:data.regionalNotice?'High-risk regions':'Essential travel only',caution:'Regional restrictions',information:'Travel advice',unknown:'Safety unverified'};
+    const summaries={critical:'FCDO advises against all travel.',high:data.regionalNotice?'Avoid affected regions; check your exact route.':'FCDO advises against non-essential travel.',caution:'Some areas: essential travel only. Check your route.',information:'Review local risks. No safety guarantee.',unknown:'Check official advice before booking.'};
+    box.dataset.level=data.severity;box.replaceChildren(text('strong',`${icons[data.severity]||'?'} ${data.country?data.country+' · ':''}${titles[data.severity]||data.title}`),text('p',summaries[data.severity]||'Check official guidance.'));
+    const details=document.createElement('details');details.append(text('summary','Details & source'));
+    details.append(text('p',data.message||'Check the official advisory for details.'));
+    if(data.regionalNotice)details.append(text('p',data.regionalNotice));
+    const link=text('a','Official advice ↗');link.href=data.url;link.target='_blank';link.rel='noopener noreferrer';details.append(link);
+    details.append(text('small',data.checkedAt?`Source: ${data.source} · Retrieved ${new Date(data.checkedAt).toLocaleString()}${data.sourceUpdatedAt?' · Source updated '+new Date(data.sourceUpdatedAt).toLocaleDateString():''}`:'Current advisory could not be retrieved.'));
+    details.append(text('small',data.disclaimer||'Unknown does not mean safe. Check your own government’s travel advice.'));box.append(details);
   }
   function update(event){
     const destination=String(event.detail?.destination||'').trim();if(destination===current)return;current=destination;clearTimeout(timer);controller?.abort();
