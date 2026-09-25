@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {travelAdvisoryRouter} from './travel-advisory.js';
 import {tripDraftRouter} from './trip-drafts.js';
 import { liveReviewRouter } from './live-review.js';
 import { costEstimateRouter } from "./cost-estimate.js";
@@ -24,6 +25,7 @@ import { tripsRouter } from "./trips.js";
 import { tripPlanRouter } from "./trip-plan.js";
 
 export const apiRouter = Router();
+apiRouter.use(travelAdvisoryRouter);
 apiRouter.use('/trip-drafts',tripDraftRouter);
 apiRouter.use(liveReviewRouter);
 apiRouter.use(costEstimateRouter);
