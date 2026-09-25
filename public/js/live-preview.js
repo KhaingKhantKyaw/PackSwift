@@ -3,6 +3,11 @@
   let input = {}, places = [], destination = '', engaged = false, started = 0, timer, revision = 0;
   const excluded = new Set();
   let recommended = [], notesTimer, savedId;
+  let resumeAction=null, restoredSelection=null;
+  window.addEventListener('packswift:draft-restored',event=>{
+    engaged=true;
+    resumeAction=event.detail.action;restoredSelection=event.detail.preview;
+  });
   let noteMatches=[],noteController;
   let liveReview=null, reviewController, reviewTimer;
   const ready=data=>Boolean(String(data.origin||'').trim() && String(data.destination||'').trim() && data.startDate && data.endDate && Date.parse(data.endDate)>Date.parse(data.startDate));
@@ -160,18 +165,22 @@
   window.addEventListener('packswift:preview-results',event=>{
     if(!ready(event.detail.input))return;
     if(!engaged && !new URLSearchParams(location.search).size)return;
-    input=event.detail.input;recommended=event.detail.recommendation.primary || event.detail.recommendation.activities || [];mergeNotes();
-    const token=revision;timer=setTimeout(()=>{if(token!==revision)return;$('preview-thinking').hidden=true;$('preview-skeleton').hidden=true;$('preview-checklist').hidden=false;snapshot();render();},Math.max(0,400-(performance.now()-started)));
+    input=event.detail.input;recommended=event.detail.recommendation.primary || event.detail.recommendation.activities || [];
+    if(restoredSelection?.places?.length){recommended=restoredSelection.places;excluded.clear();(restoredSelection.excluded||[]).forEach(id=>excluded.add(id));restoredSelection=null;}
+    mergeNotes();
+    const token=revision;timer=setTimeout(()=>{if(token!==revision)return;$('preview-thinking').hidden=true;$('preview-skeleton').hidden=true;$('preview-checklist').hidden=false;snapshot();render();if(resumeAction==='save'||resumeAction==='board'){const action=resumeAction;resumeAction=null;$(action==='save'?'preview-save':'preview-board-open').click();}},Math.max(0,400-(performance.now()-started)));
   });
   const form=$('trip-planner-form');['input','change','click'].forEach(type=>form.addEventListener(type,()=>{engaged=true;},true));
   $('trip-notes').addEventListener('input',event=>{clearTimeout(notesTimer);noteController?.abort();noteMatches=[];const value=event.target.value;notesTimer=setTimeout(()=>{input.notes=value;mergeNotes();resetSaved();$('preview-skeleton').hidden=true;$('preview-checklist').hidden=false;render();searchNotePlaces(value);},300);});
   $('preview-checklist').addEventListener('click',event=>{const button=event.target.closest('[data-place]');if(!button)return;const id=button.dataset.place;button.dataset.action==='exclude'?excluded.add(id):excluded.delete(id);resetSaved();render();});
-  $('preview-board-open').addEventListener('click',()=>{
+  $('preview-board-open').addEventListener('click',async()=>{
+    if(!await window.PackSwiftDraft.gate('board',{places,excluded:[...excluded]}))return;
     $('preview-content').hidden=true;$('preview-board').hidden=false;const list=$('preview-timeline');list.replaceChildren();
     renderBoard();
   });
   $('preview-back').addEventListener('click',()=>{$('preview-board').hidden=true;$('preview-content').hidden=false;});
-  $('preview-save').addEventListener('click',()=>{
+  $('preview-save').addEventListener('click',async()=>{
+    if(!await window.PackSwiftDraft.gate('save',{places,excluded:[...excluded]}))return;
     const user=window.PackSwift?.currentUser;
     if(!user?.id){$('preview-toast').textContent='Log in to save this itinerary under your profile.';return;}
     try{

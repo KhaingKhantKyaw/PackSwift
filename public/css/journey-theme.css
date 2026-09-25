@@ -1,4 +1,5 @@
 /* One coastal palette: evergreen ink, sea-glass accents, warm paper. */
+.trip-auth-dialog{position:fixed;width:min(420px,90vw);padding:30px;border:1px solid var(--ps-border);border-radius:22px;background:var(--ps-surface);color:var(--ps-ink);box-shadow:0 24px 80px #0003}.trip-auth-dialog::backdrop{background:#102c3980;backdrop-filter:blur(5px)}.trip-auth-dialog h2{font-size:21px;margin:8px 0 12px}.trip-auth-dialog p{font-size:13px;line-height:1.7;color:var(--ps-muted);margin-bottom:22px}.trip-auth-dialog .button{margin:4px}.trip-auth-dialog .draft-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:inherit;width:36px;height:36px;font-size:24px;cursor:pointer}
 .planner-screen-reader-title{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(min-width:981px){
  body[data-page=planner]{overflow:hidden}

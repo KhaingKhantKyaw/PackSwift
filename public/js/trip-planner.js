@@ -2477,6 +2477,7 @@ async function hydrateConciergeTripFromQuery() {
 }
 
 async function loadSavedTravelPreferences() {
+  if(new URLSearchParams(location.search).has('resume_draft'))return;
   if (activePlan) return;
   const params = new URLSearchParams(window.location.search);
   if (params.has("trip_id") || params.has("pending_ai_trip") || params.has("pending_packswift_trip")) return;
@@ -2619,7 +2620,7 @@ plannerForm.addEventListener("submit", async (event) => {
 
   const user = await window.PackSwift.authReady;
   if (!user) {
-    showTripLoginRequired(input);
+    await window.PackSwiftDraft.gate('plan');
     return;
   }
 
@@ -2783,6 +2784,12 @@ plannerForm.addEventListener("input", handleLivePlannerEdit);
 plannerForm.addEventListener("change", handleLivePlannerEdit);
 
 setupFormattedDateControl("start");
+window.addEventListener('packswift:draft-restored',event=>{
+  const amount=budgetInput.value;
+  setPlannerDate('start',startDateInput.value);setPlannerDate('end',endDateInput.value);
+  syncTripScopeState();updateBudgetMinimum();budgetInput.value=amount;updateLiveTripPreview();
+  if(event.detail.action==='plan')plannerForm.requestSubmit();
+});
 const plannerHeader=document.querySelector('.site-header');
 const fitPlannerViewport=()=>document.documentElement.style.setProperty('--planner-header-bottom',`${Math.ceil(plannerHeader.getBoundingClientRect().bottom)}px`);
 new ResizeObserver(fitPlannerViewport).observe(plannerHeader);
@@ -2798,6 +2805,7 @@ loadDestinationCatalog()
   .then(async () => {
     await hydrateConciergeTripFromQuery();
     await loadSavedTravelPreferences();
+    await window.PackSwiftDraft.resume();
   })
   .catch(() => {});
 

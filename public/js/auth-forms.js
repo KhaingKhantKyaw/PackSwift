@@ -50,6 +50,7 @@ function requestedRedirectPath() {
 }
 
 function postAuthDestination() {
+  if(new URLSearchParams(window.location.search).get('redirect')==='/trip-planner?resume_draft=1')return '/trip-planner?resume_draft=1';
   let hasPendingTrip = false;
   try {
     hasPendingTrip = Boolean(sessionStorage.getItem(pendingPackswiftTripKey));
