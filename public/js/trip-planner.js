@@ -1533,12 +1533,7 @@ function applyFocusedDestinationMode() {
       .join(", ");
   document.querySelector("#focused-destination-attractions").textContent =
     focusedDestination.attractions.slice(0, 4).join(" · ");
-  document.querySelector("#planner-eyebrow").textContent =
-    `${focusedDestination.name} trip planner`;
-  document.querySelector("#planner-heading").innerHTML =
-    `Plan only for <span>${focusedDestination.name}.</span>`;
-  document.querySelector("#planner-intro").textContent =
-    `Your destination is fixed to ${focusedDestination.name}, ${focusedDestination.country}. Adjust the practical details below and PackSwift will keep every recommendation, activity, and logistics note specific to this trip.`;
+  document.querySelector('.planner-screen-reader-title').textContent = `Plan your trip to ${focusedDestination.name}`;
 }
 
 async function loadDestinationCatalog() {
@@ -2788,6 +2783,11 @@ plannerForm.addEventListener("input", handleLivePlannerEdit);
 plannerForm.addEventListener("change", handleLivePlannerEdit);
 
 setupFormattedDateControl("start");
+const plannerHeader=document.querySelector('.site-header');
+const fitPlannerViewport=()=>document.documentElement.style.setProperty('--planner-header-bottom',`${Math.ceil(plannerHeader.getBoundingClientRect().bottom)}px`);
+new ResizeObserver(fitPlannerViewport).observe(plannerHeader);
+window.addEventListener('resize',fitPlannerViewport);
+fitPlannerViewport();
 setupFormattedDateControl("end");
 // New trips start without assumed travel dates. Explicit saved/AI trips hydrate below.
 applyPlannerQuery();
