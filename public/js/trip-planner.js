@@ -1550,9 +1550,7 @@ async function loadDestinationCatalog() {
   const labels = new Set();
   for (const destination of destinationCatalog) {
     labels.add(destination.name);
-    labels.add(`${destination.name}, ${destination.country}`);
     labels.add(destination.country);
-    labels.add(destination.region);
   }
   datalist.replaceChildren(
     ...[...labels].sort().map((label) => {
@@ -1561,6 +1559,7 @@ async function loadDestinationCatalog() {
       return option;
     }),
   );
+  window.dispatchEvent(new CustomEvent('packswift:location-catalog',{detail:destinationCatalog}));
   applyFocusedDestinationMode();
   updateBudgetMinimum();
   updateLiveTripPreview();
