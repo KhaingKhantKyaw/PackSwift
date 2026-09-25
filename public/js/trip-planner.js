@@ -1229,6 +1229,11 @@ async function refreshVisualItinerary(input, sequence) {
 }
 
 function scheduleLiveRecommendation(input) {
+  if(!String(input.origin||'').trim() || !String(input.destination||'').trim() || !input.startDate || !input.endDate || Date.parse(input.endDate)<=Date.parse(input.startDate)){
+    clearTimeout(liveRecommendationTimer);visualItineraryController?.abort();++liveRecommendationSequence;
+    liveActivityGrid.replaceChildren();liveActivityStatus.textContent='Choose your route and dates to begin.';
+    window.dispatchEvent(new CustomEvent('packswift:preview-incomplete',{detail:input}));return;
+  }
   window.dispatchEvent(new CustomEvent("packswift:preview-thinking", { detail: input }));
   visualItineraryController?.abort();
   activateActivityContext(input);
@@ -2785,7 +2790,7 @@ plannerForm.addEventListener("change", handleLivePlannerEdit);
 
 setupFormattedDateControl("start");
 setupFormattedDateControl("end");
-setInitialDates();
+// New trips start without assumed travel dates. Explicit saved/AI trips hydrate below.
 applyPlannerQuery();
 syncTripScopeState();
 updateBudgetMinimum();

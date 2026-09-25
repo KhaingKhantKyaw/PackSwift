@@ -4,6 +4,40 @@
   const excluded = new Set();
   let recommended = [], notesTimer, savedId;
   let noteMatches=[],noteController;
+  let liveReview=null, reviewController, reviewTimer;
+  const ready=data=>Boolean(String(data.origin||'').trim() && String(data.destination||'').trim() && data.startDate && data.endDate && Date.parse(data.endDate)>Date.parse(data.startDate));
+  window.addEventListener('packswift:preview-incomplete',event=>{
+    input=event.detail;revision++;clearTimeout(timer);clearTimeout(reviewTimer);reviewController?.abort();noteController?.abort();liveReview=null;
+    $('preview-thinking').hidden=true;$('preview-skeleton').hidden=true;$('preview-content').hidden=true;$('preview-board').hidden=true;$('preview-idle').hidden=false;
+    const message=$('preview-idle').querySelector('p');if(message)message.textContent='Choose your departure city and travel dates to start your live plan.';
+    $('preview-save').disabled=true;$('preview-board-open').disabled=true;reviewBox.replaceChildren();
+  });
+  const reviewBox=document.createElement('section');reviewBox.className='live-review-summary';reviewBox.setAttribute('aria-live','polite');
+  $('preview-snapshot').after(reviewBox);
+  function queueReview() {
+    clearTimeout(reviewTimer);reviewController?.abort();liveReview=null;
+    if(!ready(input) || nights()<1){reviewBox.replaceChildren();return;}
+    reviewBox.textContent='Updating trip review…';
+    reviewTimer=setTimeout(async()=>{
+      const controller=new AbortController();reviewController=controller;
+      try {
+        const response=await fetch('/api/v1/trips/live-review',{method:'POST',headers:{'Content-Type':'application/json'},signal:controller.signal,body:JSON.stringify({...input,passportCountry:$('passport-country')?.value,selectedPlaces:places.filter(p=>!excluded.has(key(p)))})});
+        const result=await response.json();if(!response.ok)throw new Error(result.message || 'Review unavailable');
+        if(controller.signal.aborted)return;liveReview=result;renderReview();if(!$('preview-board').hidden)renderBoard();
+      }catch(error){if(error.name!=='AbortError')reviewBox.textContent='Detailed review is temporarily unavailable. Your selected places remain available.';}
+    },800);
+  }
+  function textNode(tag,text){const node=document.createElement(tag);node.textContent=text;return node;}
+  function reviewMoney(amount){return new Intl.NumberFormat('en',{style:'currency',currency:liveReview.budget.currency,maximumFractionDigits:0}).format(amount);}
+  function renderReview(){
+    reviewBox.replaceChildren();const r=liveReview,s=r.tripSummary;
+    reviewBox.append(textNode('h3',`${s.origin || 'Origin'} → ${s.destination}`),textNode('p',`${s.days} days · ${s.nights} nights · ${s.adults} adults · ${s.children} children`));
+    r.alerts.forEach(alert=>{const box=document.createElement('div');box.className='review-alert';box.append(textNode('strong',alert.title),textNode('p',alert.message));reviewBox.append(box);});
+    const details=document.createElement('details');details.open=true;details.append(textNode('summary','Estimated ground budget'));
+    r.budget.categories.forEach(row=>{const line=document.createElement('div');line.className='review-cost-row';line.append(textNode('span',row.label),textNode('strong',`${reviewMoney(row.minimum)}–${reviewMoney(row.maximum)}`));details.append(line);});
+    details.append(textNode('p',`Ground total: ${reviewMoney(r.budget.total.minimum)}–${reviewMoney(r.budget.total.maximum)}`),textNode('p',r.budget.status),textNode('small',`Not included: ${r.budget.excluded.join(', ')}. ${r.budget.source}.`));reviewBox.append(details);
+    const packing=document.createElement('details');packing.append(textNode('summary','Preparation & packing'));const list=document.createElement('ul');r.packingRecommendations.forEach(item=>list.append(textNode('li',item)));packing.append(list);reviewBox.append(packing,textNode('small',r.dataStatus));
+  }
   async function searchNotePlaces(notes) {
     noteController?.abort();noteMatches=[];
     const theme=notes.match(noteThemes)?.[1]?.toLowerCase();
@@ -60,6 +94,13 @@
     return window.PackSwiftTripEngine.generateDynamicTrip(input.destination,nights()+1,input.notes,input.pace,{places,excluded:[...excluded],currency:input.currency,travelers:input.travelers,accessibility:input.accessibility,level:/luxury/.test(input.planningGoal)?'luxury':/budget|possible/.test(input.planningGoal)?'budget':'comfort'});
   }
   function renderBoard() {
+    if(liveReview){
+      const list=$('preview-timeline');list.replaceChildren();
+      liveReview.itinerary.forEach(day=>{const section=document.createElement('section');section.className='review-day';section.append(textNode('h3',`Day ${day.day} · ${day.date} — ${day.title}`),textNode('p',day.guidance));
+        day.activities.forEach((place,index)=>{const stop=document.createElement('div');stop.className='preview-stop';stop.append(textNode('span',`STOP ${String(index+1).padStart(2,'0')}`),card(place,false));section.append(stop);});
+        section.append(textNode('small',`${day.transport} · Daily spending allowance ${reviewMoney(day.estimatedDailyGroundCost.minimum)}–${reviewMoney(day.estimatedDailyGroundCost.maximum)} (lodging excluded)`));list.append(section);});
+      if(liveReview.unscheduled.length)list.append(textNode('p',`${liveReview.unscheduled.length} selected places do not fit this pace. Adjust dates or pace to include them.`));return;
+    }
     const list=$('preview-timeline'), {routes,unscheduled,cap,days,expenses}=schedule();list.replaceChildren();
     routes.forEach((stops,day)=>{
       const heading=document.createElement('h3');heading.textContent=`ROUTE ${day+1} · Day ${day+1}: ${days[day].label}`;list.append(heading);
@@ -97,13 +138,15 @@
   }
   function render() {
     $('preview-checklist').replaceChildren(...places.map(p=>card(p)));
-    if(places.length)$('preview-checklist').append(expenseCard(schedule().expenses));
+    queueReview();
     if(!places.length) $('preview-checklist').textContent='No matching places yet. Choose a destination or adjust your preferences.';
     const valid=Boolean(input.destination && input.startDate && input.endDate && nights()>0 && places.some(p=>!excluded.has(key(p))));
     $('preview-save').disabled=!valid;$('preview-board-open').disabled=!valid;
     if(!$('preview-board').hidden)renderBoard();
   }
   window.addEventListener('packswift:preview-thinking',event=>{
+    if(!ready(event.detail))return;
+    clearTimeout(reviewTimer);reviewController?.abort();liveReview=null;reviewBox.replaceChildren();
     input=event.detail;
     resetSaved();
     if(!engaged && !new URLSearchParams(location.search).size)return;
@@ -115,6 +158,7 @@
     $('preview-status').textContent=input.destination?`Curating places and balancing your budget for ${input.destination}…`:'Choose a destination to begin tailoring…';snapshot();
   });
   window.addEventListener('packswift:preview-results',event=>{
+    if(!ready(event.detail.input))return;
     if(!engaged && !new URLSearchParams(location.search).size)return;
     input=event.detail.input;recommended=event.detail.recommendation.primary || event.detail.recommendation.activities || [];mergeNotes();
     const token=revision;timer=setTimeout(()=>{if(token!==revision)return;$('preview-thinking').hidden=true;$('preview-skeleton').hidden=true;$('preview-checklist').hidden=false;snapshot();render();},Math.max(0,400-(performance.now()-started)));
@@ -133,7 +177,7 @@
     try{
       const storageKey=`packswift_saved_plans:${user.id}`;
       const saved=JSON.parse(localStorage.getItem(storageKey) || '[]');if(!Array.isArray(saved))throw new Error();
-      const plan={...input,id:savedId || crypto.randomUUID(),userId:user.id,username:user.username || user.full_name,selectedPlaces:places.filter(p=>!excluded.has(key(p))),...schedule(),updatedAt:new Date().toISOString()};
+      const plan={...input,liveReview,id:savedId || crypto.randomUUID(),userId:user.id,username:user.username || user.full_name,selectedPlaces:places.filter(p=>!excluded.has(key(p))),...schedule(),updatedAt:new Date().toISOString()};
       const index=saved.findIndex(p=>p.id===plan.id);if(index>=0)saved[index]=plan;else saved.push(plan);
       localStorage.setItem(storageKey,JSON.stringify(saved));savedId=plan.id;
       $('preview-save').textContent='✓ Saved to Dashboard';$('preview-save').classList.add('is-saved');$('preview-save').disabled=true;

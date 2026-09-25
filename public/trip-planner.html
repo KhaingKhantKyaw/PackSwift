@@ -69,12 +69,12 @@
             </fieldset>
             <div class="form-field">
               <label class="form-label" for="origin-search">Origin / From</label>
-              <input class="field-control" id="origin-search" name="origin" type="search" maxlength="100" list="destination-options" placeholder="e.g. Yangon, Myanmar" value="Yangon" required>
+              <input class="field-control" id="origin-search" name="origin" type="search" maxlength="100" list="destination-options" placeholder="Choose your departure city" required>
               <span class="field-hint">Departure city or country.</span>
             </div>
             <div id="destination-field" class="form-field">
               <label class="form-label" for="destination-search">Destination / To</label>
-              <input class="field-control" id="destination-search" name="destination" type="search" maxlength="100" list="destination-options" placeholder="e.g. Bangkok, Thailand" value="Bangkok" required>
+              <input class="field-control" id="destination-search" name="destination" type="search" maxlength="100" list="destination-options" placeholder="Choose your destination" required>
               <input id="domestic-destination" name="destination" type="hidden" value="Yangon" disabled>
               <datalist id="destination-options"></datalist>
               <span id="destination-field-hint" class="field-hint">Arrival city or country.</span>
@@ -253,6 +253,7 @@
                   <div><label class="form-label" for="walking-level">Walking preference</label><select class="field-control" id="walking-level" name="walkingLevel"><option value="standard">Regular walking</option><option value="limited">Short walks & frequent rests</option><option value="step-free">Step-free routes preferred</option></select></div>
                   <div><label class="form-label" for="dietary-style">Food preference</label><select class="field-control" id="dietary-style" name="dietaryStyle"><option value="any">No preference</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="halal">Halal</option><option value="other">Other — add a note</option></select></div>
                   <div class="form-field-wide"><label class="form-label" for="family-needs">Group needs</label><input class="field-control" id="family-needs" name="familyNeeds" maxlength="180" placeholder="e.g. toddler naps, stroller, older travellers, food allergies"></div>
+                  <div class="form-field-wide"><label class="form-label" for="passport-country">Passport nationality <span class="label-optional">Optional</span></label><input class="field-control" id="passport-country" name="passportCountry" maxlength="80" placeholder="e.g. Myanmar"><small>Used for entry-check reminders, not an eligibility decision.</small></div>
                 </div>
                 <p class="form-help">Accessibility and dietary suitability must be checked with each venue.</p>
               </details>
