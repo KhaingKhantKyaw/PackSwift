@@ -1,5 +1,18 @@
 /* One coastal palette: evergreen ink, sea-glass accents, warm paper. */
-.preview-essentials article>.essential-icon{width:36px;height:36px;border-radius:11px}.essential-icon svg{display:block;width:20px;height:20px}
+.essential-heading{display:flex;align-items:center;gap:10px;margin-bottom:8px;min-width:0}
+.essential-heading .essential-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border-radius:11px}
+.essential-heading strong{line-height:1.4;overflow-wrap:break-word}
+.essential-icon svg{display:block;width:20px;height:20px}
+.essential-icon--document{background:#dbeafe;color:#1d4ed8}
+.essential-icon--bed{background:#ede9fe;color:#6d28d9}
+.essential-icon--wallet{background:#fef3c7;color:#92400e}
+.essential-icon--bag{background:#d1fae5;color:#047857}
+.essential-icon--baby{background:#fce7f3;color:#be185d}
+html[data-theme=dark] .essential-icon--document{background:#1e3a5f;color:#93c5fd}
+html[data-theme=dark] .essential-icon--bed{background:#3b2861;color:#c4b5fd}
+html[data-theme=dark] .essential-icon--wallet{background:#4b3619;color:#fcd34d}
+html[data-theme=dark] .essential-icon--bag{background:#16483e;color:#6ee7b7}
+html[data-theme=dark] .essential-icon--baby{background:#54243f;color:#f9a8d4}
 [data-deferred-preview-places]{display:none!important}
 .smart-preview #preview-snapshot{display:block;padding:20px;border:1px solid var(--ps-border);border-radius:18px;background:linear-gradient(120deg,#bce9d928,transparent);margin:16px 0}
 .smart-preview #preview-snapshot>small{font-size:9px;letter-spacing:.16em;color:var(--ps-muted)}
