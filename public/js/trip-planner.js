@@ -590,6 +590,17 @@ function setTravellerCount(type, value) {
   const input = isAdult ? adultInput : childInput;
   const next = Math.min(isAdult ? 20 : 19, Math.max(isAdult ? 1 : 0, Math.floor(Number(value) || 0)));
   input.value = String(next);
+  updateTravellerButtons();
+}
+
+function updateTravellerButtons(){
+  const adults=Number(adultInput.value)||1,children=Number(childInput.value)||0;
+  plannerForm.querySelectorAll('[data-counter]').forEach(button=>{
+    const adult=button.dataset.counter==='adults';
+    button.disabled=Number(button.dataset.step)>0?adults+children>=20:(adult?adults<=1:children<=0);
+  });
+  const summary=document.getElementById('traveller-count-summary');
+  if(summary)summary.textContent=`${adults+children} traveller${adults+children===1?'':'s'}${adults+children>=20?' · Maximum 20':''}`;
 }
 
 function isDomesticTrip() {
@@ -2774,9 +2785,10 @@ for (const input of [
 for (const button of plannerForm.querySelectorAll("[data-counter]")) {
   button.addEventListener("click", () => {
     const input = button.dataset.counter === "adults" ? adultInput : childInput;
+    if(Number(button.dataset.step)>0 && Number(adultInput.value)+Number(childInput.value)>=20)return;
     setTravellerCount(button.dataset.counter, Number(input.value) + Number(button.dataset.step));
-    updateBudgetMinimum();
-    handleLivePlannerEdit();
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+    input.dispatchEvent(new Event('change',{bubbles:true}));
   });
 }
 
@@ -2784,7 +2796,9 @@ plannerForm.addEventListener("input", handleLivePlannerEdit);
 plannerForm.addEventListener("change", handleLivePlannerEdit);
 
 setupFormattedDateControl("start");
+updateTravellerButtons();
 window.addEventListener('packswift:draft-restored',event=>{
+  updateTravellerButtons();
   const amount=budgetInput.value;
   setPlannerDate('start',startDateInput.value);setPlannerDate('end',endDateInput.value);
   syncTripScopeState();updateBudgetMinimum();budgetInput.value=amount;updateLiveTripPreview();

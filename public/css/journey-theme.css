@@ -1,4 +1,9 @@
 /* One coastal palette: evergreen ink, sea-glass accents, warm paper. */
+.traveller-stepper{display:flex;align-items:center;gap:8px;border:1px solid var(--ps-border);border-radius:14px;padding:6px;background:var(--ps-surface)}
+.traveller-stepper button{flex:0 0 40px;width:40px;height:40px;border:1px solid var(--ps-border);border-radius:10px;background:var(--ps-canvas);color:var(--ps-ink);font-size:22px;cursor:pointer;display:grid;place-items:center}
+.traveller-stepper button:hover:not(:disabled){background:#bce9d9;color:#173d3e}.traveller-stepper button:disabled{opacity:.3;cursor:not-allowed}.traveller-stepper button:focus-visible{outline:2px solid var(--ps-accent);outline-offset:2px}
+body[data-page=planner] .traveller-stepper input.field-control{appearance:textfield;-moz-appearance:textfield;min-width:0;width:100%;text-align:center;border:0!important;background:transparent!important;min-height:40px;padding:0!important;box-shadow:none;font-size:17px;font-weight:600}
+.traveller-stepper input::-webkit-inner-spin-button,.traveller-stepper input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.traveller-fields .form-label small{font-size:10px;color:var(--ps-muted);font-weight:400;margin-left:4px}.traveller-count-summary{font-size:11px;color:var(--ps-muted);margin:8px 0 0}
 /* Temporarily reserved for the later customization step; no layout gaps. */
 body[data-page=planner] [data-deferred-planner-section][hidden]{display:none!important}
 body[data-page=planner] .traveller-fields>.lifestyle-detail-grid{margin-top:0}

@@ -88,9 +88,10 @@
             <div class="form-field form-field-wide">
               <fieldset class="traveller-fields" aria-label="Travellers">
                 <div class="lifestyle-detail-grid">
-                  <div><label class="form-label" for="adults">Adults (18+)</label><input class="field-control" id="adults" name="adults" type="number" min="1" max="20" step="1" value="1" required></div>
-                  <div><label class="form-label" for="children">Children (under 18)</label><input class="field-control" id="children" name="children" type="number" min="0" max="19" step="1" value="0" required></div>
+                  <div><label class="form-label" for="adults">Adults <small>18+</small></label><div class="traveller-stepper"><button type="button" data-counter="adults" data-step="-1" aria-label="Remove one adult">−</button><input class="field-control" id="adults" name="adults" type="number" min="1" max="20" step="1" value="1" readonly required><button type="button" data-counter="adults" data-step="1" aria-label="Add one adult">+</button></div></div>
+                  <div><label class="form-label" for="children">Children <small>Under 18</small></label><div class="traveller-stepper"><button type="button" data-counter="children" data-step="-1" aria-label="Remove one child">−</button><input class="field-control" id="children" name="children" type="number" min="0" max="19" step="1" value="0" readonly required><button type="button" data-counter="children" data-step="1" aria-label="Add one child">+</button></div></div>
                 </div>
+                <p id="traveller-count-summary" class="traveller-count-summary" role="status" aria-live="polite"></p>
               </fieldset>
               <section class="demand-calendar" aria-label="Travel date range calendar">
                   <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
