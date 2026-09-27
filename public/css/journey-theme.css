@@ -1,4 +1,5 @@
 /* One coastal palette: evergreen ink, sea-glass accents, warm paper. */
+.preview-essentials article>.essential-icon{width:36px;height:36px;border-radius:11px}.essential-icon svg{display:block;width:20px;height:20px}
 [data-deferred-preview-places]{display:none!important}
 .smart-preview #preview-snapshot{display:block;padding:20px;border:1px solid var(--ps-border);border-radius:18px;background:linear-gradient(120deg,#bce9d928,transparent);margin:16px 0}
 .smart-preview #preview-snapshot>small{font-size:9px;letter-spacing:.16em;color:var(--ps-muted)}
