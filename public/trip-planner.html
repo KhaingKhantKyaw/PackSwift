@@ -79,7 +79,6 @@
               <datalist id="destination-options"></datalist>
               <span id="destination-field-hint" class="field-hint">Arrival city or country.</span>
             </div>
-            <div class="form-section-heading"><h3>Dates</h3><p>Select your arrival and departure dates.</p></div>
             <input type="hidden" id="start-date" name="startDate">
             <input type="hidden" id="end-date" name="endDate">
             <input type="hidden" id="start-date-display">
@@ -87,12 +86,11 @@
             <input type="hidden" id="start-date-picker">
             <input type="hidden" id="end-date-picker">
             <div class="form-field form-field-wide">
-              <fieldset class="traveller-fields"><legend>Who is travelling?</legend>
+              <fieldset class="traveller-fields" aria-label="Travellers">
                 <div class="lifestyle-detail-grid">
                   <div><label class="form-label" for="adults">Adults (18+)</label><input class="field-control" id="adults" name="adults" type="number" min="1" max="20" step="1" value="1" required></div>
                   <div><label class="form-label" for="children">Children (under 18)</label><input class="field-control" id="children" name="children" type="number" min="0" max="19" step="1" value="0" required></div>
                 </div>
-                <p class="form-help">Up to 20 travellers. Budget is for the whole group.</p>
               </fieldset>
               <section class="demand-calendar" aria-label="Travel date range calendar">
                   <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
@@ -114,7 +112,8 @@
                 <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="once-in-lifetime"><span><strong>Bucket list</strong></span></label>
               </div>
             </fieldset>
-            <details class="lifestyle-disclosure form-field-wide">
+            <!-- Deferred to a later planning step. Keep IDs and defaults for existing bindings. -->
+            <details class="lifestyle-disclosure form-field-wide" data-deferred-planner-section="preferences" hidden>
               <summary>Customize preferences <span>Optional</span></summary>
               <div class="lifestyle-detail-grid">
             <p id="lifestyle-preset-feedback" class="form-help form-field-wide" role="status" aria-live="polite"></p>
@@ -199,8 +198,7 @@
             </div>
               </div>
             </details>
-            <div class="form-section-heading"><h3>Travel Pace</h3><p>Choose your daily rhythm.</p></div>
-            <fieldset class="form-field form-field-wide" style="border:0;padding:0;margin:0">
+            <fieldset class="form-field form-field-wide" data-deferred-planner-section="pace" hidden style="border:0;padding:0;margin:0">
               <legend class="form-legend">Travel Pace</legend>
               <div class="pace-option-grid">
                 <label class="pace-choice"><input type="radio" name="pace" value="relaxed"><span><strong>Slow &amp; Relaxed 🌿</strong><small>1–2 spots/day</small></span></label>
@@ -247,7 +245,7 @@
               </div>
               </details>
             </div>
-            <div class="form-field form-field-wide">
+            <div class="form-field form-field-wide" data-deferred-planner-section="comfort-and-notes" hidden>
               <details class="lifestyle-disclosure"><summary>Comfort & dietary needs <span>Optional</span></summary>
                 <div class="lifestyle-detail-grid">
                   <div><label class="form-label" for="walking-level">Walking preference</label><select class="field-control" id="walking-level" name="walkingLevel"><option value="standard">Regular walking</option><option value="limited">Short walks & frequent rests</option><option value="step-free">Step-free routes preferred</option></select></div>
