@@ -36,12 +36,15 @@
   function reviewMoney(amount){return new Intl.NumberFormat('en',{style:'currency',currency:liveReview.budget.currency,maximumFractionDigits:0}).format(amount);}
   function renderReview(){
     reviewBox.replaceChildren();const r=liveReview,s=r.tripSummary;
-    reviewBox.append(textNode('h3',`${s.origin || 'Origin'} → ${s.destination}`),textNode('p',`${s.days} days · ${s.nights} nights · ${s.adults} adults · ${s.children} children`));
-    r.alerts.forEach(alert=>{const box=document.createElement('div');box.className='review-alert';box.append(textNode('strong',alert.title),textNode('p',alert.message));reviewBox.append(box);});
-    const details=document.createElement('details');details.open=true;details.append(textNode('summary','Estimated ground budget'));
+    reviewBox.append(textNode('h3','Before you set off'));
+    const essentials=document.createElement('div');essentials.className='preview-essentials';
+    const items=[['01','Travel documents','Check passport validity and entry rules for your nationality.'],['02','Stay & arrival','Confirm your accommodation and arrival transfer.'],['03','Budget buffer','Allow separately for flights, insurance and unexpected costs.'],['04','Daily essentials','Prepare medication, footwear and charging essentials.']];
+    if(s.children>0)items.push(['05','Travelling with children','Check child documents and age-appropriate care supplies.']);
+    items.forEach(([number,title,description])=>{const card=document.createElement('article');card.append(textNode('span',number),textNode('strong',title),textNode('p',description));essentials.append(card);});reviewBox.append(essentials);
+    const details=document.createElement('details');details.append(textNode('summary','Budget breakdown · estimated'));
     r.budget.categories.forEach(row=>{const line=document.createElement('div');line.className='review-cost-row';line.append(textNode('span',row.label),textNode('strong',`${reviewMoney(row.minimum)}–${reviewMoney(row.maximum)}`));details.append(line);});
     details.append(textNode('p',`Ground total: ${reviewMoney(r.budget.total.minimum)}–${reviewMoney(r.budget.total.maximum)}`),textNode('p',r.budget.status),textNode('small',`Not included: ${r.budget.excluded.join(', ')}. ${r.budget.source}.`));reviewBox.append(details);
-    const packing=document.createElement('details');packing.append(textNode('summary','Preparation & packing'));const list=document.createElement('ul');r.packingRecommendations.forEach(item=>list.append(textNode('li',item)));packing.append(list);reviewBox.append(packing,textNode('small',r.dataStatus));
+    const packing=document.createElement('details');packing.append(textNode('summary','Full preparation list'));const list=document.createElement('ul');r.packingRecommendations.forEach(item=>list.append(textNode('li',item)));packing.append(list);reviewBox.append(packing,textNode('small','Planning guidance — verify entry rules and bookings before travel.'));
   }
   async function searchNotePlaces(notes) {
     noteController?.abort();noteMatches=[];
@@ -127,10 +130,12 @@
   const money = n => { try { return new Intl.NumberFormat('en', {style:'currency',currency:input.currency || 'USD',maximumFractionDigits:0}).format(n || 0); } catch { return String(n || 0); } };
   const nights = () => Math.max(0, Math.round((Date.parse(input.endDate)-Date.parse(input.startDate))/86400000) || 0);
   function snapshot() {
-    const tags = [input.destination, input.startDate && input.endDate ? `${input.startDate} – ${input.endDate} • ${nights()} nights` : 'Choose dates', input.planningGoal, input.pace, `Budget: ${money(input.budget)} • ${money(input.budget / Math.max(1,nights()))}/day`].filter(Boolean);
-    $('preview-snapshot').replaceChildren(...tags.map(text => { const node=document.createElement('span');node.textContent=text;return node; }));
-    const group=document.createElement('span');group.textContent=`${input.adults || 1} adults · ${input.children || 0} children`;$('preview-snapshot').append(group);
-    [input.accessibility && input.accessibility!=='standard'?input.accessibility:null,input.dietaryStyle && input.dietaryStyle!=='any'?input.dietaryStyle:null,input.familyNeeds].filter(Boolean).forEach(text=>{const tag=document.createElement('span');tag.textContent=text;$('preview-snapshot').append(tag);});
+    const formatDate=value=>new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(value+'T00:00:00Z'));
+    const heading=textNode('h3',`${input.origin || 'From'} → ${input.destination || 'Destination'}`);
+    const dates=textNode('p',input.startDate&&input.endDate?`${formatDate(input.startDate)} – ${formatDate(input.endDate)} · ${nights()} nights`:'Choose your travel dates');
+    const group=textNode('span',`${input.adults||1} adult${Number(input.adults)>1?'s':''}${Number(input.children)>0?` · ${input.children} children`:''}`);
+    const budget=textNode('span',`Your budget · ${money(input.budget)}`);
+    $('preview-snapshot').replaceChildren(textNode('small','YOUR NEXT JOURNEY'),heading,dates,group,budget);
   }
   function card(p, editable=true) {
     const row=document.createElement('article');row.className='preview-place';row.classList.toggle('is-excluded',excluded.has(key(p)));
@@ -145,7 +150,7 @@
     $('preview-checklist').replaceChildren(...places.map(p=>card(p)));
     queueReview();
     if(!places.length) $('preview-checklist').textContent='No matching places yet. Choose a destination or adjust your preferences.';
-    const valid=Boolean(input.destination && input.startDate && input.endDate && nights()>0 && places.some(p=>!excluded.has(key(p))));
+    const valid=ready(input);
     $('preview-save').disabled=!valid;$('preview-board-open').disabled=!valid;
     if(!$('preview-board').hidden)renderBoard();
   }
