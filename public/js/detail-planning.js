@@ -8,7 +8,7 @@
  document.getElementById('smart-preview').after(section);
  const title=n('h2','Make this trip yours'),status=n('p'),list=n('div'),board=n('button','View selected Plan Board →');
  status.setAttribute('role','status');list.className='detail-place-grid';board.type='button';board.className='button button-primary';section.append(title,status,list,board);
- function fields(){return [...form.elements].filter(e=>e.name).map(e=>({name:e.name,value:e.value,checked:e.checked,type:e.type}));}
+ function fields(){return window.PackSwiftDraft.captureFields(form);}
  async function save(){await api(`/api/trips/${tripId}/details`,{fields:fields(),selected,rejected},'PUT');}
  function render(){
   list.replaceChildren();const candidates=pool.filter(p=>!selected.some(s=>id(s)===id(p))&&!rejected.includes(id(p))).slice(0,6);
@@ -24,7 +24,7 @@
   try{
    if(!tripId){
     const existing=new URLSearchParams(location.search).get('trip_id');
-    if(existing){const r=await window.PackSwift.api(`/api/trips/${encodeURIComponent(existing)}`);tripId=existing;const d=r.trip?.preferences?.detailPlanning;selected=d?.selected||[];rejected=d?.rejected||[];for(const f of d?.fields||[]){for(const el of form.elements){if(el.name!==f.name)continue;if(el.type==='checkbox'||el.type==='radio'){if(el.value===f.value)el.checked=!!f.checked;}else el.value=f.value;}}}
+    if(existing){const r=await window.PackSwift.api(`/api/trips/${encodeURIComponent(existing)}`);tripId=existing;const d=r.trip?.preferences?.detailPlanning;selected=d?.selected||[];rejected=d?.rejected||[];window.PackSwiftDraft.restoreFields(form,d?.fields||[]);}
     else{const r=await api('/api/trips/analyze',input);if(!r.persistence?.saved||!r.persistence.tripId)throw Error('Your trip could not be saved. Please try again.');tripId=r.persistence.tripId;}
    }
    await save();
