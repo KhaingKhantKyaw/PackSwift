@@ -181,6 +181,7 @@
   $('preview-checklist').addEventListener('click',event=>{const button=event.target.closest('[data-place]');if(!button)return;const id=button.dataset.place;button.dataset.action==='exclude'?excluded.add(id):excluded.delete(id);resetSaved();render();});
   $('preview-board-open').addEventListener('click',async()=>{
     if(!await window.PackSwiftDraft.gate('board',{places,excluded:[...excluded]}))return;
+    if(window.PackSwiftDetails){await window.PackSwiftDetails.enter(input,places);return;}
     $('preview-content').hidden=true;$('preview-board').hidden=false;const list=$('preview-timeline');list.replaceChildren();
     renderBoard();
   });

@@ -49,3 +49,15 @@ html[data-theme=dark] .smart-preview{color:#e2e8f0}html[data-theme=dark] .previe
 @keyframes plan-spark{50%{transform:scale(1.15) rotate(10deg);opacity:.75}}
 @keyframes plan-dialog-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.plan-details-cta::before,.plan-details-spark,.trip-auth-dialog[open]{animation:none}.preview-actions .plan-details-cta,.plan-details-arrow{transition:none}}
+.planning-details-active .detail-step-hidden,.planning-details-active #focused-destination-context,.planning-details-active #smart-preview{display:none!important}
+.detail-place-stage[hidden]{display:none}
+.detail-place-grid{display:grid;gap:14px;margin:20px 0}
+.detail-place-card{padding:18px;border:1px solid var(--ps-border,#dce5df);border-radius:20px;background:var(--ps-surface,#fffefa);transition:opacity .22s,transform .22s}
+.detail-place-card.is-leaving{opacity:0;transform:translateY(-10px)}
+.detail-place-card img{width:100%;height:150px;object-fit:cover;border-radius:12px}
+.detail-place-card h3{margin:12px 0 6px;font-size:17px}
+.detail-place-card p{font-size:12px;color:var(--ps-muted)}
+.detail-place-card button{width:42px;height:42px;border-radius:50%;margin-right:10px;border:1px solid var(--ps-border);background:transparent;color:var(--ps-ink);cursor:pointer;font-size:22px}
+.detail-place-card button:first-child{background:#087e80;color:white}
+.detail-place-card button:disabled{opacity:.5;cursor:wait}
+@media(prefers-reduced-motion:reduce){.detail-place-card{transition:none}}

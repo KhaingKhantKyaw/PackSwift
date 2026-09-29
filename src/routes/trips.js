@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getDatabasePool } from "../config/database.js";
 import { randomUUID } from "node:crypto";
 import { body, param } from "express-validator";
 import { optionalAuth, requireAuth } from "../middleware/auth.js";
@@ -34,6 +35,24 @@ import { buildDetailedTimeline } from "../services/itinerary-timeline-service.js
 import { cleanTripEntity, normalizeTripRecommendation } from "../services/ai-concierge-service.js";
 
 export const tripsRouter = Router();
+tripsRouter.get('/currency-rate', requireAuth, async(req,res)=>{
+ const base=String(req.query.base||'USD').toUpperCase(),target=String(req.query.target||'THB').toUpperCase();
+ if(!/^[A-Z]{3}$/.test(base)||!/^[A-Z]{3}$/.test(target))return res.status(400).json({message:'Choose valid currencies.'});
+ if(base===target)return res.json({rate:1,base,target});
+ if(!process.env.EXCHANGERATE_API_KEY)return res.status(503).json({message:'Live exchange rates are not configured.'});
+ try{const response=await fetch(`https://v6.exchangerate-api.com/v6/${encodeURIComponent(process.env.EXCHANGERATE_API_KEY)}/pair/${base}/${target}`,{signal:AbortSignal.timeout(8000)});const data=await response.json();if(!response.ok||data.result!=='success')throw Error();res.json({rate:data.conversion_rate,base,target,updated:data.time_last_update_utc});}catch{res.status(503).json({message:'Exchange rates are temporarily unavailable.'});}
+});
+
+// Durable, owner-scoped second-step state; preserves the original trip preferences.
+tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async (req,res,next)=>{
+  try {
+    if(!/^[a-f0-9-]{36}$/i.test(req.params.tripId)||!req.body||JSON.stringify(req.body).length>80000)return res.status(400).json({message:'Trip details are incomplete or too large.'});
+    const details={fields:Array.isArray(req.body.fields)?req.body.fields:[],selected:Array.isArray(req.body.selected)?req.body.selected:[],rejected:Array.isArray(req.body.rejected)?req.body.rejected:[]};
+    const [result]=await getDatabasePool().execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.detailPlanning', CAST(? AS JSON)) WHERE public_id=? AND user_id=?",[JSON.stringify(details),req.params.tripId,req.auth.userId]);
+    if(!result.affectedRows)return res.status(404).json({message:'Trip not found.'});
+    res.json({success:true});
+  }catch(error){next(error);}
+});
 
 function validateTripId() {
   return param("tripId")
