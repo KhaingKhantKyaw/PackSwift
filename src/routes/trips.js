@@ -48,7 +48,7 @@ tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async (req,res
   try {
     if(!/^[a-f0-9-]{36}$/i.test(req.params.tripId)||!req.body||JSON.stringify(req.body).length>80000)return res.status(400).json({message:'Trip details are incomplete or too large.'});
     const details={fields:Array.isArray(req.body.fields)?req.body.fields:[],selected:Array.isArray(req.body.selected)?req.body.selected:[],rejected:Array.isArray(req.body.rejected)?req.body.rejected:[]};
-    const [result]=await getDatabasePool().execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.detailPlanning', CAST(? AS JSON)) WHERE public_id=? AND user_id=?",[JSON.stringify(details),req.params.tripId,req.auth.userId]);
+    const [result]=await getDatabasePool().execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.detailPlanning', JSON_EXTRACT(?, '$')) WHERE public_id=? AND user_id=?",[JSON.stringify(details),req.params.tripId,req.auth.userId]);
     if(!result.affectedRows)return res.status(404).json({message:'Trip not found.'});
     res.json({success:true});
   }catch(error){next(error);}
