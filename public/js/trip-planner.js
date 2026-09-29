@@ -2822,13 +2822,15 @@ updateBudgetMinimum();
 updateLiveTripPreview();
 loadDestinationCatalog()
   .then(async () => {
+    if(new URLSearchParams(location.search).has('resume_draft'))return;
     await hydrateConciergeTripFromQuery();
     await loadSavedTravelPreferences();
-    await window.PackSwiftDraft.resume();
   })
-  .catch(() => {});
+  .catch(() => {})
+  .finally(() => window.PackSwiftDraft.resume());
 
 async function resumePendingTripSave() {
+  if(new URLSearchParams(location.search).has('resume_draft'))return;
   const user = await window.PackSwift.authReady;
   if (
     !user ||

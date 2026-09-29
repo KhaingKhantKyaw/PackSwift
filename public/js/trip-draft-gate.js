@@ -26,10 +26,13 @@
     try{
       const response=await fetch('/api/trip-drafts/restore',{method:'POST'});const result=await response.json();if(!response.ok)throw Error(result.message);
       const form=document.getElementById('trip-planner-form');
+      window.PackSwiftRestoringDraft=true;
       for(const saved of result.payload.fields||[]){for(const el of form.elements){if(el.name!==saved.name)continue;if(el.type==='radio'||el.type==='checkbox'){if(el.value===saved.value)el.checked=Boolean(saved.checked);}else el.value=saved.value;}}
+      window.dispatchEvent(new Event('packswift:pets-restored'));
       window.dispatchEvent(new CustomEvent('packswift:draft-restored',{detail:{action:result.action,preview:result.payload.preview}}));
+      window.refreshDynamicBudget?.();
       history.replaceState(null,'','/trip-planner');
-    }catch(error){feedback.textContent=error.message;}
+    }catch(error){feedback.textContent=error.message;}finally{window.PackSwiftRestoringDraft=false;}
   }
   window.PackSwiftDraft={gate,resume};
 })();
