@@ -61,3 +61,25 @@ html[data-theme=dark] .smart-preview{color:#e2e8f0}html[data-theme=dark] .previe
 .detail-place-card button:first-child{background:#087e80;color:white}
 .detail-place-card button:disabled{opacity:.5;cursor:wait}
 @media(prefers-reduced-motion:reduce){.detail-place-card{transition:none}}
+.detail-place-stage{--board-accent:#087e80;--board-tint:#e5f6f1}
+.detail-place-stage>h2{letter-spacing:-.035em}
+.detail-place-stage>.detail-place-grid{gap:22px}
+.detail-place-card .detail-place-media{position:relative;margin:0;overflow:hidden;border-radius:14px;background:#dcece7}
+.detail-place-card .detail-place-media img{display:block;width:100%;height:220px;object-fit:cover;border-radius:0;transition:transform .4s}
+.detail-place-card:hover .detail-place-media img{transform:scale(1.025)}
+.detail-place-media figcaption{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,#09282bdd);padding:24px 12px 9px;color:#fff;font-size:10px;line-height:1.5}
+.detail-place-card.detail-board-card{padding:0;overflow:hidden;border-color:var(--ps-border,#dce5df);box-shadow:0 8px 24px #123a3610}
+.detail-board-card:nth-child(3n+2){--board-accent:#b94e37;--board-tint:#fff0e8}
+.detail-board-card:nth-child(3n){--board-accent:#7451ac;--board-tint:#f0eafa}
+.detail-board-card .detail-place-media{border-radius:0}
+.detail-stop-badge{position:absolute;top:16px;left:16px;padding:9px 13px;border-radius:999px;background:var(--board-accent);color:white;font-size:11px;font-weight:700;letter-spacing:.1em;box-shadow:0 4px 16px #0002}
+.detail-board-copy{padding:22px;background:linear-gradient(120deg,var(--board-tint),var(--ps-surface,#fffefa))}
+.detail-board-copy>small{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--board-accent)}
+.detail-board-copy h3{font-size:21px;line-height:1.35;margin:10px 0 16px}
+.detail-board-metadata{display:grid;gap:8px}
+.detail-board-metadata p{display:flex;align-items:baseline;gap:10px;margin:0;font-size:12px;line-height:1.6}
+.detail-board-metadata p>span:first-child{color:var(--board-accent);font-size:17px}
+html[data-theme=dark] .detail-board-copy{background:var(--ps-surface,#17323a)}
+html[data-theme=dark] .detail-board-copy>small,html[data-theme=dark] .detail-board-metadata p>span:first-child{color:#bce9d9}
+@media(max-width:540px){.detail-place-card .detail-place-media img{height:180px}.detail-board-copy{padding:17px}}
+@media(prefers-reduced-motion:reduce){.detail-place-card .detail-place-media img{transition:none}.detail-place-card:hover .detail-place-media img{transform:none}}
