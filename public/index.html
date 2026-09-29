@@ -1,1 +1,91 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Explore the world — PackSwift</title><link rel="stylesheet" href="/css/styles.css"><link rel="stylesheet" href="/css/destination-guide.css"><link rel="stylesheet" href="/css/guide-controls.css"><link rel="stylesheet" href="/css/world-explorer.css"><script src="/js/app.js" defer></script><script src="/js/destination-guide.js" defer></script><script src="/js/world-explorer.js" defer></script></head><body data-page="home" class="explorer-home"><header class="site-header"><div class="header-inner"><a class="brand" href="/">PackSwift</a><nav class="desktop-nav" aria-label="Main navigation"></nav><a class="header-action" href="/login">Login</a></div></header><main class="page-shell explore-shell"><section class="explore-intro"><p class="eyebrow">A WORLD OF POSSIBILITIES</p><h1>Your next chapter.<br><span>Somewhere new.</span></h1><p>Not sure where to go? Start with a continent. Find a place that feels like you.</p></section><section class="explore-filters" aria-label="Destination filters"><div><label for="explore-search">City or country</label><input id="explore-search" type="search" placeholder="e.g. Bangkok or Thailand"></div><div><label for="explore-budget">Budget</label><select id="explore-budget"><option value="">All budgets</option><option>$</option><option>$$</option><option>$$$</option></select></div><div><label for="explore-style">Travel mood</label><select id="explore-style"><option value="">All experiences</option><option value="beach">Beach & relaxation</option><option value="city">City & shopping</option><option value="culture">History & culture</option><option value="nature">Nature & adventure</option></select></div><button id="explore-reset" type="button">Reset</button></section><div class="explore-layout"><aside class="explore-geography"><p class="eyebrow">01 / CHOOSE YOUR WORLD</p><h2>Where are you drawn to?</h2><div id="explore-continents" class="continent-grid"></div><section id="explore-regions-wrap" hidden><h3>02 / Choose a region</h3><div id="explore-regions" class="region-options"></div></section></aside><section class="explore-results"><nav id="explore-breadcrumbs" aria-label="Exploration path"></nav><h2 id="explore-title">Start anywhere.</h2><p id="explore-count" role="status" aria-live="polite"></p><p id="explore-notice"></p><div id="explore-cities" class="explore-city-grid"></div><p class="explore-cost-note">Cost bands are relative internal estimates, not live quotes. Check travel advisories before booking.</p></section></div></main><footer class="site-footer"><div class="footer-inner"><span>PackSwift · Less planning. More discovery.</span><a href="/help">Need a hand?</a></div></footer><nav class="mobile-nav" aria-label="Mobile navigation"></nav></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>PackSwift — Find your next escape</title>
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/home-slider.css">
+<link rel="stylesheet" href="/css/destination-guide.css">
+<link rel="stylesheet" href="/css/guide-controls.css">
+<link rel="stylesheet" href="/css/world-explorer.css">
+<script src="/js/app.js" defer></script>
+<script src="/js/destination-guide.js" defer></script>
+<script src="/js/home-slider.js" defer></script>
+<script src="/js/world-explorer.js" defer></script>
+</head>
+<body data-page="home" class="slider-home combined-home">
+<a class="skip-link" href="#main-content">Skip to destinations</a>
+<main id="main-content">
+<div class="home-hero-shell">
+<div class="destination-backdrops" aria-hidden="true">
+<img class="destination-backdrop is-visible" src="/images/packswift1.jpg" alt="" fetchpriority="high">
+<img class="destination-backdrop" alt="">
+</div>
+<header class="slider-header">
+<a class="slider-brand" href="/" aria-label="PackSwift home">◈ Pack<span>Swift</span></a>
+<nav class="slider-menu" aria-label="Main navigation"></nav>
+<div class="slider-account">
+<button type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><span class="theme-toggle-thumb" aria-hidden="true">☀</span></button>
+<span data-auth="guest"><a href="/signup">Get Started</a><a href="/login">Login</a></span>
+<span data-auth="user" hidden><a href="/profile" data-profile-name>Profile</a><button type="button" data-logout>Logout</button></span>
+</div>
+<div class="slider-search-wrap">
+<label for="destination-slider-search">Find your next escape</label>
+<div class="slider-search"><span aria-hidden="true">⌕</span>
+<input id="destination-slider-search" type="search" placeholder="Search tourist spots or cities..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="slider-search-results" aria-expanded="false">
+<span aria-hidden="true">↗</span></div>
+<div id="slider-search-results" class="slider-search-results" role="listbox" aria-label="Destinations" hidden></div>
+<span id="slider-search-status" class="slider-search-status" role="status"></span>
+</div>
+</header>
+<div class="destination-stage">
+<section class="destination-story" aria-labelledby="slider-title">
+<p class="slider-eyebrow">LESS PLANNING. MORE LIVING.</p>
+<span id="slider-location" class="slider-location">📍 Singapore, Singapore</span>
+<h1 id="slider-title">SINGAPORE</h1>
+<p id="slider-description">Garden paths above the city. Hawker flavours around the corner. A small island with a world of possibilities.</p>
+<div class="slider-actions">
+<a id="slider-plan" class="slider-plan" href="/trip-planner?destination=Singapore">Plan Trip <span aria-hidden="true">↗</span></a>
+<button id="slider-save" class="slider-save" type="button" aria-pressed="false" aria-label="Save Singapore as an idea on this device">♡</button>
+</div>
+<p id="slider-feedback" role="status" class="slider-feedback"></p>
+<button type="button" class="button button-secondary" data-open-concierge>Not sure where to go? Ask PackSwift</button>
+</section>
+<section id="discover" class="destination-discovery" aria-label="Explore destinations">
+<div class="slider-discovery-heading"><span>WHERE WILL YOU GO NEXT?</span><span id="slider-position">01 / 09</span></div>
+<div id="destination-thumbnails" class="destination-thumbnails"></div>
+<div class="slider-controls">
+<button type="button" id="slider-previous" aria-label="Previous destination">←</button>
+<button type="button" id="slider-next" aria-label="Next destination">→</button>
+<span class="slider-line"></span><span>YOUR NEXT CHAPTER</span>
+</div>
+</section>
+</div>
+<a class="home-explore-link" href="#world-explorer">Explore the world <span aria-hidden="true">↓</span></a>
+</div>
+<section id="world-explorer" class="home-world-explorer" aria-label="Explore by continent">
+<div class="atlas-layout">
+<div class="atlas-main">
+<p class="atlas-eyebrow">EXPLORE THE WORLD</p>
+<h2>Where will your<br><span>curiosity take you?</span></h2>
+<p class="atlas-intro">Seven continents. Endless possibilities. Find your next chapter.</p>
+<div id="explore-continents" class="atlas-map" aria-label="Choose a continent"></div>
+<p class="atlas-hint">Select a continent to discover its destinations ↗</p>
+</div>
+<aside class="atlas-panel">
+<nav id="explore-breadcrumbs" aria-label="Exploration path"></nav>
+<h2 id="explore-title">Asia</h2>
+<p id="explore-count" role="status" aria-live="polite"></p>
+<section id="explore-regions-wrap"><div id="explore-regions" class="region-options" aria-label="Choose a region"></div></section>
+<p id="explore-notice"></p>
+<div id="explore-cities" class="explore-city-grid"></div>
+</aside>
+</div>
+</section>
+</main>
+<footer id="support" class="site-footer home-explore-footer"><div class="footer-inner"><span>PackSwift · Less planning. More discovery.</span><a href="/help">Need a hand?</a></div></footer>
+<nav class="mobile-nav" aria-label="Mobile navigation"></nav>
+</body>
+</html>

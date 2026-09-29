@@ -1,1 +1,46 @@
-.explore-intro{padding:28px 0}.explore-intro h1{font-size:clamp(32px,4vw,52px)!important;line-height:1.15!important;margin:12px 0}.explore-intro p{color:var(--ps-muted);line-height:1.7}.explore-filters{display:flex;gap:16px;align-items:end;padding:18px;border:1px solid var(--ps-border);border-radius:18px;background:var(--ps-surface);margin-bottom:24px}.explore-filters>div{flex:1}.explore-filters label{display:block;font-size:11px;margin-bottom:7px}.explore-filters input,.explore-filters select{width:100%;min-height:44px;padding:10px;border:1px solid var(--ps-border);border-radius:10px;background:var(--ps-canvas);color:var(--ps-ink)}.explore-filters>button{background:transparent;border:0;padding:12px;color:var(--ps-accent);cursor:pointer}.explore-layout{display:grid;grid-template-columns:300px minmax(0,1fr);gap:28px;align-items:start;margin-bottom:40px}.explore-geography{padding:22px;border:1px solid var(--ps-border);border-radius:20px;background:var(--ps-surface)}.explore-geography h2{font-size:19px!important}.continent-grid{display:grid;gap:9px}.continent-grid button,.region-options button{padding:14px;text-align:left;border:1px solid var(--ps-border);border-radius:12px;background:transparent;color:var(--ps-ink);cursor:pointer;font:inherit;font-size:13px}.continent-grid button[aria-pressed=true],.region-options button[aria-pressed=true]{background:#bce9d9;color:#173d3e;border-color:#79b5a3}.region-options{display:flex;flex-wrap:wrap;gap:7px}.region-options button{font-size:11px;padding:9px;border-radius:20px}#explore-regions-wrap{margin-top:24px}.explore-results nav{font-size:12px;color:var(--ps-muted)}.explore-results nav button{border:0;background:transparent;color:inherit;cursor:pointer;padding:5px 0}#explore-notice{font-size:13px;line-height:1.7;color:var(--ps-muted)}#explore-count{font-size:11px;color:var(--ps-muted)}.explore-city-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.explore-city{padding:0;border:1px solid var(--ps-border);border-radius:18px;background:var(--ps-surface);color:var(--ps-ink);text-align:left;overflow:hidden;cursor:pointer;transition:transform .2s}.explore-city:hover{transform:translateY(-3px)}.explore-city>img{height:170px;width:100%;object-fit:cover;display:block}.explore-city-art{height:170px;display:grid;place-items:center;background:linear-gradient(135deg,#173d3e,#79b4a0);color:#e0f4e9;font-size:38px;letter-spacing:.1em}.explore-city-copy{padding:18px}.explore-city-copy small{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ps-muted)}.explore-city-copy h3{font-size:20px!important;margin:8px 0}.explore-city-copy p{font-size:12px;color:var(--ps-muted);text-transform:capitalize}.explore-city-copy strong,.explore-city-copy>span{font-size:11px}.explore-city-copy>span{float:right;color:var(--ps-accent)}.explore-cost-note{font-size:10px;color:var(--ps-muted);line-height:1.7;margin-top:24px}.explore-shell :focus-visible{outline:2px solid var(--ps-accent);outline-offset:3px}@media(max-width:850px){.explore-layout{grid-template-columns:1fr}.continent-grid{grid-template-columns:1fr 1fr}.explore-filters{flex-wrap:wrap}.explore-filters>div:first-child{flex-basis:100%}}@media(max-width:460px){.explore-city-grid{grid-template-columns:1fr}}@media(prefers-reduced-motion:reduce){.explore-city{transition:none}}
+/* World geometry: holtzy/D3-graph-gallery world.geojson (Natural Earth-derived). */
+body.combined-home .home-hero-shell{position:relative;isolation:isolate}
+body.combined-home .destination-backdrops{position:absolute;inset:0;z-index:-1}
+body.combined-home .home-world-explorer{position:relative;isolation:isolate;padding:72px 5vw;background:#08272e;color:#effbf8;scroll-margin-top:0;font-family:Montserrat,Arial,sans-serif}
+.home-world-explorer::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,rgba(4,30,37,.93),rgba(5,39,43,.83)),url('/images/destination-bali.jpg') center/cover}
+.atlas-layout{max-width:1600px;margin:auto;display:grid;grid-template-columns:minmax(0,1.7fr) minmax(320px,1fr);gap:40px;align-items:start}
+.atlas-eyebrow{font-size:11px;letter-spacing:.3em;color:#a4e6dc;margin:12px 0 24px}
+.home-world-explorer .atlas-main h2{font:700 clamp(32px,4vw,64px)/1.12 Montserrat,Arial,sans-serif!important;letter-spacing:-.045em;color:#fff;margin:0 0 20px}
+.home-world-explorer .atlas-main h2 span{color:#89e4d7}
+.atlas-intro{font-size:14px;line-height:1.8;color:#c1d9d8;max-width:470px}
+.atlas-map{position:relative;width:100%;aspect-ratio:2/1;margin:48px 0 20px;background:url('/images/world-atlas.svg') center/100% 100% no-repeat;filter:drop-shadow(0 0 16px #73dac01a)}
+.atlas-continent{position:absolute;transform:translate(-50%,-50%);border:1px solid #d3fff044;border-radius:999px;background:#102f37dc;color:#eefbf7;font:500 clamp(9px,1vw,12px)/1.3 Montserrat,Arial,sans-serif;padding:9px 12px;cursor:pointer;white-space:nowrap;transition:background .2s,box-shadow .2s}
+.atlas-continent:hover,.atlas-continent[aria-pressed=true]{background:#a6edde;color:#103c38;border-color:#dcfff6;box-shadow:0 0 24px #86eadb66}
+.atlas-continent[data-continent="North America"]{left:21%;top:29%}
+.atlas-continent[data-continent="South America"]{left:33%;top:63%}
+.atlas-continent[data-continent="Europe"]{left:53%;top:25%}
+.atlas-continent[data-continent="Africa"]{left:53%;top:52%}
+.atlas-continent[data-continent="Asia"]{left:72%;top:31%}
+.atlas-continent[data-continent="Oceania"]{left:87%;top:69%}
+.atlas-continent[data-continent="Antarctica"]{left:51%;top:93%}
+.atlas-hint{color:#9ebebb;font-size:11px;letter-spacing:.04em;text-align:center}
+.atlas-panel{padding:26px;border:1px solid #b5e2d733;border-radius:28px;background:#193c4266;backdrop-filter:blur(18px);box-shadow:0 18px 60px #00171c33}
+#explore-breadcrumbs{font-size:10px;letter-spacing:.1em;color:#b2dcd4}
+#explore-breadcrumbs button{background:none;border:0;color:inherit;padding:4px 0;cursor:pointer;font:inherit}
+.home-world-explorer #explore-title{font:600 clamp(24px,2.5vw,34px)/1.2 Montserrat,Arial,sans-serif!important;color:white;margin:16px 0 8px;letter-spacing:-.03em}
+#explore-count,#explore-notice{font-size:11px;line-height:1.7;color:#bfd8d5}
+.region-options{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0}
+.region-options button{padding:8px 11px;background:transparent;border:1px solid #bce9d944;border-radius:30px;color:#deefeb;font:500 10px/1.3 Montserrat,Arial,sans-serif;cursor:pointer}
+.region-options button[aria-pressed=true]{background:#bce9d9;color:#173d3e;border-color:#bce9d9}
+.explore-city-grid{display:grid;gap:16px;max-height:600px;overflow-y:auto;padding:2px 5px 4px 0;scrollbar-width:thin;scrollbar-color:#7eb8ac55 transparent}
+.explore-city{position:relative;min-height:220px;width:100%;padding:0;overflow:hidden;border-radius:20px;border:1px solid #c9efdf55;background:#163f45;color:white;text-align:left;cursor:pointer;transition:transform .2s}
+.explore-city>img,.explore-city-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.explore-city-art{display:grid;place-items:center;background:linear-gradient(130deg,#17474c,#48897f);font-size:60px;color:#b4e5d9}
+.explore-city::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#041e28f2,transparent 90%)}
+.explore-city-copy{position:relative;z-index:1;padding:95px 20px 20px}
+.explore-city-copy small{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:#d6ece7}
+.home-world-explorer .explore-city-copy h3{font:600 25px/1.3 Montserrat,Arial,sans-serif!important;color:#fff;margin:7px 0}
+.explore-city-copy p{font-size:11px;text-transform:capitalize;color:#c5ddd8;margin:0 0 12px}
+.explore-city-copy>span{font-size:11px;color:#a8ebda}
+.explore-city:hover{transform:translateY(-2px)}
+.home-world-explorer :focus-visible{outline:3px solid #a6edde;outline-offset:4px}
+.combined-home .home-explore-link{position:relative;display:flex;width:max-content;gap:20px;margin:auto;padding:18px 24px 30px;font-size:13px;color:#e2f5ee}
+.combined-home .home-explore-footer{position:relative;background:var(--ps-canvas,#f5f6f0);color:var(--ps-ink,#173d3e);margin:0}
+@media(max-width:950px){.atlas-layout{grid-template-columns:1fr}.atlas-map{max-width:760px;margin:30px auto}.atlas-panel{max-width:760px;width:100%;box-sizing:border-box;margin:auto}.explore-city-grid{grid-template-columns:1fr 1fr;max-height:600px}.atlas-main{text-align:center}.atlas-intro{margin:0 auto}}
+@media(max-width:540px){body.combined-home .home-world-explorer{padding:40px 18px}.atlas-continent{font-size:8px;padding:7px 6px}.atlas-panel{padding:18px;border-radius:20px}.explore-city-grid{grid-template-columns:1fr}.atlas-map{margin-top:35px}.atlas-layout{gap:20px}}
+@media(prefers-reduced-motion:reduce){.atlas-continent,.explore-city{transition:none}}
