@@ -33,3 +33,19 @@ html[data-theme=dark] .smart-preview{color:#e2e8f0}html[data-theme=dark] .previe
 .pet-preparation p,.pet-preparation li{font-size:13px;line-height:1.65}
 .pet-preparation ul{padding-left:20px;display:grid;gap:8px}
 .pet-preparation small{font-size:11px;line-height:1.6;color:var(--ps-muted,#576c69)}
+.preview-next-action #preview-save[hidden]{display:none!important}
+.preview-actions.preview-next-action{display:flex}
+.preview-actions .plan-details-cta{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:18px 22px;border:1px solid #89dccc;border-radius:18px;background:linear-gradient(115deg,#07494e,#087e80);color:#fff;font-weight:600;box-shadow:0 8px 24px #087e8022;transition:transform .25s,box-shadow .25s}
+.plan-details-cta::before{content:"";position:absolute;inset:-100%;z-index:-1;background:linear-gradient(110deg,transparent 43%,#ffffff20 50%,transparent 57%);transform:translateX(-65%);animation:plan-sheen 5s ease-in-out infinite}
+.plan-details-cta:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 12px 28px #087e8033}
+.plan-details-spark{font-size:24px;color:#bce9d9;animation:plan-spark 3s ease-in-out infinite}
+.plan-details-arrow{font-size:22px;transition:transform .25s}
+.plan-details-cta:hover .plan-details-arrow{transform:translate(3px,-3px)}
+.plan-details-cta:disabled{opacity:.5;cursor:not-allowed}
+.plan-details-cta:disabled::before,.plan-details-cta:disabled .plan-details-spark{animation:none}
+.trip-auth-dialog .draft-emblem{display:grid;place-items:center;width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#bce9d9,#ddf8f0);color:#087e80;font-size:30px;margin-bottom:18px}
+.trip-auth-dialog[open]{animation:plan-dialog-in .25s ease-out}
+@keyframes plan-sheen{0%,45%{transform:translateX(-65%)}85%,100%{transform:translateX(65%)}}
+@keyframes plan-spark{50%{transform:scale(1.15) rotate(10deg);opacity:.75}}
+@keyframes plan-dialog-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.plan-details-cta::before,.plan-details-spark,.trip-auth-dialog[open]{animation:none}.preview-actions .plan-details-cta,.plan-details-arrow{transition:none}}

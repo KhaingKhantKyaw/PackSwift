@@ -2643,8 +2643,7 @@ plannerForm.addEventListener("submit", async (event) => {
   }
 
   const button = plannerForm.querySelector('[type="submit"]');
-  button.disabled = true;
-  button.textContent = "Shaping your plan…";
+  if (button) { button.disabled = true; button.textContent = "Shaping your plan…"; }
   try {
     activePlan = await requestPlan(input);
     await syncSelectedActivitiesToPlan(activePlan);
@@ -2657,8 +2656,7 @@ plannerForm.addEventListener("submit", async (event) => {
   } catch (requestError) {
     plannerFeedback.textContent = requestError.message;
   } finally {
-    button.disabled = false;
-    button.innerHTML = 'Plan my trip <span aria-hidden="true">→</span>';
+    if (button) { button.disabled = false; button.innerHTML = 'Plan my trip <span aria-hidden="true">→</span>'; }
   }
 });
 
