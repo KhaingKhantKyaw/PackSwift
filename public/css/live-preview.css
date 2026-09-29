@@ -24,3 +24,12 @@ html[data-theme=dark] .smart-preview{color:#e2e8f0}html[data-theme=dark] .previe
 @keyframes preview-wave{50%{transform:translateY(-3px);opacity:.4}}@keyframes preview-glow{50%{text-shadow:0 0 16px #00a8b570}}@keyframes preview-blink{50%{opacity:0}}@keyframes preview-shimmer{to{background-position:-200% 0}}@keyframes preview-reveal{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 @media(max-width:800px){.result-panel:has(.smart-preview){position:static;max-height:none}}
 @media(prefers-reduced-motion:reduce){.smart-preview *{animation:none!important;transition:none!important}}
+.live-review-summary{display:grid;gap:12px;margin:16px 0;font-size:13px;line-height:1.6}.live-review-summary h3,.review-day h3{font-size:15px;margin:0}.live-review-summary p{margin:4px 0}.live-review-summary details,.review-day{border:1px solid #94a3b833;border-radius:14px;padding:14px}.live-review-summary summary{cursor:pointer;font-weight:600}.review-alert{border-left:3px solid #d69a36;padding:8px 12px;background:#d69a360d;border-radius:6px}.review-cost-row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid #94a3b81a}.review-cost-row strong{text-align:right;font-weight:500}.live-review-summary small,.review-day>small{display:block;opacity:.8;font-size:11px}.review-day{margin:12px 0}.review-day>p{font-size:12px;line-height:1.6}
+#pet-options{margin-top:14px;display:grid;gap:8px}
+#pet-options[hidden],.pet-preparation[hidden]{display:none!important}
+#pet-options small{font-size:12px;line-height:1.5;color:var(--ps-muted,#576c69)}
+.pet-preparation{margin:18px 0;padding:18px;border:1px solid var(--ps-border,#dce5df);border-radius:18px;background:var(--ps-surface,#fffefa);color:var(--ps-ink,#173d3e)}
+.pet-preparation h3{font-size:16px;margin:0 0 10px}
+.pet-preparation p,.pet-preparation li{font-size:13px;line-height:1.65}
+.pet-preparation ul{padding-left:20px;display:grid;gap:8px}
+.pet-preparation small{font-size:11px;line-height:1.6;color:var(--ps-muted,#576c69)}

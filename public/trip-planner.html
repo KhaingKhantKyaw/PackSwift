@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="/css/live-preview.css">
     <script src="/js/tripEngine.js" defer></script>
     <script src="/js/live-preview.js" defer></script>
+    <script src="/js/pet-planning.js" defer></script>
     <script src="/js/location-autocomplete.js" defer></script>
     <script src="/js/trip-draft-gate.js" defer></script>
     <script src="/js/travel-advisory.js" defer></script>
@@ -263,6 +264,16 @@
               <legend class="form-legend">Travelling with pets?</legend>
               <div class="choice-row">
                 <label class="choice"><input type="checkbox" name="travelingWithPets" value="true"><span>Include pet-friendly planning</span></label>
+              </div>
+              <div id="pet-options" hidden>
+                <label class="form-label" for="pet-type">Pet type</label>
+                <select id="pet-type" name="petType" class="field-control" disabled>
+                  <option value="">Choose your pet</option>
+                  <option value="dog">Dog</option><option value="cat">Cat</option>
+                  <option value="rabbit">Rabbit</option><option value="bird">Pet bird</option>
+                  <option value="small-mammal">Other small mammal</option><option value="other">Other animal</option>
+                </select>
+                <small>Options are for planning only. Carriers and destinations may not accept every species.</small>
               </div>
             </fieldset>
           </div>

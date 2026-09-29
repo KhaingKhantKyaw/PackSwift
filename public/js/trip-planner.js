@@ -1458,6 +1458,7 @@ function updateLiveTripPreview() {
     smartPace,
     travelerDemographic: groupValue,
     travelingWithPets: withPets,
+    petType: withPets ? String(data.get("petType") || "") : "",
     notes: String(data.get('notes') || ''),
     accessibility: String(data.get('walkingLevel') || 'standard'),
     dietaryStyle: String(data.get('dietaryStyle') || 'any'),
@@ -1602,6 +1603,7 @@ function collectInput() {
     tripPurpose,
     travelerDemographic: String(formData.get("travelerDemographic")),
     travelingWithPets: formData.get("travelingWithPets") === "true",
+    petType: formData.get("travelingWithPets") === "true" ? String(formData.get("petType") || "") : "",
     interests: [...(purposeInterests[tripPurpose] || purposeInterests.leisure)],
     notes: String(formData.get("notes") || "").trim(),
     accessibility: String(formData.get('walkingLevel') || 'standard'),
@@ -2095,6 +2097,7 @@ function packingContextFromPlan(plan) {
       plan.input?.travelerDemographic || "adults",
     travelingWithPets:
       plan.input?.travelingWithPets === true,
+    petType: plan.input?.petType || "",
     interests: plan.input?.interests || [],
     packingList: plan.packingList || null,
   };
@@ -2154,6 +2157,7 @@ function planAnalysisInput(plan) {
     tripPurpose: input.tripPurpose || "leisure",
     travelerDemographic: input.travelerDemographic || "couples",
     travelingWithPets: input.travelingWithPets === true,
+    petType: input.petType || "",
     interests: input.interests || [],
     notes: input.notes || "",
     planningGoal: input.planningGoal || "best-value",
@@ -2228,6 +2232,8 @@ function restorePlannerFormFromPlan(plan) {
     'input[name="travelingWithPets"]',
   );
   petOption.checked = input.travelingWithPets === true;
+  document.getElementById("pet-type").value = input.petType || "";
+  window.dispatchEvent(new Event("packswift:pets-restored"));
   tripNotesInput.value = input.notes || "";
   const lifestyleValues = {
     accommodationStyle: input.accommodationStyle || "comfortable",
@@ -2272,6 +2278,7 @@ function storedTripPlannerPlan(trip) {
       tripPurpose: trip.tripPurpose || "leisure",
       travelerDemographic: trip.preferences?.travelerDemographic || "couples",
       travelingWithPets: trip.preferences?.travelingWithPets === true,
+      petType: trip.preferences?.petType || "",
       pace: trip.pace || "balanced",
       smartPace: trip.preferences?.smartPace || {
         lateRiser: false,
