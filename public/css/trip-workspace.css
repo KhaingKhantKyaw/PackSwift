@@ -1,0 +1,30 @@
+body.trip-workspace .planner-layout{grid-template-columns:minmax(320px,2fr) minmax(0,3fr);gap:24px}
+.setup-header small{font-size:9px;letter-spacing:.17em;color:var(--ps-accent)}
+.setup-header h2{font-size:27px;margin:10px 0}
+.setup-header p{font-size:13px;color:var(--ps-muted)}
+.setup-tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:22px 0}
+.setup-tabs button{padding:11px;border:1px solid var(--ps-border);border-radius:12px;background:transparent;color:var(--ps-ink);text-align:left;font:inherit;font-size:12px;cursor:pointer}
+.setup-tabs button[aria-current=step]{background:#087e80;color:white;border-color:#087e80}
+.setup-step{grid-column:1/-1;display:grid;gap:18px;min-width:0}
+.setup-step[hidden]{display:none!important}
+.setup-step h3{font-size:18px;margin:5px 0}
+body.trip-workspace .setup-step .form-field{margin:0}
+.setup-controls{display:flex;justify-content:space-between;gap:10px;margin-top:24px;position:sticky;bottom:0;background:var(--ps-surface);padding:12px 0;z-index:3}
+.setup-controls button{padding:13px 20px;border-radius:999px;border:1px solid var(--ps-border);background:transparent;color:var(--ps-ink);cursor:pointer;font-weight:600}
+.setup-controls button:last-child{background:#087e80;color:white;margin-left:auto}
+.setup-error{color:#b83c35;font-size:13px}
+.workspace-readiness{border:1px solid var(--ps-border);padding:20px;border-radius:18px;display:grid;gap:12px}
+.workspace-readiness label{display:flex;gap:10px;align-items:center;font-size:13px}
+.workspace-readiness input{accent-color:#087e80;width:17px;height:17px}
+.workspace-readiness progress{width:100%;accent-color:#087e80}
+.workspace-readiness p{font-size:11px;color:var(--ps-muted)}
+.agent-dashboard{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.agent-dashboard article{border:1px solid var(--ps-border);border-radius:18px;padding:18px;background:var(--ps-surface)}
+.agent-dashboard article:nth-child(3n+1){border-top:3px solid #55b6a2}.agent-dashboard article:nth-child(3n+2){border-top:3px solid #e8ac77}.agent-dashboard article:nth-child(3n){border-top:3px solid #a895d4}
+.agent-dashboard h4{margin:0 0 10px;font-size:15px}.agent-dashboard p{font-size:12px;line-height:1.65;color:var(--ps-muted)}
+.agent-dashboard a{font-size:12px;color:var(--ps-accent)}
+body.trip-workspace .preview-essentials{display:none}
+body.trip-workspace.planning-details-active .setup-step{display:grid}
+body.trip-workspace.planning-details-active .setup-step[hidden]{display:none!important}
+@media(max-width:950px){body.trip-workspace .planner-layout{grid-template-columns:1fr}}
+@media(max-width:540px){.agent-dashboard{grid-template-columns:1fr}}

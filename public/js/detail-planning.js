@@ -49,11 +49,11 @@
    pool=[...new Map([...places,...(window.PackSwiftTripEngine?.knowledge(input.destination)||[])].map(p=>[id(p),p])).values()];
    document.body.classList.add('planning-details-active');
    form.querySelectorAll('[data-deferred-planner-section]').forEach(el=>{el.hidden=false;if(el.tagName==='DETAILS')el.open=true;});
-   form.querySelectorAll('.form-grid > *').forEach(el=>{if(!el.hasAttribute('data-deferred-planner-section'))el.classList.add('detail-step-hidden');});
+   if(!window.PackSwiftWorkspace)form.querySelectorAll('.form-grid > *').forEach(el=>{if(!el.hasAttribute('data-deferred-planner-section'))el.classList.add('detail-step-hidden');});
    document.getElementById('smart-preview').hidden=true;section.hidden=false;render();form.scrollTop=0;
    if(!document.getElementById('detail-exchange')){
     const box=n('section');box.id='detail-exchange';box.className='form-field-wide';box.append(n('h3','Currency exchange'));
-    const label=n('label','Your currency');label.htmlFor='detail-base-currency';const select=n('select');select.id='detail-base-currency';select.name='exchangeBase';select.className='field-control';['USD','THB','EUR','JPY','SGD','MMK','GBP','CNY'].forEach(code=>{const o=n('option',code);o.value=code;select.append(o);});const rate=n('p','Choose a currency to check its rate.');rate.setAttribute('role','status');box.append(label,select,rate);form.querySelector('.form-grid').append(box);
+    const label=n('label','Your currency');label.htmlFor='detail-base-currency';const select=n('select');select.id='detail-base-currency';select.name='exchangeBase';select.className='field-control';['USD','THB','EUR','JPY','SGD','MMK','GBP','CNY'].forEach(code=>{const o=n('option',code);o.value=code;select.append(o);});const rate=n('p','Choose a currency to check its rate.');rate.setAttribute('role','status');box.append(label,select,rate);(form.querySelector('.setup-step[data-step="2"]')||form.querySelector('.form-grid')).append(box);
     select.onchange=async()=>{rate.textContent='Checking exchange rate…';try{const r=await window.PackSwift.api(`/api/trips/currency-rate?base=${select.value}&target=${encodeURIComponent(input.currency||'USD')}`);rate.textContent=`1 ${r.base} ≈ ${r.rate} ${r.target} · indicative rate; fees excluded`;}catch(e){rate.textContent=e.message||'Rate unavailable.';}};select.onchange();
    }
    history.replaceState(null,'',`/trip-planner?trip_id=${encodeURIComponent(tripId)}`);

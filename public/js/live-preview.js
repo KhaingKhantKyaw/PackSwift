@@ -36,7 +36,18 @@
   function reviewMoney(amount){return new Intl.NumberFormat('en',{style:'currency',currency:liveReview.budget.currency,maximumFractionDigits:0}).format(amount);}
   function renderReview(){
     reviewBox.replaceChildren();const r=liveReview,s=r.tripSummary;
-    reviewBox.append(textNode('h3','Before you set off'));
+    reviewBox.append(textNode('h3','Your travel briefing'));
+    const dashboard=document.createElement('div');dashboard.className='agent-dashboard';
+    const nationality=document.getElementById('passport-country')?.value.trim();
+    const panels=[
+      ['🛂 Entry checks',nationality?`Passport nationality: ${nationality}. Verify destination and transit entry rules, passport validity, visa and arrival forms before booking.`:'Add your passport nationality in Your travellers. Entry eligibility has not been verified.','Entry preparation','/assist-visa'],
+      ['✈ Flights',`${input.origin} → ${input.destination}. Compare baggage, arrival time, transit requirements and change rules. No live fare or booking is confirmed.`,null,null],
+      ['🏨 Your stay',`${nights()} nights in ${input.destination}. Match your ${input.accommodationStyle||'preferred'} stay with transport access, cancellation terms and check-in time. No room availability is confirmed.`,null,null],
+      ['🚆 Getting around','Plan your airport transfer first. Group nearby stops and allow travel and rest time; confirm local services and fares.',null,null],
+      ['📱 Stay connected','Check phone compatibility, SIM / eSIM options and roaming fees. Download maps and bookings for offline access.',null,null],
+      ['🧳 Smart packing','Prepare for your dates, activities and personal needs. Check a current forecast near departure.','Open packing list','/packing-list']
+    ];
+    for(const [heading,copy,label,href] of panels){const card=document.createElement('article');card.append(textNode('h4',heading),textNode('p',copy));if(href){const link=textNode('a',label+' ↗');link.href=href;card.append(link);}dashboard.append(card);}reviewBox.append(dashboard);
     const essentials=document.createElement('div');essentials.className='preview-essentials';
     const items=[['document','Travel documents','Check passport validity and entry rules for your nationality.'],['bed','Stay & arrival','Confirm your accommodation and arrival transfer.'],['wallet','Budget buffer','Allow separately for flights, insurance and unexpected costs.'],['bag','Daily essentials','Prepare medication, footwear and charging essentials.']];
     if(s.children>0)items.push(['baby','Travelling with children','Check child documents and age-appropriate care supplies.']);

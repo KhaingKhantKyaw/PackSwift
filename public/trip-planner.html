@@ -22,6 +22,8 @@
     <script src="/js/tripEngine.js" defer></script>
     <script src="/js/live-preview.js" defer></script>
     <script src="/js/detail-planning.js" defer></script>
+    <link rel="stylesheet" href="/css/trip-workspace.css">
+    <script src="/js/trip-workspace.js" defer></script>
     <script src="/js/pet-planning.js" defer></script>
     <script src="/js/location-autocomplete.js" defer></script>
     <script src="/js/trip-draft-gate.js" defer></script>
@@ -283,7 +285,7 @@
 
         <section class="panel result-panel" aria-live="polite">
           <section id="smart-preview" class="smart-preview" aria-label="Live trip preview">
-            <h2>Live Trip Preview</h2>
+            <h2>Your Trip Plan</h2>
             <div id="preview-idle" class="preview-idle"><span class="preview-spark" aria-hidden="true">✧</span><p>Start configuring your trip on the left to see your live plan.</p><span class="preview-idle-hint" aria-hidden="true">Tell us where you want to go…<i></i></span></div>
             <div id="preview-thinking" class="preview-thinking" role="status" hidden><span class="preview-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="preview-status"></span></div>
             <div id="preview-content" hidden>
