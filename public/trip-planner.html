@@ -1,403 +1,58 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#00A8B5">
-    <meta name="description" content="Create a personal destination, climate, budget, and itinerary recommendation with PackSwift.">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Trip Planner — PackSwift">
-    <meta property="og:description" content="Turn your dates, budget, and interests into a practical travel plan.">
-    <meta property="og:url" content="https://packswift-logistics.v5t2tz86db.chatgpt.site/trip-planner">
-    <meta property="og:image" content="https://packswift-logistics.v5t2tz86db.chatgpt.site/og-planner.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <title>Trip Planner — PackSwift</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <script src="/js/app.js" defer></script>
-    <script src="/js/destination-currency.js" defer></script>
-    <script src="/js/costEngine.js" defer></script>
-    <script src="/js/visual-itinerary.js" defer></script>
-    <script src="/js/destination-route-editor.js" defer></script>
-    <link rel="stylesheet" href="/css/live-preview.css">
-    <script src="/js/tripEngine.js" defer></script>
-    <script src="/js/live-preview.js" defer></script>
-    <script src="/js/detail-planning.js" defer></script>
-    <link rel="stylesheet" href="/css/trip-workspace.css">
-    <script src="/js/trip-workspace.js" defer></script>
-    <script src="/js/pet-planning.js" defer></script>
-    <script src="/js/location-autocomplete.js" defer></script>
-    <script src="/js/trip-draft-gate.js" defer></script>
-    <script src="/js/travel-advisory.js" defer></script>
-    <script src="/js/trip-planner.js" defer></script>
-    <script src="/js/date-demand-calendar.js" defer></script>
-    <script src="/js/dynamic-budget.js" defer></script>
-  </head>
-  <body data-page="planner">
-    <a class="skip-link" href="#main-content">Skip to content</a>
-    <header class="site-header"><div class="header-inner">
-      <a class="brand" href="/" aria-label="PackSwift home"><span class="brand-mark" aria-hidden="true"></span><span>Pack<span class="brand-accent">Swift</span></span></a>
-      <nav class="desktop-nav" aria-label="Primary navigation">
-        <a class="nav-link" data-nav="home" href="/">Home</a><a class="nav-link" data-nav="planner" href="/trip-planner">Trip Planner</a><a class="nav-link" data-nav="packing" href="/packing-list">Packing List</a><a class="nav-link" data-nav="trips" href="/my-trips">My Trips</a>
-      </nav>
-      <a class="header-action" href="/my-trips">My trips <span aria-hidden="true">↗</span></a>
-    </div></header>
-
-    <main id="main-content" class="page-shell planner-page-shell">
-      <h1 class="planner-screen-reader-title">Plan your trip</h1>
-
-      <section class="planner-layout">
-        <form id="trip-planner-form" class="panel form-panel" aria-label="Trip preferences" novalidate>
-          <section id="focused-destination-context" class="focused-destination-context" aria-labelledby="focused-destination-name" hidden>
-            <span class="focused-lock">Destination locked</span>
-            <div>
-              <span id="focused-destination-code" class="focused-destination-code">BKK</span>
-              <div><h3 id="focused-destination-name">Bangkok</h3><p id="focused-destination-country">Thailand · Asia</p></div>
-            </div>
-            <dl>
-              <div><dt>Best season</dt><dd id="focused-destination-season">November–February</dd></div>
-              <div><dt>Plan includes</dt><dd id="focused-destination-attractions">Temples, river, malls and local food</dd></div>
-              <div><dt>Logistics</dt><dd id="focused-destination-logistics">Airport arrival, local transport, daily routing and packing guidance</dd></div>
-            </dl>
-          </section>
-          <div class="form-grid">
-            <fieldset class="form-field form-field-wide featured-destinations">
-              <legend class="form-legend">Most Popular Destinations</legend>
-              <div id="popular-destination-grid" class="featured-preset-grid" aria-label="Popular destination quick selections"></div>
-            </fieldset>
-            <fieldset class="form-field form-field-wide scope-selector">
-              <legend class="form-legend">Trip scope</legend>
-              <div class="scope-option-grid">
-                <label class="scope-choice"><input type="radio" name="tripScope" value="domestic"><span><strong>Nationwide</strong><small>Domestic · same country</small></span></label>
-                <label class="scope-choice"><input type="radio" name="tripScope" value="international" checked><span><strong>Worldwide</strong><small>International · cross-border</small></span></label>
-              </div>
-            </fieldset>
-            <div class="form-field">
-              <label class="form-label" for="origin-search">Origin / From</label>
-              <input class="field-control" id="origin-search" name="origin" type="search" maxlength="100" list="destination-options" placeholder="Choose your departure city" required>
-              <span class="field-hint">Departure city or country.</span>
-            </div>
-            <div id="destination-field" class="form-field">
-              <label class="form-label" for="destination-search">Destination / To</label>
-              <input class="field-control" id="destination-search" name="destination" type="search" maxlength="100" list="destination-options" placeholder="Choose your destination" required>
-              <input id="domestic-destination" name="destination" type="hidden" value="Yangon" disabled>
-              <datalist id="destination-options"></datalist>
-              <span id="destination-field-hint" class="field-hint">Arrival city or country.</span>
-            </div>
-            <input type="hidden" id="start-date" name="startDate">
-            <input type="hidden" id="end-date" name="endDate">
-            <input type="hidden" id="start-date-display">
-            <input type="hidden" id="end-date-display">
-            <input type="hidden" id="start-date-picker">
-            <input type="hidden" id="end-date-picker">
-            <div class="form-field form-field-wide">
-              <fieldset class="traveller-fields" aria-label="Travellers">
-                <div class="lifestyle-detail-grid">
-                  <div><label class="form-label" for="adults">Adults <small>18+</small></label><div class="traveller-stepper"><button type="button" data-counter="adults" data-step="-1" aria-label="Remove one adult">−</button><input class="field-control" id="adults" name="adults" type="number" min="1" max="20" step="1" value="1" readonly required><button type="button" data-counter="adults" data-step="1" aria-label="Add one adult">+</button></div></div>
-                  <div><label class="form-label" for="children">Children <small>Under 18</small></label><div class="traveller-stepper"><button type="button" data-counter="children" data-step="-1" aria-label="Remove one child">−</button><input class="field-control" id="children" name="children" type="number" min="0" max="19" step="1" value="0" readonly required><button type="button" data-counter="children" data-step="1" aria-label="Add one child">+</button></div></div>
-                </div>
-                <p id="traveller-count-summary" class="traveller-count-summary" role="status" aria-live="polite"></p>
-              </fieldset>
-              <section class="demand-calendar" aria-label="Travel date range calendar">
-                  <div class="demand-month-nav"><button type="button" id="demand-prev" aria-label="Previous month">←</button><strong id="demand-month"></strong><button type="button" id="demand-next" aria-label="Next month">→</button></div>
-                  <p id="demand-selection" role="status">Choose a start date, then an end date.</p>
-                  <div class="demand-weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
-                  <div id="demand-days" class="demand-days" role="group" aria-label="Travel date choices"></div>
-                  <p class="demand-legend"><span>🟢 Low / budget</span><span>🟡 Moderate</span><span>🔴 Peak / weekend</span></p>
-                <p id="demand-range-summary" class="demand-range-summary" role="status"></p>
-              </section>
-            </div>
-            <fieldset class="form-field form-field-wide planning-goal-fieldset">
-              <legend class="form-legend">Travel intention</legend>
-              <div class="planning-goal-grid">
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="make-possible"><span><strong>Lowest cost</strong></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="fixed-budget"><span><strong>Fixed budget</strong></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="best-value" checked><span><strong>Best value</strong></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="comfort-first"><span><strong>Comfort</strong></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="luxury"><span><strong>Luxury</strong></span></label>
-                <label class="planning-goal-choice"><input type="radio" name="planningGoal" value="once-in-lifetime"><span><strong>Bucket list</strong></span></label>
-              </div>
-            </fieldset>
-            <!-- Deferred to a later planning step. Keep IDs and defaults for existing bindings. -->
-            <details class="lifestyle-disclosure form-field-wide" data-deferred-planner-section="preferences" hidden>
-              <summary>Customize preferences <span>Optional</span></summary>
-              <div class="lifestyle-detail-grid">
-            <p id="lifestyle-preset-feedback" class="form-help form-field-wide" role="status" aria-live="polite"></p>
-            <div class="form-field">
-              <label class="form-label" for="accommodation-style">Accommodation</label>
-              <select class="field-control" id="accommodation-style" name="accommodationStyle">
-                <option value="hostel">Hostel / shared stay</option>
-                <option value="budget">Budget hotel</option>
-                <option value="comfortable" selected>Comfortable hotel</option>
-                <option value="boutique">Boutique stay</option>
-                <option value="luxury">Luxury resort or hotel</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="food-style">Food</label>
-              <select class="field-control" id="food-style" name="foodStyle">
-                <option value="street">Street food &amp; local stalls</option>
-                <option value="local">Local restaurants</option>
-                <option value="mixed" selected>Mixed casual dining</option>
-                <option value="fine">Fine dining</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="transport-style">Local transport</label>
-              <select class="field-control" id="transport-style" name="transportStyle">
-                <option value="public">Public transport</option>
-                <option value="mixed" selected>Public + ride-hailing</option>
-                <option value="private">Private car / driver</option>
-                <option value="premium">Premium private transfers</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="activity-style">Activities</label>
-              <select class="field-control" id="activity-style" name="activityStyle">
-                <option value="free">Mostly free highlights</option>
-                <option value="essential">Essential paid highlights</option>
-                <option value="balanced" selected>Balanced selection</option>
-                <option value="premium">Premium experiences</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="extras-style">Personal extras</label>
-              <select class="field-control" id="extras-style" name="extrasStyle">
-                <option value="none">No extra allowance</option>
-                <option value="light" selected>Small souvenir allowance</option>
-                <option value="planned">Planned personal extras</option>
-                <option value="priority">Personal extras are a trip priority</option>
-              </select>
-            </div>
-            <div class="form-field form-field-wide lifestyle-flexibility-panel">
-              <span class="form-label">Planning flexibility</span>
-              <div class="choice-row">
-                <label class="choice"><input type="checkbox" name="dateFlexible" value="true"><span>My travel dates are flexible</span></label>
-                <label class="choice"><input type="checkbox" name="tripLengthFlexible" value="true"><span>My trip length can change</span></label>
-              </div>
-            </div>
-            <div class="form-field form-field-wide">
-              <label class="form-label" for="must-have-experience">One experience I do not want to miss <span class="label-optional">Optional</span></label>
-              <input class="field-control" id="must-have-experience" name="mustHaveExperience" type="text" maxlength="180" placeholder="e.g. See Wat Arun at sunrise or spend one day at the beach">
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="trip-purpose">Travel Purpose</label>
-              <select class="field-control" id="trip-purpose" name="tripPurpose">
-                <option value="leisure">Leisure &amp; Relaxation</option>
-                <option value="cultural">Cultural &amp; Historical</option>
-                <option value="adventure">Adventure &amp; Outdoor</option>
-                <option value="food">Food &amp; Culinary</option>
-                <option value="business">Business / Workation</option>
-                <option value="events">Special Events &amp; Celebrations</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label class="form-label" for="traveler-demographic">Travel Groups</label>
-              <select class="field-control" id="traveler-demographic" name="travelerDemographic">
-                <option value="solo" selected>Solo</option>
-                <option value="couples">Couples</option>
-                <option value="family-with-children">Family</option>
-                <option value="friends-group">Friends / Group</option>
-                <option value="business-duo">Digital Nomad / Business Duo</option>
-                <option value="senior">Senior Travelers</option>
-              </select>
-            </div>
-              </div>
-            </details>
-            <fieldset class="form-field form-field-wide" data-deferred-planner-section="pace" hidden style="border:0;padding:0;margin:0">
-              <legend class="form-legend">Travel Pace</legend>
-              <div class="pace-option-grid">
-                <label class="pace-choice"><input type="radio" name="pace" value="relaxed"><span><strong>Slow &amp; Relaxed 🌿</strong><small>1–2 spots/day</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="balanced" checked><span><strong>Balanced &amp; Steady ⚖️</strong><small>3–4 spots/day</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="packed"><span><strong>Packed &amp; Fast ⚡</strong><small>5+ spots/day</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="cultural"><span><strong>Cultural Deep Dive 🎨</strong><small>Museums &amp; history focus</small></span></label>
-                <label class="pace-choice"><input type="radio" name="pace" value="culinary"><span><strong>Culinary &amp; Foodie 🍜</strong><small>Market &amp; café focus</small></span></label>
-              </div>
-              <div class="smart-pace-panel" aria-labelledby="smart-pace-title">
-                <div><strong id="smart-pace-title">Smart pace</strong><small>Fine-tune the daily timing</small></div>
-                <div class="smart-pace-toggles">
-                  <label class="smart-pace-toggle"><span><strong>Late Riser</strong><small>Start after 10 AM</small></span><input type="checkbox" name="lateRiser" value="true"><i aria-hidden="true"></i></label>
-                  <label class="smart-pace-toggle"><span><strong>Midday Rest</strong><small>2-hour afternoon gap</small></span><input type="checkbox" name="middayRest" value="true"><i aria-hidden="true"></i></label>
-                  <label class="smart-pace-toggle"><span><strong>Cluster Nearby</strong><small>Minimize transit time</small></span><input type="checkbox" name="clusterNearby" value="true"><i aria-hidden="true"></i></label>
-                </div>
-              </div>
-            </fieldset>
-            <div class="form-section-heading"><h3>Budget</h3></div>
-            <div class="form-field form-field-wide">
-              <div class="budget-label-row"><label class="form-label" for="budget">Total trip budget</label><span id="budget-currency-label" class="form-label">Currency</span></div>
-              <div class="budget-field">
-                <span id="budget-currency-symbol" class="budget-currency-symbol" aria-hidden="true">$</span>
-                <input class="budget-amount" id="budget" name="budget" type="text" inputmode="numeric" autocomplete="off" pattern="[0-9,]+" value="1,500" placeholder="e.g. 1,500" aria-describedby="budget-minimum-hint" required>
-                <select class="budget-currency-select" id="currency" name="currency" aria-labelledby="budget-currency-label">
-                  <option value="THB">THB (฿)</option>
-                  <option value="MMK">MMK (Ks)</option>
-                  <option value="CNY">CNY (¥)</option>
-                  <option value="USD" selected>USD ($)</option>
-                  <option value="SGD">SGD (S$)</option>
-                  <option value="EUR">EUR (€)</option>
-                  <option value="JPY">JPY (¥)</option>
-                </select>
-              </div>
-              <div id="dynamic-budget-badge" class="budget-info-callout" role="status"></div>
-              <small id="dynamic-budget-warning" class="dynamic-budget-warning" role="status"></small>
-              <small id="route-budget-warning" class="dynamic-budget-warning" role="status"></small>
-              <p class="budget-scope-note">Ground costs only · Flights excluded</p>
-              <details class="budget-details"><summary>Budget details</summary>
-              <span id="cost-demand-badge" class="cost-demand-badge"></span>
-              <p class="form-help">Estimates update with your dates and preferences. You can edit the amount. Visas and insurance are excluded.</p>
-              <div id="budget-minimum-hint" class="budget-info-callout" aria-live="polite">
-                <span class="budget-info-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 8h.01"></path></svg></span>
-                <div><strong id="budget-info-title">Route Budget Estimate</strong><p>Minimum budget for <b id="budget-info-route">Yangon → Bangkok</b>: <b id="budget-info-amount">$380.00</b> <span id="budget-info-detail">577 km route. ~USD 100 transit/person × 1 traveller + USD 40/day × 1 × 7 days.</span></p></div>
-              </div>
-              </details>
-            </div>
-            <div class="form-field form-field-wide" data-deferred-planner-section="comfort-and-notes" hidden>
-              <details class="lifestyle-disclosure"><summary>Comfort & dietary needs <span>Optional</span></summary>
-                <div class="lifestyle-detail-grid">
-                  <div><label class="form-label" for="walking-level">Walking preference</label><select class="field-control" id="walking-level" name="walkingLevel"><option value="standard">Regular walking</option><option value="limited">Short walks & frequent rests</option><option value="step-free">Step-free routes preferred</option></select></div>
-                  <div><label class="form-label" for="dietary-style">Food preference</label><select class="field-control" id="dietary-style" name="dietaryStyle"><option value="any">No preference</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="halal">Halal</option><option value="other">Other — add a note</option></select></div>
-                  <div class="form-field-wide"><label class="form-label" for="family-needs">Group needs</label><input class="field-control" id="family-needs" name="familyNeeds" maxlength="180" placeholder="e.g. toddler naps, stroller, older travellers, food allergies"></div>
-                  <div class="form-field-wide"><label class="form-label" for="passport-country">Passport nationality <span class="label-optional">Optional</span></label><input class="field-control" id="passport-country" name="passportCountry" maxlength="80" placeholder="e.g. Myanmar"><small>Used for entry-check reminders, not an eligibility decision.</small></div>
-                </div>
-                <p class="form-help">Accessibility and dietary suitability must be checked with each venue.</p>
-              </details>
-              <label class="form-label" for="trip-notes">Trip notes <span class="label-optional">Optional</span></label>
-              <textarea class="field-control" id="trip-notes" name="notes" rows="3" maxlength="600" placeholder="e.g. Add a beach day and vegetarian food options"></textarea>
-            </div>
-            <fieldset class="form-field form-field-wide" style="border:0;padding:0;margin:0">
-              <legend class="form-legend">Travelling with pets?</legend>
-              <div class="choice-row">
-                <label class="choice"><input type="checkbox" name="travelingWithPets" value="true"><span>Include pet-friendly planning</span></label>
-              </div>
-              <div id="pet-options" hidden>
-                <label class="form-label" for="pet-type">Pet type</label>
-                <select id="pet-type" name="petType" class="field-control" disabled>
-                  <option value="">Choose your pet</option>
-                  <option value="dog">Dog</option><option value="cat">Cat</option>
-                  <option value="rabbit">Rabbit</option><option value="bird">Pet bird</option>
-                  <option value="small-mammal">Other small mammal</option><option value="other">Other animal</option>
-                </select>
-                <small>Options are for planning only. Carriers and destinations may not accept every species.</small>
-              </div>
-            </fieldset>
-          </div>
-          <p id="planner-feedback" class="form-feedback" role="alert"></p>
-        </form>
-
-        <section class="panel result-panel" aria-live="polite">
-          <section id="smart-preview" class="smart-preview" aria-label="Live trip preview">
-            <h2>Your Trip Plan</h2>
-            <div id="preview-idle" class="preview-idle"><span class="preview-spark" aria-hidden="true">✧</span><p>Start configuring your trip on the left to see your live plan.</p><span class="preview-idle-hint" aria-hidden="true">Tell us where you want to go…<i></i></span></div>
-            <div id="preview-thinking" class="preview-thinking" role="status" hidden><span class="preview-dots" aria-hidden="true"><i></i><i></i><i></i></span><span id="preview-status"></span></div>
-            <div id="preview-content" hidden>
-              <div id="preview-snapshot" class="preview-snapshot"></div>
-              <div id="preview-skeleton" class="preview-skeleton" aria-hidden="true" hidden><i></i><i></i><i></i></div>
-              <!-- Place selection is deferred to the next planning step. -->
-              <div id="preview-checklist" data-deferred-preview-places></div>
-              <div class="preview-actions preview-next-action"><button id="preview-save" type="button" hidden>Save My Trip Plan</button><button id="preview-board-open" class="plan-details-cta" type="button"><span class="plan-details-spark" aria-hidden="true">✦</span><span>Let’s plan more in details</span><span class="plan-details-arrow" aria-hidden="true">↗</span></button></div>
-              <small>Your trip is saved to your account when you continue.</small>
-            </div>
-            <div id="preview-board" hidden><button id="preview-back" type="button">← Back to Preview</button><div id="preview-timeline"></div></div>
-            <p id="preview-toast" role="status"></p>
-          </section>
-          <div id="result-empty" class="result-empty">
-            <div class="planner-live-preview">
-              <div class="planner-live-heading">
-                <span class="result-empty-mark" aria-hidden="true">✦</span>
-                <div><p class="eyebrow">Live trip preview</p><h2>Your trip is taking shape</h2></div>
-              </div>
-              <p id="live-announcement" class="planner-live-announcement">Choose a destination or leave it open for a worldwide recommendation.</p>
-              <div class="live-summary-tags" aria-label="Current trip filters">
-                <span id="live-tag-destination">Worldwide</span>
-                <span id="live-tag-dates">Dates pending</span>
-                <span id="live-tag-budget">Budget pending</span>
-                <span id="live-tag-goal">Best value</span>
-                <span id="live-tag-group">Couples</span>
-                <span id="live-tag-pace">Balanced &amp; Steady ⚖️</span>
-                <span id="live-tag-smart-pace" hidden></span>
-              </div>
-              <dl class="planner-live-details">
-                <div><dt>Destination</dt><dd id="live-destination">Anywhere worldwide</dd></div>
-                <div><dt>Travel dates</dt><dd id="live-dates">Select your dates</dd></div>
-                <div><dt>Budget</dt><dd id="live-budget">USD 1,500</dd></div>
-                <div><dt>Estimated ground trip cost</dt><dd id="live-cost-estimate">Choose dates</dd></div>
-                <div><dt>Budget category</dt><dd id="live-budget-category">Calculating…</dd></div>
-                <div><dt>Planning priority</dt><dd id="live-planning-goal">Best value</dd></div>
-                <div><dt>Travellers</dt><dd id="live-travellers">2 travellers</dd></div>
-                <div><dt>Trip style</dt><dd id="live-style">Leisure &amp; Relaxation · Balanced &amp; Steady ⚖️ · Couples</dd></div>
-              </dl>
-              <div id="live-notices" class="planner-live-notices" aria-live="polite"></div>
-              <section class="live-budget-paths" aria-labelledby="live-budget-paths-title">
-                <div class="live-preview-section-heading"><div><span>Choice, not judgement</span><h3 id="live-budget-paths-title">Three ways to make this trip work</h3></div></div>
-                <div id="live-budget-options" class="live-budget-options"></div>
-              </section>
-              <section class="live-activity-section" aria-labelledby="live-activity-title">
-                <div class="live-preview-section-heading">
-                  <div><span>Matched instantly</span><h3 id="live-activity-title">Activities for your choices</h3></div>
-                  <small id="live-activity-status" role="status">Preparing suggestions…</small>
-                </div>
-                <div id="live-activity-grid" class="live-activity-grid" aria-live="polite"></div>
-              </section>
-              <section id="selected-places-section" class="selected-places-section" aria-labelledby="selected-places-title" hidden>
-                <div class="live-preview-section-heading">
-                  <div><span>Your choices</span><h3 id="selected-places-title">Places added to visit</h3></div>
-                  <small id="selected-places-count">0 places</small>
-                </div>
-                <div id="selected-places-list" class="selected-places-list" aria-live="polite"></div>
-              </section>
-              <section class="live-itinerary-section" aria-labelledby="live-itinerary-title">
-                <div class="live-preview-section-heading">
-                  <div><span>Pace-aware outline</span><h3 id="live-itinerary-title">Your first days</h3></div>
-                  <small id="live-itinerary-density">3 activities per day</small>
-                </div>
-                <div id="live-itinerary-list" class="live-itinerary-list"></div>
-                <label for="visual-travel-style">Itinerary travel style</label>
-                <select id="visual-travel-style" class="field-control">
-                  <option value="">Match my preferences</option>
-                  <option>Family with Kids</option>
-                  <option>Food &amp; Culinary</option>
-                  <option>Culture &amp; Heritage</option>
-                  <option>Solo / Aesthetic</option>
-                  <option>Budget / Backpacker</option>
-                </select>
-              </section>
-            </div>
-          </div>
-          <div id="activity-plan-toast" class="activity-plan-toast" role="status" aria-live="polite" hidden></div>
-          <div id="plan-result" class="plan-result" hidden>
-            <div class="result-topline"><span class="result-kicker">Your destination match</span><span id="result-score" class="result-score">—</span></div>
-            <section class="destination-route" aria-label="Day tour itinerary">
-              <p id="destination-route-status" class="visual-route-note" role="status"></p>
-              <div id="destination-route-timeline" class="destination-route-scroll" tabindex="0" aria-label="Scroll through day tour stops"></div>
-            </section>
-            <div class="result-actions">
-              <button id="save-trip-button" class="button button-primary" type="button">Save to My Trips</button>
-              <a id="create-packing-list-button" class="button button-secondary" href="/packing-list">Create packing list</a>
-            </div>
-            <a id="assist-ready-button" class="assist-ready-button" href="/assist-trip" hidden>Assist To Ready My Trips <span aria-hidden="true">→</span></a>
-            <p id="save-trip-feedback" class="packing-save-feedback" role="status"></p>
-          </div>
-        </section>
-      </section>
-    </main>
-
-    <dialog id="trip-login-required-dialog" class="login-required-dialog" aria-labelledby="trip-login-required-title">
-      <form method="dialog" class="login-required-card">
-        <button class="login-required-close" type="submit" value="cancel" aria-label="Close">×</button>
-        <span class="login-required-icon" aria-hidden="true">○</span>
-        <p class="eyebrow">Account required</p>
-        <h2 id="trip-login-required-title">Continue your trip with an account</h2>
-        <p>Your route, dates, travellers, budget, and preferences are preserved while you sign in.</p>
-        <div class="login-required-actions">
-          <button class="button button-quiet" type="submit" value="cancel">Not now</button>
-          <a id="trip-login-link" class="button button-primary" href="/login?redirect=/trip-planner">Log in</a>
-          <a id="trip-signup-link" class="button button-secondary" href="/signup?redirect=/trip-planner">Create an account</a>
-        </div>
-      </form>
-    </dialog>
-
-    <footer class="site-footer"><div class="footer-inner"><span>© <span data-current-year></span> PackSwift</span><span>Plans are guidance; verify current local conditions before travel.</span></div></footer>
-    <nav class="mobile-nav" aria-label="Mobile navigation">
-      <a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a><a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a><a data-nav="packing" href="/packing-list"><span aria-hidden="true">✓</span><span>Pack</span></a><a data-nav="trips" href="/my-trips"><span aria-hidden="true">▤</span><span>Trips</span></a>
-    </nav>
-  </body>
-</html>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#123f43"><title>Plan your next chapter — PackSwift</title>
+<link rel="stylesheet" href="/css/styles.css"><link rel="stylesheet" href="/css/planner-studio.css">
+<script src="/js/app.js" defer></script><script src="/js/destination-currency.js" defer></script>
+<link rel="stylesheet" href="/css/city-briefing.css">
+<script src="/js/city-briefing.js" defer></script>
+<link rel="stylesheet" href="/css/planner-workspace.css">
+<script src="/js/planner-workspace.js" defer></script>
+<script src="/js/trip-draft-gate.js" defer></script><script src="/js/planner-studio.js" defer></script>
+</head>
+<body data-page="planner-studio" class="planner-studio">
+<a class="skip-link" href="#studio-main">Skip to trip setup</a>
+<header class="site-header"><div class="header-inner"><a class="brand" href="/">PackSwift</a><nav class="desktop-nav" aria-label="Main navigation"></nav><a class="header-action" href="/login">Login</a></div></header>
+<main id="studio-main" class="studio-shell">
+<div class="studio-page-heading"><div><span class="studio-eyebrow">LESS PLANNING. MORE LIVING.</span><h1>Your next chapter, thoughtfully planned.</h1></div><span class="studio-caption">One journey. All the essentials.</span></div>
+<div class="studio-columns">
+<form id="trip-planner-form" class="studio-setup" novalidate>
+<a href="/" class="workspace-brand">◇ PackSwift</a>
+<header class="studio-panel-heading"><div><h1>Plan Your Trip</h1><p>Create your personalized travel plan with real-time recommendations.</p></div></header>
+<nav id="studio-steps" class="studio-steps" aria-label="Planning steps"></nav>
+<section class="studio-step" data-step="0"><span class="studio-eyebrow">01 / THE JOURNEY</span><h3>Where are we going?</h3>
+<label for="origin-search">Departure city</label><input id="origin-search" name="origin" placeholder="e.g. Yangon" list="studio-cities" autocomplete="off" required>
+<label for="destination-search">Destination</label><input id="destination-search" name="destination" placeholder="e.g. Bangkok" list="studio-cities" autocomplete="off" required><datalist id="studio-cities"></datalist>
+<div class="studio-pair"><div><label for="start-date">Departure date</label><input id="start-date" name="startDate" type="date" required></div><div><label for="end-date">Return date</label><input id="end-date" name="endDate" type="date" required></div></div>
+<label for="trip-scope">Trip scope</label><select id="trip-scope" name="tripScope"><option value="international">Worldwide</option><option value="domestic">Within one country</option></select>
+<p class="studio-note">Start with your route and dates. Everything stays editable.</p></section>
+<section class="studio-step" data-step="1" hidden><span class="studio-eyebrow">02 / YOUR PEOPLE</span><h3>Who’s coming along?</h3>
+<div class="studio-pair"><div><label for="adults">Adults · 18+</label><input id="adults" name="adults" type="number" min="1" max="20" value="1" required></div><div><label for="children">Children · under 18</label><input id="children" name="children" type="number" min="0" max="19" value="0" required></div></div>
+<label for="passport-country">Passport nationality</label><input id="passport-country" name="passportCountry" placeholder="e.g. Myanmar" required><p class="studio-note">For entry-check reminders, not a visa eligibility decision.</p>
+<label class="studio-check"><input type="checkbox" name="travelingWithPets" id="studio-pets" value="true"> Include pet-friendly planning</label>
+<div id="studio-pet-field" hidden><label for="pet-type">Pet type</label><select id="pet-type" name="petType"><option value="dog">Dog</option><option value="cat">Cat</option><option value="rabbit">Rabbit</option><option value="bird">Pet bird</option><option value="other">Other species</option></select><p class="studio-note">Species acceptance depends on your route and carrier.</p></div></section>
+<section class="studio-step" data-step="2" hidden><span class="studio-eyebrow">03 / YOUR BUDGET</span><h3>Make room for the moments.</h3>
+<label for="budget">Your total budget</label><div class="studio-money"><input id="budget" name="budget" type="number" min="1" step="1" placeholder="Enter your amount" required><select id="currency" name="currency" aria-label="Budget currency"><option>USD</option><option>THB</option><option>MMK</option><option>SGD</option><option>EUR</option><option>JPY</option><option>CNY</option><option>VND</option><option>IDR</option></select></div>
+<label for="planning-goal">What matters most?</label><select id="planning-goal" name="planningGoal"><option value="make-possible">Lowest practical cost</option><option value="fixed-budget">Stay within my budget</option><option value="best-value" selected>Best value</option><option value="comfort-first">Comfort first</option><option value="luxury">Premium experiences</option></select>
+<p class="studio-note">Dashboard estimates cover ground costs. Flights, visas, insurance and shopping still need separate allowances.</p></section>
+<section class="studio-step" data-step="3" hidden><span class="studio-eyebrow">04 / YOUR RHYTHM</span><h3>Travel your way.</h3>
+<label for="travel-purpose">What would you love to do?</label><select id="travel-purpose" name="tripPurpose"><option value="culture">Culture & sightseeing</option><option value="food">Food & local life</option><option value="adventure">Nature & adventure</option><option value="leisure">Relaxation & beaches</option></select>
+<div class="studio-pair"><div><label for="accommodation">Stay style</label><select id="accommodation" name="accommodationStyle"><option value="hostel">Hostel / shared</option><option value="budget">Budget hotel</option><option value="comfortable" selected>Comfortable hotel</option><option value="luxury">Luxury stay</option></select></div><div><label for="pace">Travel pace</label><select id="pace" name="pace"><option value="relaxed">Slow & relaxed</option><option value="balanced" selected>Balanced</option><option value="packed">Packed & active</option></select></div></div>
+<label for="dietary-style">Food preference</label><select id="dietary-style" name="dietaryStyle"><option value="any">No preference</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="halal">Halal</option></select>
+<label for="walking-level">Walking & access</label><select id="walking-level" name="accessibility"><option value="standard">Regular walking</option><option value="limited">Short walks & rests</option><option value="step-free">Step-free preferred</option></select>
+<label for="trip-notes">Anything else? <small>Optional</small></label><textarea id="trip-notes" name="notes" rows="3" maxlength="600" placeholder="Must-see places, allergies, special requests…"></textarea></section>
+<section class="studio-step" data-step="4" hidden><span class="studio-eyebrow">05 / YOUR HIGHLIGHTS</span><h3>Choose your moments.</h3><p class="studio-note">Add places to your itinerary. Sample suggestions are labelled; confirm venue details before visiting.</p><button id="studio-find" type="button" class="studio-secondary">Find places for my trip ↗</button><p id="studio-places-status" role="status"></p><div id="studio-places"></div></section>
+<section class="studio-step" data-step="5" hidden><span class="studio-eyebrow">06 / REVIEW</span><h3>Ready for your next chapter?</h3><p class="studio-note">Review your route, dates, budget and selected activities in the workspace. Save your trip to your account when you’re ready.</p><button type="button" class="studio-secondary" id="workspace-review">Review trip overview ↗</button></section>
+<p id="planner-feedback" class="studio-error" role="alert"></p>
+<footer class="studio-form-actions"><button id="studio-back" type="button" class="studio-secondary">← Back</button><button id="studio-next" type="button" class="studio-primary">Continue →</button></footer>
+</form>
+<section class="studio-dashboard" aria-label="Your trip plan">
+<nav class="workspace-nav" aria-label="Trip workspace"><a href="/" class="workspace-brand">◇ PackSwift</a><div><button type="button" data-workspace-target="studio-summary" aria-current="page">Trip Overview</button><button type="button" data-workspace-target="workspace-itinerary">Itinerary</button><button type="button" data-workspace-target="workspace-map">Map View</button><button type="button" data-workspace-target="workspace-packing">Packing</button><button type="button" data-workspace-target="studio-checks">Checklist</button></div></nav>
+<header class="studio-panel-heading"><div><span class="studio-eyebrow">THE BIG PICTURE</span><h2>Your Trip Plan</h2></div><span id="studio-state" class="studio-state" role="status">Ready when you are</span></header>
+<div id="studio-summary" class="studio-summary"><span class="studio-eyebrow">YOUR NEXT CHAPTER</span><h3>Somewhere new. Something you.</h3><p>Choose your route to begin.</p></div>
+<div id="studio-dashboard-content"></div>
+<section class="studio-readiness"><div class="studio-section-title"><h3>Before you go</h3><span id="studio-ready-count">0 / 10</span></div><progress id="studio-progress" max="10" value="0" aria-label="Self-checked preparation progress"></progress><div id="studio-checks"></div><p class="studio-note">Your own checklist — not verification or travel clearance.</p></section>
+<div class="studio-save-row"><button id="studio-save" class="studio-primary" type="button">Save & continue planning ↗</button><p id="studio-save-status" role="status"></p></div>
+</section>
+</div></main></body></html>
