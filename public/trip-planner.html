@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="/css/city-briefing.css">
 <script src="/js/city-briefing.js" defer></script>
 <link rel="stylesheet" href="/css/planner-workspace.css">
+<link rel="stylesheet" href="/css/planner-minimal.css">
 <script src="/js/planner-workspace.js" defer></script>
 <script src="/js/trip-draft-gate.js" defer></script><script src="/js/planner-studio.js" defer></script>
 </head>
@@ -48,7 +49,7 @@
 <footer class="studio-form-actions"><button id="studio-back" type="button" class="studio-secondary">← Back</button><button id="studio-next" type="button" class="studio-primary">Continue →</button></footer>
 </form>
 <section class="studio-dashboard" aria-label="Your trip plan">
-<nav class="workspace-nav" aria-label="Trip workspace"><a href="/" class="workspace-brand">◇ PackSwift</a><div><button type="button" data-workspace-target="studio-summary" aria-current="page">Trip Overview</button><button type="button" data-workspace-target="workspace-itinerary">Itinerary</button><button type="button" data-workspace-target="workspace-map">Map View</button><button type="button" data-workspace-target="workspace-packing">Packing</button><button type="button" data-workspace-target="studio-checks">Checklist</button></div></nav>
+<nav class="workspace-nav" aria-label="Trip workspace"><a href="/" class="workspace-brand">Your Trip Preview</a><div><button type="button" data-workspace-target="studio-summary" aria-current="page">Overview</button><button type="button" data-workspace-target="workspace-itinerary">Itinerary</button><button type="button" data-workspace-target="workspace-map">Map</button><button type="button" data-workspace-target="workspace-packing">Packing</button><button type="button" data-workspace-target="studio-checks">Checklist</button></div><a class="workspace-account" data-auth="guest" href="/login?redirect=%2Ftrip-planner" aria-label="Log in to PackSwift"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span>Login</span></a><a class="workspace-account" data-auth="user" hidden href="/profile" aria-label="Open your profile"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span data-profile-name>Profile</span></a></nav>
 <header class="studio-panel-heading"><div><span class="studio-eyebrow">THE BIG PICTURE</span><h2>Your Trip Plan</h2></div><span id="studio-state" class="studio-state" role="status">Ready when you are</span></header>
 <div id="studio-summary" class="studio-summary"><span class="studio-eyebrow">YOUR NEXT CHAPTER</span><h3>Somewhere new. Something you.</h3><p>Choose your route to begin.</p></div>
 <div id="studio-dashboard-content"></div>
