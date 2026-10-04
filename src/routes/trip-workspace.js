@@ -9,6 +9,16 @@ import {destinationCatalog} from '../services/travel-planner.js';
 export const tripWorkspaceRouter=Router();
 const guard=[requireAuth,requireDatabase];
 const validId=id=>/^[a-f\d]{8}-[a-f\d]{4}-4[a-f\d]{3}-[89ab][a-f\d]{3}-[a-f\d]{12}$/i.test(id);
+// Child planning tables reference trip_sessions with ON DELETE CASCADE.
+// Preferences (requirements and missing items) live on the trip row itself.
+tripWorkspaceRouter.delete('/:tripId',...guard,async(req,res,next)=>{
+  try {
+    if(!validId(req.params.tripId))return res.status(400).json({error:'Invalid trip ID.'});
+    const [result]=await getDatabasePool().execute('DELETE FROM trip_sessions WHERE public_id=? AND user_id=?',[req.params.tripId,req.auth.userId]);
+    if(!result.affectedRows)return res.status(404).json({error:'Trip not found.'});
+    res.status(200).json({removed:true,tripId:req.params.tripId});
+  }catch(e){next(e);}
+});
 async function snapshot(user,id) {
   const trip=await getOwnedTrip(user,id);if(!trip)return null;
   const workspace=trip.preferences.workspace || {revision:0,requirements:{},needs:[]};

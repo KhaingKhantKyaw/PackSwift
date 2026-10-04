@@ -23,6 +23,43 @@
  function itinerary(){root.append(el('h1',`${data.details.destination} itinerary`),el('p','Suggested activities—not confirmed reservations. Edit the day, time and title, then save. Leave time blank if unknown.','saved-trip-hint'));const editor=el('div');const items=structuredClone(data.timeline);function draw(){editor.replaceChildren();items.forEach((item,index)=>{const row=el('div',null,'saved-trip-editor');for(const [field,title,type]of [['day','Day','number'],['startTime','Time','time'],['title','Activity','text']]){const label=el('label',title),input=el('input',null,'field-control');input.type=type;input.value=item[field]||'';if(type==='number'){input.min=1;input.max=data.details.nights+1;}if(type==='text')input.maxLength=180;input.oninput=()=>{item[field]=type==='number'?Number(input.value):input.value;dirty=true;};label.append(input);row.append(label);}row.append(button('Remove',()=>{items.splice(index,1);dirty=true;draw();}));editor.append(row);});}draw();root.append(button('Regenerate itinerary',()=>{if(confirm('Replace all itinerary edits with a new suggested plan?'))mutate({action:'regenerate'});}),button('Regenerate a day',()=>{const value=prompt('Which day would you like to regenerate?');if(value===null)return;const day=Number(value);if(!Number.isInteger(day)||day<1||day>data.details.nights+1)return feedback('Choose a valid day.');if(confirm(`Replace activities for Day ${day}?`))mutate({action:'regenerate',day});}),editor,button('+ Add activity',()=>{items.push({day:1,title:'New activity',startTime:''});dirty=true;draw();}),button('Save itinerary',()=>{if(items.some(p=>p.day>data.details.nights+1||p.day<1||!p.title.trim()))return feedback('Check each title and day against your trip dates.');mutate({action:'itinerary',items});}),button('Mark itinerary reviewed',()=>{if(dirty)return feedback('Save your itinerary changes before reviewing.');mutate({action:'review-itinerary'});}));}
  function packing(){root.append(el('h1','Smart packing'),el('p',`${data.details.destination} · ${data.details.nights} nights · ${data.details.purpose}`),el('p','Mark owned items as prepared. “I Need It” saves your missing-item list; shopping is outside Phase 1.','saved-trip-hint'));if(!data.packing.length){root.append(el('p','No packing items were generated for this trip.'));return;}const groups=Object.groupBy(data.packing,p=>p.category);for(const [category,items]of Object.entries(groups)){const c=card(category);for(const p of items){const row=el('div',null,'saved-trip-packing'),info=el('div');info.append(el('strong',p.itemName),el('p',p.reason||'Suggested from your saved trip context.'));const actions=el('div');for(const [value,title]of [['have','✓ I Have It'],['need','I Need It'],['unchecked','Reset']]){const b=button(title,()=>mutate({action:'packing',itemId:p.id,state:value}));b.setAttribute('aria-pressed',String(value==='have'?p.completed:value==='need'?(data.workspace.needs||[]).includes(p.id):!p.completed&&!(data.workspace.needs||[]).includes(p.id)));actions.append(b);}row.append(info,actions);c.append(row);}root.append(c);}}
  function render(){root.replaceChildren();nav();if(section==='requirements')requirementsView();else if(section==='itinerary')itinerary();else if(section==='packing')packing();else overview();root.setAttribute('aria-busy','false');}
- async function load(){feedback('Loading your saved trip…');root.setAttribute('aria-busy','true');try{await window.PackSwift.authReady;if(!window.PackSwift.currentUser){root.replaceChildren(el('h1','Your trips, in one place'),link('Sign in to continue','/login?redirect='+encodeURIComponent(location.pathname)));feedback('Sign in to access your saved trips.');return;}if(!id){const result=await api('/api/trips');root.replaceChildren(el('h1','My Trips'));const grid=el('div',null,'saved-trip-grid');for(const t of result.trips){const c=card(t.details.destination);c.append(el('p',`${t.details.origin} → ${t.details.destination}`),el('p',`${t.details.start} – ${t.details.end} · ${t.progress.percent}% planned`),link('Continue Planning',`/trips/${t.tripId}`),link('Edit Trip',`/trip-planner?trip_id=${t.tripId}`));grid.append(c);}root.append(grid);if(!result.trips.length)root.append(el('p','No saved trips yet. Your next chapter starts with a plan.'));root.append(link('Plan a trip','/trip-planner'),link('Older saved plans','/my-trips'));}else{data=await api(`/api/trips/${encodeURIComponent(id)}/workspace`);render();}status.hidden=true;}catch(e){feedback(e.message||'We couldn’t load your trip.');status.append(button('Try again',load));}finally{root.setAttribute('aria-busy','false');}}
+
+ function emptyTrips(grid){
+   if(grid.children.length)return;
+   const empty=card('No trips planned yet');
+   empty.append(el('p','Start planning your next adventure with PackSwift.'),link('Plan a Trip →','/trip-planner'));
+   grid.append(empty);
+ }
+ function removeTrip(trip,tripCard,opener){
+   const dialog=el('dialog',null,'trip-auth-dialog remove-trip-dialog');
+   dialog.setAttribute('aria-labelledby','remove-trip-title');
+   dialog.setAttribute('aria-describedby','remove-trip-description');
+   const title=el('h2','Remove Trip?');title.id='remove-trip-title';
+   const icon=el('span','⚠ ');icon.setAttribute('aria-hidden','true');title.prepend(icon);
+   const warning=el('p','This will remove the saved trip and its associated planning information.');warning.id='remove-trip-description';
+   const error=el('p');error.setAttribute('role','alert');
+   let pending=false,removed=false;
+   const cancel=button('Cancel',()=>dialog.close());
+   const confirmButton=button('Remove Trip',async()=>{
+     if(pending)return;pending=true;cancel.disabled=true;confirmButton.disabled=true;
+     confirmButton.textContent='Removing…';error.textContent='';
+     try{
+       await api('/api/trips/'+encodeURIComponent(trip.tripId),{method:'DELETE'});
+       const grid=tripCard.parentElement;tripCard.remove();emptyTrips(grid);removed=true;dialog.close();
+       const toast=el('div','Trip removed successfully.','trip-remove-toast');toast.setAttribute('role','status');document.body.append(toast);setTimeout(()=>toast.remove(),5000);
+     }catch{
+       error.textContent="We couldn't remove this trip. Please try again.";
+     }finally{pending=false;cancel.disabled=false;confirmButton.disabled=false;confirmButton.textContent='Remove Trip';}
+   });
+   confirmButton.classList.add('remove-trip-confirm');
+   const actions=el('div');actions.append(cancel,confirmButton);
+   dialog.append(title,el('p',`Are you sure you want to remove your ${trip.details.destination} trip?`),el('strong',`${trip.details.origin} → ${trip.details.destination}`),el('p',`${trip.details.start} – ${trip.details.end}`),warning,error,actions);
+   dialog.addEventListener('cancel',event=>{if(pending)event.preventDefault();});
+   dialog.addEventListener('click',event=>{if(event.target!==dialog||pending)return;const box=dialog.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dialog.close();});
+   dialog.addEventListener('close',()=>{dialog.remove();if(!removed&&opener.isConnected)opener.focus();else{const target=root.querySelector('.saved-trip-grid a')||root.querySelector('a');target?.focus();}},{once:true});
+   document.body.append(dialog);dialog.showModal();cancel.focus();
+ }
+
+ async function load(){feedback('Loading your saved trip…');root.setAttribute('aria-busy','true');try{await window.PackSwift.authReady;if(!window.PackSwift.currentUser){root.replaceChildren(el('h1','Your trips, in one place'),link('Sign in to continue','/login?redirect='+encodeURIComponent(location.pathname)));feedback('Sign in to access your saved trips.');return;}if(!id){const result=await api('/api/trips');root.replaceChildren(el('h1','My Trips'));const grid=el('div',null,'saved-trip-grid');for(const t of result.trips){const c=card(t.details.destination);c.append(el('p',`${t.details.origin} → ${t.details.destination}`),el('p',`${t.details.start} – ${t.details.end} · ${t.progress.percent}% planned`),link('Continue Planning',`/trips/${t.tripId}`),link('Edit Trip',`/trip-planner?trip_id=${t.tripId}`));const remove=button('Remove Trip',()=>removeTrip(t,c,remove));remove.classList.add('remove-trip-action');remove.setAttribute('aria-label',`Remove ${t.details.destination} trip`);c.append(remove);grid.append(c);}root.append(grid);emptyTrips(grid);root.append(link('Plan a trip','/trip-planner'),link('Older saved plans','/my-trips'));}else{data=await api(`/api/trips/${encodeURIComponent(id)}/workspace`);render();}status.hidden=true;}catch(e){feedback(e.message||'We couldn’t load your trip.');status.append(button('Try again',load));}finally{root.setAttribute('aria-busy','false');}}
  window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});load();
 })();

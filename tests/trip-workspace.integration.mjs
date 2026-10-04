@@ -29,5 +29,14 @@ try{
  const reloaded=await call(`/api/trips/${id}/workspace`,{cookie:user.cookie});assert.equal(reloaded.data.timeline[0].title,'User edited activity');assert.equal(reloaded.data.packing.find(p=>p.id===itemId).completed,true);assert.ok(reloaded.data.workspace.requirements.passport);
  const list=await call('/api/trips',{cookie:user.cookie});assert.ok(list.data.trips.some(t=>t.tripId===id));
  for(const suffix of ['', '/requirements','/itinerary','/packing'])assert.equal((await fetch(base+`/trips/${id}${suffix}`)).status,200);
- console.log('PASS: draft restore → save → overview; ownership; conflict protection; requirements, itinerary and packing persist after reload; My Trips and routes.');
+ const second=await call('/api/trips/analyze',{method:'POST',cookie:user.cookie,body:{origin:'Yangon',destination:'Bangkok',startDate:'2026-12-16',endDate:'2027-01-03',adults:1,children:0,travelers:1,budget:28400,currency:'THB',tripPurpose:'culture',pace:'balanced',tripScope:'international'}});assert.equal(second.status,201);const secondId=second.data.persistence.tripId;
+ assert.equal((await call(`/api/trips/${id}`,{method:'DELETE'})).status,401);
+ assert.equal((await call(`/api/trips/${id}`,{method:'DELETE',cookie:other.cookie})).status,404);
+ assert.equal((await call(`/api/trips/${id}/workspace`,{cookie:user.cookie})).status,200);
+ assert.equal((await call(`/api/trips/${id}`,{method:'DELETE',cookie:user.cookie})).status,200);
+ assert.equal((await call(`/api/trips/${id}/workspace`,{cookie:user.cookie})).status,404);
+ assert.equal((await call(`/api/trips/${secondId}/workspace`,{cookie:user.cookie})).status,200);
+ const [packingRows]=await getDatabasePool().execute('SELECT id FROM packing_lists WHERE id=?',[itemId]);assert.equal(packingRows.length,0);
+ assert.equal((await call(`/api/auth/me`,{cookie:user.cookie})).status,200);
+ console.log('PASS: Phase 1 flow, deletion ownership, cascading packing cleanup, same-destination trip preserved, user account preserved.');
 }finally{const pool=getDatabasePool();for(const id of created){await pool.execute('DELETE FROM trip_sessions WHERE user_id=?',[id]);await pool.execute('DELETE FROM users WHERE id=?',[id]);}await pool.end();}
