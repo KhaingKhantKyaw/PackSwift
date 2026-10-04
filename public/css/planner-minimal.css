@@ -1,56 +1,44 @@
-/* Design 1: a contained, light planning workspace. Scoped to this page only. */
+/* Planner layout adapter. Brand values come from the shared Home theme. */
 html:has(body.planner-studio){height:100%;overflow:hidden}
-body.planner-studio{height:100dvh!important;min-height:0!important;padding:0!important;margin:0!important;overflow:hidden!important;background:#f4f6fb!important;color:#122947!important;font-family:Inter,Arial,sans-serif!important}
-body.planner-studio main.studio-shell{position:fixed!important;inset:0!important;max-width:none!important;width:100%!important;height:100dvh!important;padding:12px!important;box-sizing:border-box;margin:0!important;overflow:hidden}
-body.planner-studio .studio-columns{height:100%;grid-template-columns:minmax(290px,30%) minmax(0,1fr);gap:12px;max-width:1500px;margin:auto}
-body.planner-studio .studio-setup,body.planner-studio .studio-dashboard{position:relative!important;top:auto!important;height:100%!important;min-height:0!important;overflow-y:auto;overscroll-behavior:contain;border:1px solid #e5eaf3;border-radius:12px;background:#fff!important;box-shadow:0 2px 12px #19375b04;scrollbar-color:#d2dcec transparent;color:#122947}
-body.planner-studio .studio-setup{padding:22px}
-body.planner-studio .studio-setup>.workspace-brand{color:#102c50;font-size:23px;margin-bottom:22px}
-body.planner-studio .studio-setup .studio-panel-heading h1{color:#102c50!important;font-size:20px!important}
-body.planner-studio .studio-setup .studio-panel-heading p{color:#78879c;font-size:11px;line-height:1.6}
-body.planner-studio .studio-steps{margin-top:15px}
-body.planner-studio .studio-steps>[data-step-button]{color:#6b7c91;border-top:1px solid #edf0f5;font-size:12px;padding:14px 0}
-body.planner-studio .studio-steps>[aria-current=step]{color:#102c50;font-weight:700}
-body.planner-studio .workspace-step-number{width:25px;height:25px;border-color:#dce5f2;background:#f3f6fb;font-size:10px}
-body.planner-studio .studio-steps>[aria-current=step] .workspace-step-number{background:#153c70;border-color:#153c70;color:white}
-body.planner-studio .studio-setup label{color:#556b86;font-size:10px;margin:12px 0 6px;letter-spacing:.02em;text-transform:none}
-body.planner-studio .studio-setup input:not([type=checkbox]),body.planner-studio .studio-setup select,body.planner-studio .studio-setup textarea{background:#fff!important;color:#173252!important;border:1px solid #dfe7f2!important;border-radius:7px;font:12px/1.5 Inter,Arial,sans-serif!important;padding:11px 12px!important;color-scheme:light;min-height:40px}
-body.planner-studio .studio-setup .studio-pair{grid-template-columns:1fr 1fr;gap:10px}
-body.planner-studio .studio-setup .studio-note{color:#8390a3;font-size:10px}
-body.planner-studio .studio-form-actions{background:#fff;border-color:#e9eef5;bottom:-22px;padding:14px 0;margin-top:12px}
-body.planner-studio .studio-primary{background:#153c70;border-color:#153c70;border-radius:7px;font-size:12px}
-body.planner-studio .studio-setup .studio-secondary{color:#153c70;border-color:#dbe5f2}
-body.planner-studio .studio-setup .studio-place,body.planner-studio .studio-setup .studio-selected{color:#173252;border-color:#e0e7f0}
-body.planner-studio .studio-setup .studio-place button{color:#173252}
-body.planner-studio .studio-setup .studio-place button:first-child{background:#e8f2ff}
-body.planner-studio .studio-dashboard{padding:0 20px 24px}
-body.planner-studio .workspace-nav{position:sticky;top:0;margin:0 -20px 14px;padding:15px 20px;background:#fffffff5;color:#102c50;border-bottom:1px solid #eef1f6;gap:14px;flex-wrap:wrap}
-body.planner-studio .workspace-nav .workspace-brand{display:block;font-size:16px;letter-spacing:-.3px}
-body.planner-studio .workspace-nav>div{order:3;flex-basis:100%;display:flex;gap:22px}
-body.planner-studio .workspace-nav button{font-size:11px;color:#6e7e93;padding:6px 0}
-body.planner-studio .workspace-nav button[aria-current]{color:#1a56c2;border-bottom-color:#1a56c2}
-body.planner-studio .workspace-account{display:flex;gap:7px;align-items:center;padding:8px 12px;border:1px solid #dfe7f2;border-radius:8px;font-size:11px;font-weight:600;color:#153c70;text-decoration:none;margin-left:auto}
-body.planner-studio .workspace-account[hidden]{display:none!important}
-body.planner-studio .studio-dashboard>.studio-panel-heading{margin:0 0 10px;justify-content:flex-end}
-body.planner-studio .studio-dashboard>.studio-panel-heading>div{display:none}
-body.planner-studio .studio-state{font-size:10px;color:#279057;max-width:none}
-body.planner-studio .workspace-hero{min-height:0;border-radius:10px;margin-bottom:16px}
-body.planner-studio .workspace-hero-content{padding:20px;background:linear-gradient(0deg,#071a2fdd,#071a2f22);padding-top:42px}
-body.planner-studio .workspace-hero h2{font:700 clamp(23px,2.5vw,34px)/1.3 Inter,Arial,sans-serif!important;color:#fff!important;margin:10px 0}
-body.planner-studio .workspace-hero p{font-size:11px}.workspace-kicker{font-size:8px}
-body.planner-studio .workspace-stats{gap:7px;margin-top:17px}
-body.planner-studio .workspace-stats>div{padding:9px;border-radius:7px}
-body.planner-studio .workspace-stats strong{font-size:16px}
-body.planner-studio .workspace-card{padding:16px;border-radius:10px;margin-bottom:14px;border-color:#e8edf5;box-shadow:0 2px 8px #17365403}
-body.planner-studio .workspace-card h3{font:650 14px/1.4 Inter,Arial,sans-serif!important;color:#122947!important;margin-bottom:12px}
-body.planner-studio .workspace-map-row{grid-template-columns:1fr 1fr;gap:14px}
-body.planner-studio .workspace-map{height:170px}
-body.planner-studio .workspace-total strong{font-size:20px;color:#153c70}
-body.planner-studio .workspace-recommendations{gap:12px}
-body.planner-studio .workspace-recommendations .workspace-card{border-top:1px solid #e8edf5;background:#fafcff}
-body.planner-studio .workspace-daily{grid-template-columns:68px minmax(0,1fr) 24%;gap:16px}
-body.planner-studio .workspace-days button[aria-selected=true]{background:#153c70}
-body.planner-studio .studio-readiness{border-radius:10px}
-@media(min-width:1700px){body.planner-studio main.studio-shell{padding:18px!important}}
-@media(max-width:900px){body.planner-studio .studio-columns{grid-template-columns:280px minmax(0,1fr)}body.planner-studio .workspace-map-row,body.planner-studio .workspace-recommendations{grid-template-columns:1fr}body.planner-studio .workspace-daily{grid-template-columns:60px 1fr}body.planner-studio .studio-setup .studio-pair{grid-template-columns:1fr}body.planner-studio .workspace-nav>div{gap:12px}}
-@media(max-width:640px){html:has(body.planner-studio){overflow:auto}body.planner-studio{height:auto!important;overflow:auto!important}body.planner-studio main.studio-shell{position:relative!important;height:auto!important;padding:8px!important;overflow:visible}body.planner-studio .studio-columns{grid-template-columns:1fr;height:auto}body.planner-studio .studio-setup,body.planner-studio .studio-dashboard{height:auto!important;overflow:visible}body.planner-studio .studio-setup .studio-pair{grid-template-columns:1fr 1fr}}
+body.planner-studio{--studio-ink:var(--ps-ink);--studio-muted:var(--ps-muted);--studio-paper:var(--ps-surface);--studio-line:var(--ps-border);margin:0!important;padding:0!important;height:100dvh;overflow:hidden;font-family:var(--ps-font)!important;color:var(--ps-ink)!important;background:var(--ps-canvas)!important}
+body.planner-studio>.site-header{display:block!important;position:fixed;inset:0 0 auto;z-index:30}
+body.planner-studio main.studio-shell{position:fixed!important;inset:var(--ps-header-height,80px) 0 0!important;height:auto!important;padding:18px clamp(16px,4vw,56px)!important;margin:0!important;max-width:none;box-sizing:border-box;overflow:hidden}
+body.planner-studio .studio-columns{height:100%;max-width:1440px;margin:auto;grid-template-columns:minmax(300px,.8fr) minmax(0,1.5fr);gap:20px}
+body.planner-studio .studio-setup,body.planner-studio .studio-dashboard{position:relative!important;top:auto!important;height:100%!important;min-height:0!important;overflow-y:auto;overscroll-behavior:contain;background:var(--ps-surface)!important;color:var(--ps-ink);border:1px solid var(--ps-border);border-radius:var(--ps-radius);box-shadow:var(--journey-shadow);scrollbar-color:var(--ps-border) transparent}
+body.planner-studio .studio-setup{padding:24px}
+body.planner-studio .studio-setup>.workspace-brand{display:none}
+body.planner-studio .studio-setup .studio-panel-heading h1{color:var(--ps-ink)!important;font:600 24px/1.3 var(--ps-font)!important}
+body.planner-studio .studio-setup .studio-panel-heading p,body.planner-studio .studio-note{color:var(--ps-muted)}
+body.planner-studio .studio-steps>[data-step-button]{font-family:var(--ps-font);color:var(--ps-muted);border-color:var(--ps-border)}
+body.planner-studio .studio-steps>[aria-current=step]{color:var(--ps-ink)}
+body.planner-studio .workspace-step-number{border-color:var(--ps-border);background:var(--ps-canvas)}
+body.planner-studio .studio-steps>[aria-current=step] .workspace-step-number{background:var(--ps-accent);border-color:var(--ps-accent);color:#fff}
+body.planner-studio .studio-setup label{color:var(--ps-ink);text-transform:none;letter-spacing:0;font-size:12px}
+body.planner-studio .studio-setup input:not([type=checkbox]),body.planner-studio .studio-setup select,body.planner-studio .studio-setup textarea{background:var(--ps-canvas)!important;color:var(--ps-ink)!important;border:1px solid var(--ps-border)!important;min-height:46px;border-radius:12px;font:13px/1.5 var(--ps-font)!important;color-scheme:light}
+html[data-theme=dark] body.planner-studio .studio-setup input,html[data-theme=dark] body.planner-studio .studio-setup select{color-scheme:dark}
+body.planner-studio .studio-form-actions{background:var(--ps-surface);border-color:var(--ps-border);bottom:-24px}
+body.planner-studio .studio-primary{background:var(--ps-accent);border-color:var(--ps-accent);border-radius:999px;font-family:var(--ps-font)}
+body.planner-studio .studio-secondary,body.planner-studio .studio-place button{color:var(--ps-ink);border-color:var(--ps-border)}
+body.planner-studio .studio-place,body.planner-studio .studio-selected{color:var(--ps-ink);border-color:var(--ps-border)}
+body.planner-studio .studio-dashboard{padding:0 24px 24px}
+body.planner-studio .workspace-nav{position:sticky;top:0;margin:0 -24px 18px;padding:14px 24px;background:var(--ps-surface);border-bottom:1px solid var(--ps-border);color:var(--ps-ink)}
+body.planner-studio .workspace-nav>.workspace-brand,body.planner-studio .workspace-account{display:none!important}
+body.planner-studio .workspace-nav>div{display:flex;gap:20px;flex-wrap:wrap}
+body.planner-studio .workspace-nav button{color:var(--ps-muted);font-family:var(--ps-font)}
+body.planner-studio .workspace-nav button[aria-current]{color:var(--ps-accent);border-color:var(--ps-accent)}
+body.planner-studio .workspace-hero h2{color:#fff!important;font-family:var(--ps-font)!important}
+body.planner-studio .workspace-hero{border-radius:var(--ps-radius);min-height:0}
+body.planner-studio .workspace-hero-content{padding:24px}
+body.planner-studio .workspace-card,body.planner-studio .studio-readiness,body.planner-studio .workspace-dialog{background:var(--ps-surface);color:var(--ps-ink);border-color:var(--ps-border);border-radius:var(--ps-radius);box-shadow:var(--journey-shadow)}
+body.planner-studio .workspace-card h3,body.planner-studio .workspace-card h4,body.planner-studio .workspace-cost strong{color:var(--ps-ink)!important;font-family:var(--ps-font)!important}
+body.planner-studio .workspace-card p,body.planner-studio .workspace-card small,body.planner-studio .workspace-cost{color:var(--ps-muted)}
+body.planner-studio .workspace-link,body.planner-studio .workspace-total strong{color:var(--ps-accent);font-family:var(--ps-font)}
+body.planner-studio .workspace-hero .workspace-link{color:#fff}
+body.planner-studio .workspace-days button[aria-selected=true]{background:var(--ps-accent);color:#fff}
+body.planner-studio .workspace-map{background-color:var(--ps-canvas)}
+body.planner-studio .workspace-map-labels strong{background:var(--ps-surface);color:var(--ps-ink)}
+body.planner-studio .workspace-timeline span{background:var(--journey-mint);color:#173d3e}
+body.planner-studio progress{accent-color:var(--ps-accent)}
+body.planner-studio :focus-visible{outline-color:var(--ps-accent)}
+@media(max-width:1000px){body.planner-studio .studio-columns{grid-template-columns:300px minmax(0,1fr)}body.planner-studio .workspace-map-row,body.planner-studio .workspace-recommendations{grid-template-columns:1fr}}
+@media(max-width:760px){html:has(body.planner-studio){overflow:auto}body.planner-studio{height:auto;overflow:auto}body.planner-studio main.studio-shell{position:relative!important;inset:auto!important;margin-top:var(--ps-header-height,80px)!important;overflow:visible}body.planner-studio .studio-columns{grid-template-columns:1fr;height:auto}body.planner-studio .studio-setup,body.planner-studio .studio-dashboard{height:auto!important;overflow:visible}body.planner-studio .workspace-nav{position:relative}body.planner-studio .studio-pair{grid-template-columns:1fr 1fr}}

@@ -1,3 +1,14 @@
+/* Shared Home-derived design tokens, consumed by every page and the planner adapter. */
+:root{--ps-font:Montserrat,Arial,sans-serif;--ps-radius:16px;--ps-content-width:1320px;--ps-workspace-width:1440px}
+body .page-shell{max-width:var(--ps-content-width);width:92%;margin-left:auto;margin-right:auto}
+body .site-header .header-inner{display:flex!important;align-items:center;justify-content:space-between;width:92%;max-width:1440px;min-height:80px;padding:12px 0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+body .site-header .desktop-nav{display:flex;align-items:center;gap:24px}
+body .site-header .account-navigation{display:flex;align-items:center;gap:10px}
+body .site-header .nav-link[aria-current=page]{color:var(--ps-accent)!important;border-bottom:2px solid var(--ps-accent)}
+body :is(.button,.account-link,.field-control){font-family:var(--ps-font)}
+body :is(.field-control){min-height:46px;border-radius:12px}
+body :is(.panel,.trip-card){border-color:var(--ps-border);background:var(--ps-surface)}
+@media(max-width:850px){body .site-header .header-inner{flex-wrap:wrap;gap:10px}body .site-header .desktop-nav{order:3;flex-basis:100%;justify-content:center;gap:20px;overflow-x:auto}body .site-header .account-navigation{margin-left:auto}}
 /* One coastal palette: evergreen ink, sea-glass accents, warm paper. */
 .essential-heading{display:flex;align-items:center;gap:10px;margin-bottom:8px;min-width:0}
 .essential-heading .essential-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;border-radius:11px}

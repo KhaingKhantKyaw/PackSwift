@@ -71,12 +71,14 @@ const advisoryStyles=document.createElement('link');advisoryStyles.rel='styleshe
 const mainNavigation = `
   <a class="nav-link" data-nav="home" href="/">Home</a>
   <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
+  <a class="nav-link" data-nav="explore" href="/#world-explorer">Explore</a>
   <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/my-trips">My Trips</a>
   <a class="nav-link" data-nav="help" href="/help">Help</a>`;
 
 const mobileNavigation = `
   <a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a>
   <a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a>
+  <a data-nav="explore" href="/#world-explorer"><span aria-hidden="true">◎</span><span>Explore</span></a>
   <a data-nav="trips" data-auth="user" hidden href="/my-trips"><span aria-hidden="true">▤</span><span>My Trips</span></a>
   <a data-nav="help" href="/help"><span aria-hidden="true">?</span><span>Help</span></a>
   <a data-nav="profile" href="/profile"><span aria-hidden="true">○</span><span>Account</span></a>`;
@@ -93,9 +95,9 @@ const footer=document.querySelector('.site-footer .footer-inner, .slider-footer'
 if(footer){const links=document.createElement('nav');links.className='footer-help-links';links.setAttribute('aria-label','Information and support');for(const [label,url] of [['About PackSwift','/about'],['Contact & Feedback','/help#contact'],['Privacy','/help#privacy'],['Terms','/help#terms']]){const a=document.createElement('a');a.textContent=label;a.href=url;links.append(a);}footer.append(links);}
 document.addEventListener('click',event=>{if(event.target.closest('[data-open-concierge]'))window.PackSwift?.concierge?.open(true);});
 
-for (const oldAction of document.querySelectorAll(".header-action")) {
+for (const oldAction of document.querySelectorAll(".header-action, .slider-account")) {
   const accountNavigation = document.createElement("div");
-  accountNavigation.className = "account-navigation";
+  accountNavigation.className = oldAction.classList.contains('slider-account') ? "account-navigation slider-account" : "account-navigation";
   accountNavigation.innerHTML = `
     <span data-auth="guest" class="account-guest">
       <a class="account-link" href="/login">Login</a>
@@ -117,11 +119,19 @@ for(const logo of document.querySelectorAll('.brand,.slider-brand')){
 }
 
 for (const link of document.querySelectorAll("[data-nav]")) {
-  if (link.dataset.nav === page || (page === "trips" && link.dataset.nav === "profile")) {
+  if (link.dataset.nav === (page === 'planner-studio' ? 'planner' : page) || (page === "trips" && link.dataset.nav === "profile")) {
     link.setAttribute("aria-current", "page");
   } else {
     link.removeAttribute("aria-current");
   }
+}
+
+// Measure the shared header instead of hardcoding a desktop offset in the planner.
+const globalHeader = document.querySelector('.site-header');
+if (globalHeader) {
+  const measureHeader = () => document.documentElement.style.setProperty('--ps-header-height', `${globalHeader.getBoundingClientRect().height}px`);
+  new ResizeObserver(measureHeader).observe(globalHeader);
+  measureHeader();
 }
 
 for (const year of document.querySelectorAll("[data-current-year]")) {
