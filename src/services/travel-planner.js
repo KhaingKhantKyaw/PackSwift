@@ -374,7 +374,8 @@ function parseInput(input = {}) {
     );
   }
 
-  const purpose = String(input.tripPurpose || "leisure").toLowerCase();
+  const rawPurpose = String(input.tripPurpose || "leisure").toLowerCase();
+  const purpose = rawPurpose === 'culture' ? 'cultural' : rawPurpose;
   if (!Object.hasOwn(purposeInterests, purpose)) {
     throw new RangeError("Choose a valid trip purpose.");
   }

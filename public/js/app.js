@@ -72,7 +72,7 @@ const mainNavigation = `
   <a class="nav-link" data-nav="home" href="/">Home</a>
   <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
   <a class="nav-link" data-nav="explore" href="/#world-explorer">Explore</a>
-  <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/my-trips">My Trips</a>
+  <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/trips">My Trips</a>
   <a class="nav-link" data-nav="help" href="/help">Help</a>`;
 
 const mobileNavigation = `

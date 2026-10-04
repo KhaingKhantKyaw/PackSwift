@@ -6,6 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDirectory = path.resolve(__dirname, "../../public");
 
 export const pageRouter = Router();
+pageRouter.get(['/trips','/trips/:tripId','/trips/:tripId/requirements','/trips/:tripId/itinerary','/trips/:tripId/packing'],(req,res)=>res.sendFile(path.join(publicDirectory,'saved-trip-workspace.html')));
 
 const pages = new Map([
   ["/", "index.html"],

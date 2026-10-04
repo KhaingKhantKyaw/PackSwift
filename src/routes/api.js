@@ -22,6 +22,7 @@ import { profileRouter } from "./profile.js";
 import { plannerRouter } from "./planner.js";
 import { savedTripsRouter } from "./saved-trips.js";
 import { tripsRouter } from "./trips.js";
+import { tripWorkspaceRouter } from './trip-workspace.js';
 import { tripPlanRouter } from "./trip-plan.js";
 
 export const apiRouter = Router();
@@ -40,6 +41,7 @@ apiRouter.use("/destinations", destinationsRouter);
 apiRouter.use("/profile", profileRouter);
 apiRouter.use("/planner", plannerRouter);
 apiRouter.use("/saved-trips", savedTripsRouter);
+apiRouter.use("/trips", tripWorkspaceRouter);
 apiRouter.use("/trips", tripsRouter);
 apiRouter.use("/trip/plan", tripPlanRouter);
 
