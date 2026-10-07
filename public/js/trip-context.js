@@ -1,8 +1,17 @@
 /* Shared, pure trip computations. ISO dates stay in storage and API payloads. */
 globalThis.PackSwiftTripContext=(()=>{
+ function routeContext(input){
+  const local=input.tripType==='local'||input.tripScope==='local';
+  const origin=local?(input.origin||input.localTripCity||input.destination):input.origin;
+  const destination=local?origin:input.destination;
+  const from=globalThis.PackSwiftCurrency.resolve(origin),to=globalThis.PackSwiftCurrency.resolve(destination);
+  const routeType=local?'domestic':from.countryCode&&to.countryCode?(from.countryCode===to.countryCode?'domestic':'international'):'unknown';
+  return {origin,destination,tripType:local?'local':'anywhere',tripScope:local?'local':'anywhere',routeType,isInternational:routeType==='unknown'?null:routeType==='international',originCountryCode:from.countryCode,destinationCountryCode:to.countryCode};
+ }
  const displayDate=value=>{const match=/^(\d{4})-(\d{2})-(\d{2})/.exec(String(value||''));return match?`${match[3]}/${match[2]}/${match[1].slice(2)}`:'Choose dates';};
  function entryStatus(context,rule){
   if(context.tripType==='local')return {status:'LOCAL',message:'International entry requirements are not required for this local trip.'};
+  if(context.routeType==='domestic')return {status:'DOMESTIC',message:'Domestic route — check carrier identification requirements. No international border crossing is planned.'};
   const unknown={status:'VERIFICATION_REQUIRED',message:'Entry requirements can change. Verify with the official immigration authority or embassy before traveling.'};
   if(!rule||rule.verificationStatus!=='verified'||!/^https:\/\//.test(rule.sourceUrl||'')||!Number.isFinite(Date.parse(rule.lastUpdated))||!Number.isFinite(Date.parse(rule.validUntil))||Date.parse(rule.validUntil)<Date.now()||rule.passport_country!==context.passportCountry||rule.destination_country!==context.destinationCountry||rule.conditions?.entry_mode!==context.entryMode||!Number.isInteger(context.days)||context.days<1)return unknown;
   if(rule.visa_type==='visa_free'&&(!Number.isInteger(rule.max_stay_days)||rule.max_stay_days<1))return unknown;
@@ -29,5 +38,5 @@ globalThis.PackSwiftTripContext=(()=>{
   if(usable)spending.push({label:'Emergency buffer',amount:fundedEmergency},{label:'Optional shopping / unassigned',amount:Math.max(0,available)});
   return {currency,total,flight,stay,base,remaining,spending,minimum,recommended:usable?review.budget.total.maximum:null,shortfall:minimum===null?null:Math.max(0,minimum-total),complete:local&&Boolean(stay),source:usable?'Internal ground-cost benchmarks · estimated':'No comparable destination cost data'};
  }
- return {displayDate,entryStatus,budgetSummary};
+ return {displayDate,entryStatus,budgetSummary,routeContext};
 })();

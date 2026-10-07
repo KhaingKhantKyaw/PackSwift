@@ -5,7 +5,9 @@
   }
   function restoreFields(form,fields){
     const controls=[...form.elements];const used=new Map();
-    for(const saved of fields||[]){
+    for(const record of fields||[]){
+      const saved={...record};
+      if(saved.name==='tripType'&&saved.value==='worldwide')saved.value='anywhere';
       const matches=controls.filter(el=>el.name===saved.name&&(!saved.type||el.type===saved.type));
       // Old drafts have no IDs. Match by input type and occurrence, never by name alone.
       const key=`${saved.name}:${saved.type}`;const index=used.get(key)||0;
@@ -16,6 +18,8 @@
       if(typeof saved.disabled==='boolean')target.disabled=saved.disabled;
     }
     const destination=controls.find(el=>el.id==='destination-search');
+    const origin=controls.find(el=>el.id==='origin-search');
+    if(form.elements.tripType?.value==='local'&&origin&&!origin.value&&destination)origin.value=destination.value;
     if(destination)destination.dataset.internationalValue=destination.value;
   }
   async function gate(action,preview={}){

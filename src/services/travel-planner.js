@@ -221,6 +221,7 @@ export function routeLocation(value) {
     slug: match.slug,
     name: match.name,
     country: match.country,
+    countryCode: destinationCurrency(match.country).countryCode,
     region: match.region,
     code: match.code || match.slug.slice(0, 3).toUpperCase(),
     latitude: Number(match.latitude),
@@ -338,17 +339,14 @@ function parseInput(input = {}) {
     throw new RangeError("Travelers must be between 1 and 20.");
   }
 
-  const tripType = input.tripType || 'worldwide';
-  if (!['local','worldwide'].includes(tripType)) throw new RangeError('Choose Local Trip or Worldwide.');
-  const tripScope = tripType === 'local' ? 'domestic' : String(input.tripScope || "international").toLowerCase();
-  if (!["domestic", "international"].includes(tripScope)) {
-    throw new RangeError("Choose a valid trip scope.");
-  }
-  const originQuery = String(tripType === 'local' ? input.destination || '' : input.origin || "Yangon").trim().slice(0, 100);
-  const destinationQuery = String(input.destination || "").trim().slice(0, 100);
+  const tripType = input.tripType === 'local' || input.tripScope === 'local' ? 'local' : 'anywhere';
+  const originQuery = String(tripType === 'local' ? input.origin || input.localTripCity || input.destination || '' : input.origin || "Yangon").trim().slice(0, 100);
+  const destinationQuery = String(tripType === 'local' ? originQuery : input.destination || "").trim().slice(0, 100);
   const explicitRoute = input.tripScope !== undefined || input.origin !== undefined || hasBreakdown;
   const origin = routeLocation(originQuery);
   const destination = routeLocation(destinationQuery);
+  // Keep the database's legacy geographic scope, derived server-side, not from UI labels.
+  const tripScope = destination && origin && origin.countryCode && origin.countryCode === destination.countryCode ? 'domestic' : 'international';
   if (!origin) throw new RangeError("Choose a supported origin city or country.");
   if (explicitRoute && !destination) {
     throw new RangeError("Choose a supported destination city or country.");
