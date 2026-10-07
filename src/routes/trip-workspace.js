@@ -24,7 +24,7 @@ async function snapshot(user,id) {
   const workspace=trip.preferences.workspace || {revision:0,requirements:{},needs:[]};
   const packing=await listPackingItems(user,id);
   const timeline=await listTripTimeline(user,id);
-  return {tripId:id,details:tripDetails(trip),workspace,timeline,packing,progress:workspaceProgress(trip,workspace,packing)};
+  return {tripId:id,details:tripDetails(trip),workspace,timeline,packing,itineraryPreferences:trip.preferences.detailPlanning?.itineraryPreferences||null,progress:workspaceProgress(trip,workspace,packing)};
 }
 tripWorkspaceRouter.get('/',...guard,async(req,res,next)=>{
   try {const [rows]=await getDatabasePool().execute('SELECT public_id FROM trip_sessions WHERE user_id=? ORDER BY updated_at DESC LIMIT 100',[req.auth.userId]);

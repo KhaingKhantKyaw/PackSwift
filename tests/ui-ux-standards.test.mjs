@@ -35,7 +35,7 @@ test("important forms use permanent labels and logical section headings", () => 
   assert.match(signup, /Personal details/);
   assert.match(signup, /Security &amp; password/);
   assert.match(home, /for="home-feedback-message">Quick feedback/);
-  assert.match(planner, /<h3>Trip Scope<\/h3>/);
+  assert.match(planner, /<legend class="form-legend">Trip scope<\/legend>/);
   assert.match(planner, /<h3>Dates<\/h3>/);
   assert.match(planner, /<h3>Trip Preferences<\/h3>/);
   assert.match(packing, /Conditions &amp; traveller needs/);

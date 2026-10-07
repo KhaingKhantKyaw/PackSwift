@@ -33,6 +33,7 @@ import {
 } from "../services/travel-planner.js";
 import { buildDetailedTimeline } from "../services/itinerary-timeline-service.js";
 import { cleanTripEntity, normalizeTripRecommendation } from "../services/ai-concierge-service.js";
+import '../../public/js/itinerary-preferences-model.js';
 
 export const tripsRouter = Router();
 tripsRouter.get('/currency-rate', requireAuth, async(req,res)=>{
@@ -48,6 +49,17 @@ tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async (req,res
   try {
     if(!/^[a-f0-9-]{36}$/i.test(req.params.tripId)||!req.body||JSON.stringify(req.body).length>80000)return res.status(400).json({message:'Trip details are incomplete or too large.'});
     const details={fields:Array.isArray(req.body.fields)?req.body.fields:[],selected:Array.isArray(req.body.selected)?req.body.selected:[],rejected:Array.isArray(req.body.rejected)?req.body.rejected:[]};
+    if(details.selected.some(p=>!p||typeof p!=='object'||typeof(p.title||p.name)!=='string')||details.fields.some(f=>!f||typeof f.name!=='string'))return res.status(400).json({message:'Invalid selected places or form fields.'});
+    let raw=req.body.itineraryPreferences;
+    if(raw===undefined){const field=details.fields.find(f=>f.name==='itineraryPreferences');try{raw=field?JSON.parse(field.value):{};}catch{return res.status(400).json({message:'Invalid itinerary preferences.'});}}
+    if(!raw||typeof raw!=='object'||Array.isArray(raw))return res.status(400).json({message:'Invalid itinerary preferences.'});
+    const preferences=globalThis.PackSwiftItineraryPreferenceModel.normalize(raw,details.selected);
+    const values=Object.fromEntries(details.fields.map(f=>[f.name,f.value]));
+    const days=Math.round((Date.parse(values.endDate)-Date.parse(values.startDate))/86400000)+1;
+    const errors=globalThis.PackSwiftItineraryPreferenceModel.validate(preferences,days);
+    if(errors.length)return res.status(400).json({message:errors.join(' ')});
+    details.itineraryPreferences=preferences;
+    details.fields=details.fields.filter(f=>!['itineraryPreferences','itinerary-mode-choice'].includes(f.name));
     const [result]=await getDatabasePool().execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.detailPlanning', JSON_EXTRACT(?, '$'), '$.workspace.itineraryReviewedAt', NULL, '$.workspace.requirements', JSON_OBJECT(), '$.workspace.revision', COALESCE(JSON_EXTRACT(preferences_json,'$.workspace.revision'),0)+1), updated_at=CURRENT_TIMESTAMP WHERE public_id=? AND user_id=?",[JSON.stringify(details),req.params.tripId,req.auth.userId]);
     if(!result.affectedRows)return res.status(404).json({message:'Trip not found.'});
     res.json({success:true});

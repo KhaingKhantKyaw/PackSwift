@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import '../public/js/itinerary-preferences-model.js';
+const {normalize,validate}=globalThis.PackSwiftItineraryPreferenceModel;
+const selected=[{id:'a',title:'Place A'},{id:'b',title:'Place B'}];
+test('defaults let users continue with flexible selected places',()=>{const p=normalize({},selected);assert.equal(p.planningMode,'collaborative');assert.equal(p.tripPace,'balanced');assert.equal(p.preferredDayStart,'09:00');assert.deepEqual(validate(p,5),[]);assert.equal(p.activityPreferences.length,2);assert.ok(p.activityPreferences.every(a=>!a.isUserLocked&&a.preferredDay===null));});
+test('day/time constraints and priority survive serialization and mode changes',()=>{const p=normalize({planningMode:'manual',tripPace:'packed',activityPreferences:[{activityId:'a',preferredDay:2,preferredTimePeriod:'specific',specificTime:'09:30',priority:'must_visit'}]},selected);assert.equal(p.activityPreferences[0].isUserLocked,true);assert.deepEqual(validate(p,5),[]);const restored=normalize(JSON.parse(JSON.stringify(p)),selected);assert.deepEqual(restored,p);assert.equal(normalize({...p,planningMode:'auto'},selected).activityPreferences[0].preferredDay,2);});
+test('removed activities lose preferences without copying activity records',()=>{const p=normalize({},selected);assert.deepEqual(normalize(p,[selected[1]]).activityPreferences.map(a=>a.activityId),['b']);assert.ok(!('title' in p.activityPreferences[0]));});
+test('date shortening flags a constraint and never silently moves it',()=>{const p=normalize({activityPreferences:[{activityId:'a',preferredDay:5}]},selected);assert.ok(validate(p,3).length);assert.equal(p.activityPreferences[0].preferredDay,5);});
+test('specific times and typical-day times are validated while defaults are optional',()=>{assert.ok(validate(normalize({activityPreferences:[{activityId:'a',preferredTimePeriod:'specific'}]},selected),5).length);assert.ok(validate(normalize({preferredDayStart:'22:00',preferredDayEnd:'09:00'},selected),5).length);assert.deepEqual(validate(normalize({preferredDayStart:'',preferredDayEnd:''},selected),5),[]);});

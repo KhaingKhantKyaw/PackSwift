@@ -1,7 +1,7 @@
 (() => {
   let busy=false;
   function captureFields(form){
-    return [...form.elements].filter(el=>el.name&&['INPUT','SELECT','TEXTAREA'].includes(el.tagName)).map(el=>({id:el.id||null,name:el.name,value:el.value,checked:el.checked,type:el.type,disabled:el.disabled}));
+    return [...form.elements].filter(el=>el.name&&!el.dataset?.preferenceTransient&&['INPUT','SELECT','TEXTAREA'].includes(el.tagName)).map(el=>({id:el.id||null,name:el.name,value:el.value,checked:el.checked,type:el.type,disabled:el.disabled}));
   }
   function restoreFields(form,fields){
     const controls=[...form.elements];const used=new Map();

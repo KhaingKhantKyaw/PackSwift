@@ -1,4 +1,20 @@
 /* Planner layout adapter. Brand values come from the shared Home theme. */
+body.planner-studio .studio-step>.preferences-heading{display:block;font-size:20px!important;margin:12px 0}
+.preference-modes{border:0;padding:0;margin:18px 0;display:grid;gap:9px}
+.preference-modes legend{font-weight:600;margin-bottom:10px;font-size:13px}
+body.planner-studio .preference-mode{display:grid;position:relative;gap:5px;padding:13px;border:1px solid var(--ps-border);border-radius:12px;cursor:pointer;text-transform:none}
+body.planner-studio .preference-mode input[type=radio]{position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0}
+.preference-mode:has(:checked){background:color-mix(in srgb,var(--ps-accent) 9%,var(--ps-surface));border-color:var(--ps-accent)!important}
+.preference-mode:focus-within{outline:2px solid var(--ps-accent);outline-offset:2px}
+.preference-mode span{font-size:12px;font-weight:400;color:var(--ps-muted);line-height:1.5}
+.preference-badge{color:var(--ps-accent);font-size:10px}
+.preference-place{border:1px solid var(--ps-border);border-radius:12px;padding:12px;margin-bottom:10px;min-width:0}
+.preference-place summary{display:grid;gap:5px;cursor:pointer;overflow-wrap:anywhere}
+.preference-place summary .studio-note{margin:0}.preference-place .workspace-link{font-size:12px}
+.preference-controls{border-top:1px solid var(--ps-border);margin-top:12px;padding-top:12px;display:grid;gap:10px;min-width:0}
+.preference-controls label{min-width:0}.preference-controls select{max-width:100%}
+#itinerary-preferences-content .studio-detail{margin:18px 0}
+@media(min-width:1600px){.preference-modes{grid-template-columns:repeat(3,minmax(0,1fr))}}
 body.planner-studio .trip-type-control label{position:relative;flex:1;text-align:center;cursor:pointer;margin:0}
 body.planner-studio .trip-type-control input[type=radio]{position:absolute;width:1px;height:1px;min-height:0;opacity:0;padding:0}
 body.planner-studio .trip-type-control label:has(:checked){background:var(--journey-mint);color:#173d3e;border-color:var(--ps-accent)}
