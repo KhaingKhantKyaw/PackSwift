@@ -1,5 +1,5 @@
 /* World geometry: holtzy/D3-graph-gallery world.geojson (Natural Earth-derived). */
-body.combined-home .home-hero-shell{position:relative;isolation:isolate}
+body.combined-home .home-hero-shell{position:relative;isolation:isolate;display:flex;flex-direction:column;min-height:calc(100dvh - var(--header-height,88px));padding-top:clamp(16px,3vh,28px);box-sizing:border-box}
 body.combined-home .destination-backdrops{position:absolute;inset:0;z-index:-1}
 body.combined-home .home-world-explorer{position:relative;isolation:isolate;padding:72px 5vw;background:#08272e;color:#effbf8;scroll-margin-top:0;font-family:Montserrat,Arial,sans-serif}
 .home-world-explorer::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,rgba(4,30,37,.93),rgba(5,39,43,.83)),url('/images/destination-bali.jpg') center/cover}
@@ -52,15 +52,15 @@ body.combined-home .home-explore-footer a:focus-visible{outline:2px solid #a6edd
 /* Desktop explorer is one viewport; only the destination list scrolls. */
 @media(min-width:951px){
  body.combined-home .home-world-explorer{
-  height:100vh;height:100dvh;min-height:0;box-sizing:border-box;
+  height:calc(100dvh - var(--header-height,88px));min-height:560px;box-sizing:border-box;
   padding:clamp(20px,4vh,44px) clamp(24px,4vw,72px);
  }
  .home-world-explorer .atlas-layout{height:100%;min-height:0;gap:clamp(24px,3vw,48px);grid-template-columns:minmax(0,1.7fr) minmax(300px,1fr)}
- .home-world-explorer .atlas-main{height:100%;min-height:0;display:flex;flex-direction:column;justify-content:center;overflow-y:auto;scrollbar-width:thin}
+ .home-world-explorer .atlas-main{height:100%;min-height:0;display:flex;flex-direction:column;justify-content:center}
  .home-world-explorer .atlas-eyebrow{margin:0 0 14px;flex-shrink:0}
  .home-world-explorer .atlas-main h2{font-size:clamp(30px,min(4vw,6vh),60px)!important;margin-bottom:12px;flex-shrink:0}
  .home-world-explorer .atlas-intro{margin:0;flex-shrink:0;font-size:13px}
- .home-world-explorer .atlas-map{flex-shrink:0;width:min(100%,calc((100dvh - 290px)*2));min-width:300px;margin:24px auto 12px;aspect-ratio:2/1}
+ .home-world-explorer .atlas-map{flex-shrink:0;width:min(100%,calc((100dvh - var(--header-height,88px) - 270px)*2));min-width:0;margin:20px auto 12px;aspect-ratio:2/1}
  .home-world-explorer .atlas-hint{margin:0;flex-shrink:0}
  .home-world-explorer .atlas-panel{height:100%;min-height:0;box-sizing:border-box;display:flex;flex-direction:column;padding:clamp(18px,2vw,26px);overflow-y:auto;scrollbar-width:thin}
  .home-world-explorer .atlas-panel>nav,.home-world-explorer .atlas-panel>h2,.home-world-explorer .atlas-panel>p,.home-world-explorer #explore-regions-wrap{flex-shrink:0}

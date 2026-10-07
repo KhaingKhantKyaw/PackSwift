@@ -43,7 +43,9 @@ body.planner-studio .studio-steps>[aria-current=step] .workspace-step-number{bac
 body.planner-studio .studio-setup label{color:var(--ps-ink);text-transform:none;letter-spacing:0;font-size:12px}
 body.planner-studio .studio-setup input:not([type=checkbox]),body.planner-studio .studio-setup select,body.planner-studio .studio-setup textarea{background:var(--ps-canvas)!important;color:var(--ps-ink)!important;border:1px solid var(--ps-border)!important;min-height:46px;border-radius:12px;font:13px/1.5 var(--ps-font)!important;color-scheme:light}
 html[data-theme=dark] body.planner-studio .studio-setup input,html[data-theme=dark] body.planner-studio .studio-setup select{color-scheme:dark}
-body.planner-studio .studio-form-actions{background:var(--ps-surface);border-color:var(--ps-border);bottom:-24px}
+body.planner-studio .studio-form-actions{background:rgba(250,248,242,.70);backdrop-filter:blur(14px);border-color:var(--ps-border);bottom:-24px;min-height:64px;padding:10px 0;margin-top:16px;box-sizing:border-box}
+html body.planner-studio .studio-form-actions button{height:42px;min-height:42px;padding:0 22px;flex:none}
+html[data-theme=dark] body.planner-studio .studio-form-actions{background:rgba(10,50,55,.75)}
 body.planner-studio .studio-primary{background:var(--ps-accent);border-color:var(--ps-accent);border-radius:999px;font-family:var(--ps-font)}
 body.planner-studio .studio-secondary,body.planner-studio .studio-place button{color:var(--ps-ink);border-color:var(--ps-border)}
 body.planner-studio .studio-place,body.planner-studio .studio-selected{color:var(--ps-ink);border-color:var(--ps-border)}

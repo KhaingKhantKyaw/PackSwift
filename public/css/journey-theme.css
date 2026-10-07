@@ -81,7 +81,7 @@ body:not(.slider-home) .eyebrow{color:var(--ps-accent)!important;font-weight:600
 .slider-home .slider-search-wrap{width:min(480px,100%);margin-top:8px}
 .slider-home .slider-search{background:#fffefaf2;border-color:#ffffff70;box-shadow:0 8px 28px #00000010;padding:0 18px}
 .slider-home .slider-search-wrap>label{font-size:10px;letter-spacing:.14em;color:#def0e8}
-.slider-home .destination-stage{max-width:1600px;margin:auto;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding-top:56px;padding-bottom:28px;min-height:calc(100svh - 240px)}
+.slider-home .destination-stage{width:100%;max-width:1440px;margin:auto;flex:1;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;gap:clamp(24px,4vw,48px);padding:clamp(20px,4vh,40px) var(--ps-gutter);min-height:0}
 .slider-home .destination-story{padding-bottom:0}
 .slider-home #slider-title{font-size:clamp(44px,6.1vw,92px)!important;font-weight:700;letter-spacing:-.055em;line-height:1.05;margin:18px 0}
 .slider-home #slider-description{font-size:14px;line-height:1.8;max-width:430px;min-height:76px;color:#edf5f1}
@@ -167,3 +167,24 @@ html body .site-footer a{color:var(--ps-mint)}
 @media(max-width:850px){html body:not(.slider-home) .site-header .header-inner{padding:12px 0!important;gap:10px}html body .site-header .desktop-nav{margin-left:0;gap:20px}html body .site-header .account-navigation{margin-left:auto}}
 @media(max-width:480px){html body .site-header .brand{font-size:21px!important}html body .site-header .account-link{padding:8px 10px!important}html body .site-header .desktop-nav{gap:18px}html body .site-header .nav-link{font-size:13px!important}}
 @media(prefers-reduced-motion:reduce){:root{--ps-motion:0s}}
+
+/* Shared cinematic authentication surfaces; form bindings are unchanged. */
+html body .auth-shell{min-height:calc(100dvh - var(--header-height));padding:clamp(28px,5vh,60px) 0!important;grid-template-columns:minmax(0,1fr) minmax(320px,460px)!important}
+html body .auth-intro h1{font-size:clamp(36px,4vw,58px)!important;color:var(--ps-ivory)!important;line-height:1.1;font-weight:400!important}
+html body .auth-intro h1 span{color:var(--ps-mint)!important}
+html body:not(.slider-home) .auth-intro>p,html body .auth-intro .auth-benefit,html body .auth-intro .auth-benefit strong{color:#e0eeea!important}
+html body .auth-intro .eyebrow{color:var(--ps-mint)!important}
+html body .auth-benefit{background:var(--ps-glass)!important;border-color:var(--ps-glass-border)!important;backdrop-filter:blur(14px)}
+html body .auth-panel{background:var(--ps-glass-light)!important;box-shadow:0 20px 60px #001b3040!important}
+@media(max-width:650px){html body .auth-shell{gap:24px!important}.auth-intro h1{max-width:16ch}}
+
+/* Two typography roles, including text nested inside editorial headings. */
+:root{--font-display:Georgia,"Times New Roman",serif;--font-body:"Times New Roman",serif;--ps-font:var(--font-body);--ps-heading-font:var(--font-display);--text-hero:clamp(48px,6vw,88px);--text-page-title:clamp(36px,4vw,58px);--text-section-title:clamp(22px,2vw,30px);--text-card-title:20px;--text-body:16px;--text-caption:13px;--text-label:12px}
+html body :is(h1,h2,h3,h4,h5,h6) span{font-family:var(--font-display)!important}
+html body.slider-home #slider-title{font-family:var(--font-display)!important;font-size:var(--text-hero)!important;font-weight:500;letter-spacing:-.035em;line-height:1.08}
+html body .home-world-explorer .atlas-main h2,html body .home-world-explorer #explore-title,html body .home-world-explorer .explore-city-copy h3{font-family:var(--font-display)!important;font-weight:500!important}
+html body :is(.destination-thumbnail strong,.explore-city-copy h3,.studio-place h3,.studio-selected strong,.preference-place summary strong){font-family:var(--font-display)!important;font-size:var(--text-card-title);line-height:1.25;letter-spacing:-.015em}
+html body :is(.destination-thumbnail small,.explore-city-copy small){font-family:var(--font-body)!important;font-size:var(--text-label);letter-spacing:.1em}
+html body :is(.studio-place p,.explore-city-copy p,.preference-place .studio-note){font-size:var(--text-caption);line-height:1.6}
+html body :is(.auth-intro>p,.auth-panel .panel-copy){font-size:var(--text-body);line-height:1.6}
+html body .auth-shell{margin-top:0!important;margin-bottom:0!important}
