@@ -38,5 +38,11 @@ try{
  assert.equal((await call(`/api/trips/${secondId}/workspace`,{cookie:user.cookie})).status,200);
  const [packingRows]=await getDatabasePool().execute('SELECT id FROM packing_lists WHERE id=?',[itemId]);assert.equal(packingRows.length,0);
  assert.equal((await call(`/api/auth/me`,{cookie:user.cookie})).status,200);
- console.log('PASS: Phase 1 flow, deletion ownership, cascading packing cleanup, same-destination trip preserved, user account preserved.');
+ const local=await call('/api/trips/analyze',{method:'POST',cookie:user.cookie,body:{tripType:'local',destination:'Bangkok',startDate:'2026-12-16',endDate:'2026-12-20',adults:2,children:0,travelers:2,budget:30000,currency:'THB',tripPurpose:'culture',pace:'balanced'}});
+ assert.equal(local.status,201,JSON.stringify(local.data));
+ const localId=local.data.persistence.tripId;
+ const localReload=await call(`/api/trips/${localId}/workspace`,{cookie:user.cookie});
+ assert.equal(localReload.data.details.tripType,'local');assert.equal(localReload.data.details.destination,'Bangkok');assert.equal(localReload.data.details.nights,4);
+ assert.ok(!localReload.data.packing.some(p=>/Passport and travel documents/.test(p.name||p.itemName||p.item_name||'')));
+ console.log('PASS: draft restoration, save/edit, local-trip persistence, deletion ownership, cascading cleanup, other trip and user preserved.');
 }finally{const pool=getDatabasePool();for(const id of created){await pool.execute('DELETE FROM trip_sessions WHERE user_id=?',[id]);await pool.execute('DELETE FROM users WHERE id=?',[id]);}await pool.end();}

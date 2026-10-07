@@ -70,17 +70,17 @@ const advisoryStyles=document.createElement('link');advisoryStyles.rel='styleshe
 
 const mainNavigation = `
   <a class="nav-link" data-nav="home" href="/">Home</a>
-  <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
   <a class="nav-link" data-nav="explore" href="/#world-explorer">Explore</a>
-  <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/trips">My Trips</a>
-  <a class="nav-link" data-nav="help" href="/help">Help</a>`;
+  <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
+  <a class="nav-link" data-nav="help" href="/help">Help</a>
+  <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/trips">My Trips</a>`;
 
 const mobileNavigation = `
   <a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a>
-  <a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a>
   <a data-nav="explore" href="/#world-explorer"><span aria-hidden="true">◎</span><span>Explore</span></a>
-  <a data-nav="trips" data-auth="user" hidden href="/my-trips"><span aria-hidden="true">▤</span><span>My Trips</span></a>
+  <a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a>
   <a data-nav="help" href="/help"><span aria-hidden="true">?</span><span>Help</span></a>
+  <a data-nav="trips" data-auth="user" hidden href="/my-trips"><span aria-hidden="true">▤</span><span>My Trips</span></a>
   <a data-nav="profile" href="/profile"><span aria-hidden="true">○</span><span>Account</span></a>`;
 
 for (const navigation of document.querySelectorAll(".desktop-nav")) {

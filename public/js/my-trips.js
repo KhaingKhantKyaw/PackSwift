@@ -23,17 +23,7 @@ function getDeviceTrips() {
   }
 }
 
-function formatDate(value) {
-  if (!value) return "Dates to be confirmed";
-  const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
-  return Number.isNaN(date.valueOf())
-    ? "Dates to be confirmed"
-    : new Intl.DateTimeFormat(undefined, {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }).format(date);
-}
+function formatDate(value) { return PackSwiftTripContext.displayDate(value); }
 
 function formatMoney(amount, currency = "USD") {
   try {

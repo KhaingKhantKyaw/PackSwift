@@ -1,5 +1,8 @@
 /* Shared Home-derived design tokens, consumed by every page and the planner adapter. */
-:root{--ps-font:Montserrat,Arial,sans-serif;--ps-radius:16px;--ps-content-width:1320px;--ps-workspace-width:1440px}
+:root{--ps-font:"Times New Roman",serif;--ps-heading-font:"Times New Roman",serif;--ps-radius:18px;--ps-content-width:1440px;--ps-workspace-width:1440px}
+/* Paper Cuts is intentionally not declared: no verified licensed asset is installed. */
+html body,html body :is(p,a,span,small,strong,label,input,select,textarea,button,legend,summary,li,dt,dd){font-family:var(--ps-font)!important}
+html body :is(h1,h2,h3,h4,h5,h6),html body[data-page] :is(h1,h2,h3,h4,h5,h6),html body.slider-home #slider-title,html body .brand,html body .slider-brand{font-family:var(--ps-heading-font)!important}
 body .page-shell{max-width:var(--ps-content-width);width:92%;margin-left:auto;margin-right:auto}
 body .site-header .header-inner{display:flex!important;align-items:center;justify-content:space-between;width:92%;max-width:1440px;min-height:80px;padding:12px 0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
 body .site-header .desktop-nav{display:flex;align-items:center;gap:24px}
@@ -55,7 +58,7 @@ body[data-page=planner] .traveller-fields>.lifestyle-detail-grid{margin-top:0}
 }
 @media(max-width:980px){body[data-page=planner] .planner-page-shell{height:auto!important;padding-top:16px!important}body[data-page=planner] .planner-layout{grid-template-columns:1fr;gap:18px}body[data-page=planner] .planner-layout>.panel{position:static!important;max-height:none!important;height:auto!important}}
 .location-suggestions{max-height:240px;overflow-y:auto;overscroll-behavior:contain;margin-top:6px;padding:5px;border:1px solid var(--ps-border);border-radius:12px;background:var(--ps-surface);box-shadow:0 6px 20px #173d3e0d}.location-suggestions[hidden]{display:none}.location-suggestions button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;padding:11px 10px;border:0;border-radius:8px;background:transparent;color:var(--ps-ink);font:inherit;font-size:13px;cursor:pointer}.location-suggestions small{font-size:10px;color:var(--ps-muted)}.location-suggestions button:hover,.location-suggestions button[aria-selected=true]{background:color-mix(in srgb,var(--ps-accent) 12%,var(--ps-surface))}.location-suggestions p{font-size:12px;padding:8px;color:var(--ps-muted)}
-:root{--ps-canvas:#f5f6f0;--ps-surface:#fffefa;--ps-ink:#173d3e;--ps-muted:#576c69;--ps-border:#dce5df;--ps-accent:#087e80;--journey-mint:#bce9d9;--journey-shadow:0 12px 38px #173d3e07}
+:root{--ps-navy:#062d33;--ps-teal:#0a3d42;--ps-teal-light:#164d4d;--ps-mint:#aee9d8;--ps-aqua:#8fdcce;--ps-cream:#f4f1e8;--ps-ivory:#faf8f2;--ps-text-light:#fff;--ps-text-dark:var(--ps-navy);--ps-muted-light:#9bafaa;--ps-glass:rgba(10,50,55,.72);--ps-glass-light:rgba(250,248,242,.94);--ps-glass-border:rgba(255,255,255,.16);--ps-radius-input:12px;--ps-radius-small:14px;--ps-radius-large:24px;--ps-gutter:clamp(20px,4vw,64px);--ps-canvas:var(--ps-cream);--ps-surface:var(--ps-ivory);--ps-ink:var(--ps-text-dark);--ps-muted:#526b67;--ps-border:#d8ded4;--ps-accent:#087e80;--journey-mint:var(--ps-mint);--journey-shadow:0 12px 38px #062d3312;--ps-scene:linear-gradient(180deg,rgba(4,30,35,.65),rgba(4,30,35,.9)),url('/images/packswift1.jpg');--ps-motion:200ms ease}
 html[data-theme=dark]{--ps-canvas:#0d252b;--ps-surface:#17323a;--ps-ink:#edf7f1;--ps-muted:#b6cbc5;--ps-border:#304b50;--ps-accent:#087e80;--journey-mint:#bce9d9}
 body,body.slider-home{font-family:Montserrat,Arial,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
 body:not(.slider-home){background:radial-gradient(ellipse at 95% 0%,#aee2cc38,transparent 45%),var(--ps-canvas)!important}
@@ -131,3 +134,36 @@ body[data-page=help] #contact{background:color-mix(in srgb,var(--ps-surface) 84%
 @media(max-width:1000px){.slider-home .slider-header{grid-template-columns:1fr auto}.slider-home .destination-stage{gap:28px;grid-template-columns:1fr}.slider-home .destination-story{max-width:650px}.slider-home .destination-thumbnail{min-width:0;height:200px}.slider-home .destination-discovery{max-width:760px;width:100%}.slider-home #slider-description{min-height:0}}
 @media(max-width:600px){.slider-home .slider-header{padding:18px 5vw 0;gap:16px}.slider-home .slider-brand,body:not(.slider-home) .brand{font-size:21px!important}.slider-home .slider-account a,.slider-home .slider-account button{padding:8px 10px!important;font-size:11px!important}.slider-home .destination-stage{padding:32px 5vw 24px}.slider-home .destination-thumbnail{flex-basis:42%;height:190px}.slider-home .slider-discovery-heading{font-size:9px}.slider-home .slider-actions{gap:8px}.slider-home .slider-plan{padding:13px 18px}.slider-home .slider-explore{padding:12px 14px}.slider-home .slider-menu{gap:26px}body[data-page=help] .panel{padding:22px!important}}
 @media(prefers-reduced-motion:reduce){.destination-backdrop,.destination-story,.destination-thumbnails{transition:none!important}.destination-story.is-fading,.destination-thumbnails.is-fading{opacity:1}}
+
+/* Phase 1: shared reference foundation. Existing page layouts and handlers remain intact. */
+html body:not(.slider-home){background:var(--ps-scene) center/cover fixed,var(--ps-navy)!important}
+html body:not(.slider-home) .site-header{background:var(--ps-glass)!important;border-bottom:1px solid var(--ps-glass-border)!important;backdrop-filter:blur(16px)}
+html body:not(.slider-home) .site-header .header-inner{width:calc(100% - var(--ps-gutter)*2);max-width:var(--ps-content-width);min-height:76px;padding:0!important;gap:28px;background:transparent!important}
+html body .site-header .desktop-nav{margin-left:auto;gap:24px}
+html body .site-header :is(.brand,.nav-link,.account-link){color:var(--ps-text-light)!important}
+html body .site-header .brand,html body.slider-home .slider-brand{font:500 25px/1 var(--ps-font)!important;letter-spacing:-.5px}
+html body .site-header .unified-brand-mark,html body .site-header .unified-brand-accent{color:var(--ps-mint)}
+html body .site-header .nav-link,html body.slider-home .slider-menu .nav-link{font-size:14px!important;font-weight:400!important;transition:color var(--ps-motion),border-color var(--ps-motion)}
+html body .site-header .nav-link[aria-current=page],html body.slider-home .slider-menu .nav-link[aria-current=page]{color:var(--ps-mint)!important;border-bottom-color:var(--ps-mint)!important}
+html body .site-header .account-link{border-color:var(--ps-glass-border);min-height:38px;padding:9px 18px}
+html body .site-header .account-link[href='/signup']{background:var(--ps-mint)!important;color:var(--ps-navy)!important;border-color:var(--ps-mint)!important}
+html body .site-header .theme-toggle{background:transparent!important;border-color:var(--ps-glass-border)!important}
+html body .page-shell{width:calc(100% - var(--ps-gutter)*2);max-width:var(--ps-content-width)}
+html body:not(.slider-home) .page-heading h1{font-size:clamp(36px,3.8vw,56px)!important;font-weight:400!important;line-height:1.08;letter-spacing:-.025em;color:var(--ps-text-light)!important}
+html body:not(.slider-home) .page-heading :is(p,.eyebrow){color:var(--ps-mint)!important}
+html body :is(.button,.studio-primary,.studio-secondary){min-height:44px;padding:11px 20px;font:500 14px/1.3 var(--ps-font);border-radius:999px;transition:background var(--ps-motion),box-shadow var(--ps-motion)}
+html body:not(.slider-home) .button-primary,html body.planner-studio .studio-primary{background:var(--ps-mint)!important;border:1px solid var(--ps-mint)!important;color:var(--ps-navy)!important}
+html body:not(.slider-home) .button-primary:hover,html body.planner-studio .studio-primary:hover{background:var(--ps-aqua)!important}
+html body :is(.button,.studio-primary,.studio-secondary):focus-visible{outline:2px solid var(--ps-accent);outline-offset:3px}
+html body:not(.slider-home) :is(.panel,.trip-card),html body.planner-studio :is(.workspace-card,.studio-readiness){border-radius:var(--ps-radius)!important;background:var(--ps-surface)!important;border:1px solid var(--ps-border)!important;box-shadow:var(--journey-shadow)!important}
+html body.planner-studio :is(.studio-setup,.studio-dashboard){background:var(--ps-glass-light)!important;border-radius:var(--ps-radius-large);box-shadow:var(--journey-shadow)}
+html body.planner-studio .workspace-hero{border-radius:var(--ps-radius-large)}
+html body.planner-studio .workspace-hero h2{font-size:clamp(24px,2.6vw,36px)!important;line-height:1.15;font-weight:500}
+html body.planner-studio .workspace-card h3{font-size:20px!important}
+html body.planner-studio .workspace-hero-content{background:linear-gradient(110deg,rgba(4,30,35,.8),rgba(4,30,35,.4))}
+html[data-theme=dark]{--ps-glass-light:rgba(10,50,55,.94)}
+html body .site-footer{color:var(--ps-muted-light)!important;border-color:var(--ps-glass-border)!important}
+html body .site-footer a{color:var(--ps-mint)}
+@media(max-width:850px){html body:not(.slider-home) .site-header .header-inner{padding:12px 0!important;gap:10px}html body .site-header .desktop-nav{margin-left:0;gap:20px}html body .site-header .account-navigation{margin-left:auto}}
+@media(max-width:480px){html body .site-header .brand{font-size:21px!important}html body .site-header .account-link{padding:8px 10px!important}html body .site-header .desktop-nav{gap:18px}html body .site-header .nav-link{font-size:13px!important}}
+@media(prefers-reduced-motion:reduce){:root{--ps-motion:0s}}

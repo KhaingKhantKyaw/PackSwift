@@ -45,9 +45,9 @@ test("normalizes every supported budget currency", () => {
     "USD", "EUR", "GBP", "THB", "SGD", "MYR", "JPY",
     "KRW", "AUD", "CAD", "CNY", "INR", "MMK",
   ];
-  assert.deepEqual(Object.keys(currencyRatesToUsd), supported);
+  for (const code of supported) assert.ok(currencyRatesToUsd[code] > 0);
 
-  for (const currency of supported) {
+  for (const currency of Object.keys(currencyRatesToUsd)) {
     const budget = 2000 / currencyRatesToUsd[currency];
     const plan = createTravelPlan({
       budget,

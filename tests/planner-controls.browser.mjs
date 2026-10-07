@@ -1,0 +1,44 @@
+// Optional browser smoke test. Uses an installed Playwright; no package download.
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+const require=createRequire(import.meta.url);
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined});
+try{
+ const page=await browser.newPage({viewport:{width:1366,height:900}});
+ const errors=[];page.on('pageerror',error=>errors.push(error.message));
+ await page.goto((process.env.PLANNER_TEST_URL||'http://127.0.0.1:3001')+'/trip-planner?destination=Bangkok');
+ await page.waitForSelector('.calendar-day');
+ assert.match(await page.locator('.studio-panel-heading h2').evaluate(el=>getComputedStyle(el).fontFamily),/Times New Roman/);
+ await page.waitForFunction(()=>document.querySelector('#currency').value==='THB');
+ await page.locator('#origin-search').fill('Yangon');
+ await page.getByRole('button',{name:'Next month',exact:true}).click();
+ await page.getByRole('button',{name:'Next month',exact:true}).click();
+ await page.locator('[data-date="2026-12-16"]').click();
+ await page.locator('[data-date="2026-12-20"]').click();
+ assert.equal(await page.locator('#start-date').inputValue(),'2026-12-16');
+ assert.equal(await page.locator('#end-date').inputValue(),'2026-12-20');
+ await page.locator('#studio-next').click();
+ await page.getByRole('button',{name:'Increase adults',exact:true}).click();
+ await page.getByRole('button',{name:'Increase children',exact:true}).click();
+ await page.locator('#passport-country').fill('Myanmar');
+ await page.locator('#studio-next').click();
+ await page.locator('#budget').fill('30000');
+ await page.waitForFunction(()=>document.querySelector('#studio-dashboard-content').textContent.includes('Estimated from'));
+ assert.match(await page.locator('#studio-summary').innerText(),/4 nights · 3 travellers/);
+ assert.match(await page.locator('#studio-dashboard-content').innerText(),/Verification required/);
+ await page.locator('[data-step-button="0"]').click();
+ await page.locator('#destination-search').fill('Hanoi');await page.locator('#origin-search').click();
+ assert.equal(await page.locator('#currency').inputValue(),'VND');
+ assert.equal(await page.locator('#budget').inputValue(),'');
+ await page.locator('input[name="tripType"][value="local"]').check();
+ assert.equal(await page.locator('#origin-search').isVisible(),false);
+ assert.match(await page.locator('#studio-summary').innerText(),/Local trip in Hanoi/);
+ assert.equal(await page.getByRole('button',{name:'Compare flights →',exact:true}).count(),0);
+ await page.screenshot({path:'/tmp/packswift-planner-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true);
+ await page.screenshot({path:'/tmp/packswift-planner-mobile.png',fullPage:true});
+ assert.deepEqual(errors,[]);
+ console.log('PASS: calendar, travellers, destination currency/reset, local mode, live preview, mobile overflow, no browser errors.');
+}finally{await browser.close();}

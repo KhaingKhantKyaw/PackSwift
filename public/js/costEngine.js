@@ -15,7 +15,7 @@ globalThis.PackSwiftCostEngine = (() => {
     if (!text) throw new RangeError("Choose a destination.");
     const config = Object.values(destinations).find(item => item.aliases.some(alias => ` ${text} `.includes(` ${alias} `)));
     const fallbackCurrency = globalThis.PackSwiftCurrency.resolve(destination).code;
-    const fallbackBases = { USD: 65, THB: 1200, EUR: 90, JPY: 9000, SGD: 100, MMK: 90000, CNY: 350 };
+    const fallbackBases = { USD: 65, THB: 1200, EUR: 90, JPY: 9000, SGD: 100, MMK: 90000, CNY: 350, VND:800000, IDR:500000, KRW:70000, GBP:75, MYR:150, PHP:2000, INR:2500, CHF:110, CAD:100, AUD:100, NZD:110, AED:200, QAR:200, SAR:200, ZAR:800, MAD:450, EGP:1800, KES:5000, MXN:900, BRL:220 };
     const base = fallbackBases[fallbackCurrency] || 65;
     const model = config || { currency: fallbackCurrency, baseDailyCost: { budget: base, comfort: base * 2, luxury: base * 5 }, seasonalMultipliers: months(Array(12).fill(1)), weekendSurcharge: 1.15 };
     const parse = value => {

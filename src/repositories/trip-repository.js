@@ -104,6 +104,8 @@ export async function saveTrip(plan, userId = null) {
       plan.destination.slug,
     );
     const preferences = {
+      tripType: plan.input.tripType || 'worldwide',
+      localTripCity: plan.input.localTripCity || '',
       preferredClimate: plan.input.preferredClimate,
       actualClimate: plan.weather.climate,
       travelerDemographic: plan.input.travelerDemographic,

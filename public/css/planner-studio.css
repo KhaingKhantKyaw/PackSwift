@@ -1,0 +1,56 @@
+body.planner-studio{--studio-ink:#173d3e;--studio-muted:#637b79;--studio-paper:#fffefa;--studio-line:#dce7e2;background:#edf3ee;color:var(--studio-ink);font-family:var(--ps-font);margin:0}
+body.planner-studio main.studio-shell{max-width:1600px;margin:0 auto;padding:22px 4vw 32px}
+.studio-page-heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}
+.studio-eyebrow{font-size:10px;font-weight:600;letter-spacing:.17em;color:#458780}
+body.planner-studio .studio-page-heading h1{font:600 clamp(22px,2.6vw,36px)/1.2 var(--ps-font);letter-spacing:-.045em;margin:8px 0 0;color:var(--studio-ink)}
+.studio-caption{font-size:12px;color:var(--studio-muted)}
+.studio-columns{display:grid;grid-template-columns:minmax(320px,2fr) minmax(0,3fr);gap:24px;align-items:start}
+.studio-setup,.studio-dashboard{box-sizing:border-box;background:var(--studio-paper);border:1px solid var(--studio-line);border-radius:26px;padding:26px;min-width:0;box-shadow:0 12px 40px #193d3610}
+.studio-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}
+.studio-panel-heading h2{font:600 22px/1.3 var(--ps-font)!important;letter-spacing:-.025em;margin:3px 0;color:var(--studio-ink)}
+.studio-panel-heading p{font-size:12px;color:var(--studio-muted);margin:6px 0}
+.studio-symbol{display:grid;place-items:center;width:44px;height:44px;border-radius:15px;background:#d5f0e4;color:#087e80;font-size:26px}
+.studio-setup .studio-panel-heading{justify-content:start}
+.studio-steps{display:flex;gap:5px;flex-wrap:wrap;border-bottom:1px solid var(--studio-line);padding-bottom:20px;margin-bottom:24px}
+.studio-steps button{font:500 10px/1.4 var(--ps-font);background:transparent;border:0;border-radius:9px;padding:9px 8px;color:var(--studio-muted);cursor:pointer}
+.studio-steps button[aria-current=step]{background:#173f43;color:#fff}
+.studio-step{animation:studio-enter .25s ease}
+.studio-step[hidden],#studio-pet-field[hidden],#studio-back[hidden]{display:none!important}
+.studio-step h3{font:600 25px/1.25 var(--ps-font)!important;letter-spacing:-.03em;margin:10px 0 26px;color:var(--studio-ink)}
+.studio-setup label{display:block;font-size:12px;font-weight:600;margin:17px 0 8px;color:var(--studio-ink)}
+body.planner-studio .studio-setup input:not([type=checkbox]),body.planner-studio .studio-setup select,body.planner-studio .studio-setup textarea{box-sizing:border-box;display:block;width:100%;min-width:0;padding:13px 14px;border:1px solid var(--studio-line);border-radius:12px;background:#f6f8f3;color:var(--studio-ink);font:400 14px/1.4 var(--ps-font);box-shadow:none}
+.studio-setup input:focus,.studio-setup select:focus,.studio-setup textarea:focus{outline:2px solid #459d91;outline-offset:2px}
+.studio-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.studio-money{display:grid;grid-template-columns:1fr 95px;gap:8px}
+.studio-note{font-size:11px;line-height:1.7;color:var(--studio-muted);margin-top:16px}
+.studio-setup label.studio-check{display:flex;align-items:center;gap:9px;margin:22px 0}
+.studio-check input{accent-color:#087e80}
+.studio-form-actions{display:flex;gap:12px;justify-content:space-between;position:sticky;bottom:-26px;background:var(--studio-paper);padding:18px 0 4px;border-top:1px solid var(--studio-line);margin-top:28px;z-index:2}
+.studio-primary,.studio-secondary{font:600 12px/1.4 var(--ps-font);padding:13px 19px;border-radius:999px;cursor:pointer;transition:transform .2s,background .2s}
+.studio-primary{background:#087e80;color:white;border:1px solid #087e80}.studio-secondary{background:transparent;color:var(--studio-ink);border:1px solid var(--studio-line)}
+.studio-primary:hover{background:#096668;transform:translateY(-1px)}.studio-primary:disabled{opacity:.55;cursor:wait}
+#studio-next{margin-left:auto}.studio-error{color:#b44735;font-size:12px;line-height:1.6}
+.studio-summary{position:relative;overflow:hidden;background:linear-gradient(120deg,#123f43,#25625e);color:white;border-radius:21px;padding:25px;margin-bottom:20px}
+.studio-summary::after{content:'✦';position:absolute;right:18px;top:0;font-size:140px;color:#d2ffed0c;pointer-events:none}
+.studio-summary .studio-eyebrow{color:#9fdbcd}.studio-summary h3{font:600 clamp(22px,2.1vw,30px)/1.3 var(--ps-font)!important;color:white;margin:14px 0}.studio-summary p{font-size:12px;color:#d2e6df}
+.studio-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:20px}.studio-tags span{padding:7px 11px;border:1px solid #ceeee333;border-radius:999px;font-size:10px;background:#ffffff0d}
+.studio-state{font-size:10px;color:var(--studio-muted);max-width:150px;text-align:right}
+.studio-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.studio-info-card{border:1px solid var(--studio-line);border-top:3px solid #83c6b2;border-radius:16px;padding:17px;background:var(--studio-paper)}
+.studio-info-card:nth-child(3n+2){border-top-color:#e7b58d}.studio-info-card:nth-child(3n){border-top-color:#b5a6d8}
+.studio-info-card h3{font:600 14px/1.3 var(--ps-font)!important;color:var(--studio-ink);margin:0 0 10px}.studio-info-card p{font-size:11px;line-height:1.8;color:var(--studio-muted);margin:0}
+.studio-detail{border:1px solid var(--studio-line);border-radius:16px;padding:18px;margin-top:14px}.studio-detail summary{font-size:13px;font-weight:600;cursor:pointer}.studio-detail small,.studio-detail p,.studio-detail li{font-size:11px;line-height:1.8;color:var(--studio-muted)}
+.studio-cost-row{display:flex;justify-content:space-between;gap:12px;font-size:11px;padding:10px 0;border-bottom:1px solid var(--studio-line)}
+.studio-day{border-left:2px solid #78bbaa;padding:8px 16px;margin:16px 0}.studio-day h4{font-size:14px;margin:6px 0}
+.studio-readiness{padding:20px;border-radius:18px;background:#eef6f0;margin-top:18px}.studio-section-title{display:flex;justify-content:space-between;align-items:center}.studio-section-title h3{font-size:16px!important}.studio-section-title span{font-size:11px}
+.studio-readiness progress{width:100%;height:7px;accent-color:#087e80}.studio-readiness label{display:flex;align-items:center;gap:8px;font-size:11px;padding:8px 0}.studio-readiness input{accent-color:#087e80;width:15px;height:15px}#studio-checks{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;margin-top:12px}
+.studio-save-row{margin-top:22px}.studio-save-row>.studio-primary{width:100%}.studio-save-row p{font-size:12px;color:var(--studio-muted)}
+.studio-place{border:1px solid var(--studio-line);border-radius:16px;padding:12px;margin:15px 0;transition:opacity .18s,transform .18s}.studio-place img{height:150px;width:100%;object-fit:cover;border-radius:10px}.studio-place h4{font-size:14px;margin:10px 0}.studio-place small{font-size:10px;color:var(--studio-muted)}.studio-place button,.studio-selected button{border:1px solid var(--studio-line);border-radius:999px;background:transparent;padding:8px 12px;margin:10px 6px 0 0;color:var(--studio-ink);cursor:pointer}.studio-place button:first-child{background:#d5f0e4}.studio-selected{font-size:12px;padding:12px 0;border-bottom:1px solid var(--studio-line)}.studio-leaving{opacity:0;transform:translateX(10px)}
+body.planner-studio :focus-visible{outline:2px solid #087e80;outline-offset:3px}
+html[data-theme=dark] body.planner-studio{--studio-ink:#e0eee8;--studio-muted:#a6beb6;--studio-paper:#153238;--studio-line:#315053;background:#0d252b}
+html[data-theme=dark] body.planner-studio .studio-setup input:not([type=checkbox]),html[data-theme=dark] body.planner-studio .studio-setup select,html[data-theme=dark] body.planner-studio .studio-setup textarea,html[data-theme=dark] .studio-readiness{background:#102b30}
+@media(min-width:1000px){.studio-setup,.studio-dashboard{height:calc(100dvh - 225px);min-height:420px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#b2ccc2 transparent}}
+@media(max-width:999px){.studio-columns{grid-template-columns:1fr}.studio-caption{display:none}.studio-setup,.studio-dashboard{padding:22px}}
+@media(max-width:540px){.studio-info-grid,.studio-pair{grid-template-columns:1fr}.studio-page-heading h1{font-size:24px}.studio-setup,.studio-dashboard{padding:18px}.studio-steps{gap:2px}.studio-steps button{font-size:9px}}
+@keyframes studio-enter{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.studio-step{animation:none}.studio-primary,.studio-place{transition:none}}

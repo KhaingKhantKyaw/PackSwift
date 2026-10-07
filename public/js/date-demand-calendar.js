@@ -1,74 +1,34 @@
-/* Demo demand model: no live prices or holiday/crowd claims. */
+/* Compact ISO-backed range picker and existing planner control bindings. */
 (() => {
-  const el = id => document.getElementById(id);
-  const iso = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-  const parse = value => /^\d{4}-\d{2}-\d{2}$/.test(value || "") ? new Date(`${value}T12:00:00`) : null;
-  const today = () => parse(iso(new Date()));
-  let month = parse(el("start-date").value) || today();
-  month = new Date(month.getFullYear(), month.getMonth(), 1, 12);
-  let choosingEnd = false;
-  function context() {
-    const local = PackSwiftCurrency.resolve(el("destination-search")?.value || document.querySelector('[name="destination"]')?.value);
-    const base = { THB: 1500, EUR: 100, JPY: 12000, SGD: 120, MMK: 100000, CNY: 450, USD: 80 }[local.code];
-    return { ...local, base };
-  }
-  function estimate(date) {
-    const day = date.getDay();
-    const tier = [0, 6].includes(day) ? "peak" : [1, 5].includes(day) ? "standard" : "low";
-    return { tier, amount: Math.round(context().base * ({ low: .8, standard: 1, peak: 1.35 }[tier])) };
-  }
-  const money = value => new Intl.NumberFormat("en", { style: "currency", currency: context().code, currencyDisplay: "code", maximumFractionDigits: 0 }).format(value);
-  function commit(start, end) {
-    setPlannerDate("start", iso(start)); setPlannerDate("end", end ? iso(end) : "");
-    handleLivePlannerEdit(); updateBudgetMinimum();
-  }
-  function render() {
-    const start = parse(el("start-date").value), end = parse(el("end-date").value);
-    const pretty = date => date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-    el("demand-selection").textContent = choosingEnd ? "Choose your departure date after the start date." : "Choose a start date, then an end date.";
-    el("demand-range-summary").textContent = start && end && end > start
-      ? `Selected: ${pretty(start)} – ${pretty(end)} (${Math.round((Date.UTC(end.getFullYear(), end.getMonth(), end.getDate()) - Date.UTC(start.getFullYear(), start.getMonth(), start.getDate())) / 86400000)} nights)`
-      : start ? `Start: ${pretty(start)} · Choose an end date` : "Select your travel dates";
-    el("demand-month").textContent = month.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
-    el("demand-prev").disabled = month.getFullYear() === today().getFullYear() && month.getMonth() === today().getMonth();
-    const grid = el("demand-days"); grid.replaceChildren();
-    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(document.createElement("span"));
-    const count = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
-    for (let number = 1; number <= count; number++) {
-      const date = new Date(month.getFullYear(), month.getMonth(), number, 12), data = estimate(date);
-      const button = document.createElement("button"); button.type = "button"; button.className = `demand-day demand-${data.tier}`;
-      const selected = start && end && date >= start && date <= end;
-      button.setAttribute("aria-pressed", String(Boolean(selected))); button.disabled = date < today();
-      button.dataset.date = iso(date);
-      button.classList.toggle("range-start", Boolean(start && iso(start) === iso(date)));
-      button.classList.toggle("range-end", Boolean(end && iso(end) === iso(date)));
-      button.classList.toggle("range-between", Boolean(selected && date > start && date < end));
-      button.setAttribute("aria-label", `${date.toLocaleDateString("en-GB")}, ${data.tier} estimated demand, ${money(data.amount)} per traveller`);
-      const label = document.createElement("span"); label.textContent = number;
-      const price = document.createElement("small"); price.textContent = `${context().symbol}${new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(data.amount)}`;
-      const dot = document.createElement("span"); dot.className = "demand-dot"; dot.setAttribute("aria-hidden", "true");
-      button.append(label, price, dot);
-      const preview = () => {
-        if (!choosingEnd || !start) return;
-        grid.querySelectorAll("[data-date]").forEach(cell => {
-          const value = parse(cell.dataset.date);
-          cell.classList.toggle("range-hover", value >= start && value <= date);
-        });
-      };
-      button.addEventListener("pointerenter", preview);
-      button.addEventListener("focus", preview);
-      button.addEventListener("click", () => {
-        if (!choosingEnd || !start || date <= start) { choosingEnd = true; commit(date, null); }
-        else { choosingEnd = false; commit(start, date); }
-        el("demand-selection").textContent = choosingEnd ? "Now choose the end date." : "Date range selected.";
-        render();
-      });
-      grid.append(button);
-    }
-
-  }
-  for (const [id, delta] of [["demand-prev", -1], ["demand-next", 1]]) el(id).addEventListener("click", () => { month = new Date(month.getFullYear(), month.getMonth() + delta, 1, 12); render(); });
-  el("demand-days").addEventListener("pointerleave", () => el("demand-days").querySelectorAll(".range-hover").forEach(cell => cell.classList.remove("range-hover")));
-  window.refreshDemandCalendar = render;
-  render();
+ const $=id=>document.getElementById(id),form=$('trip-planner-form');if(!form)return;
+ const node=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=text;return n;};
+ const start=$('start-date'),end=$('end-date'),dateBox=start.closest('.studio-pair');
+ dateBox.hidden=true;start.type='hidden';end.type='hidden';
+ const calendar=node('section');calendar.className='compact-trip-calendar';dateBox.after(calendar);
+ let month=new Date();month=new Date(Date.UTC(month.getFullYear(),month.getMonth(),1));let choosingEnd=false;
+ const iso=date=>date.toISOString().slice(0,10);
+ const notify=()=>form.dispatchEvent(new Event('input',{bubbles:true}));
+ function draw(){calendar.replaceChildren();const header=node('div');header.className='calendar-month';
+ for(const [label,delta]of [['←',-1],['→',1]]){const b=node('button',label);b.type='button';b.setAttribute('aria-label',delta<0?'Previous month':'Next month');b.onclick=()=>{month=new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()+delta,1));draw();};header.append(b);}
+ header.insertBefore(node('strong',month.toLocaleDateString('en',{month:'long',year:'numeric',timeZone:'UTC'})),header.lastChild);calendar.append(header,node('p',choosingEnd?'Choose an end date after the start date.':'Choose a start date, then an end date.'));
+ const grid=node('div');grid.className='calendar-grid';['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>grid.append(node('small',d)));
+ for(let j=0;j<(month.getUTCDay()+6)%7;j++)grid.append(node('span'));
+ const count=new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()+1,0)).getUTCDate();
+ for(let day=1;day<=count;day++){const date=new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth(),day)),value=iso(date),weekend=[0,6].includes(date.getUTCDay());const b=node('button',String(day));b.type='button';b.className='calendar-day '+(weekend?'peak':[1,5].includes(date.getUTCDay())?'moderate':'low');b.dataset.date=value;b.setAttribute('aria-label',PackSwiftTripContext.displayDate(value));b.setAttribute('aria-pressed',String(value===start.value||value===end.value));if(value===start.value||value===end.value)b.classList.add('endpoint');else if(value>start.value&&value<end.value)b.classList.add('in-range');
+ b.onpointerenter=b.onfocus=()=>{if(choosingEnd)grid.querySelectorAll('[data-date]').forEach(c=>c.classList.toggle('range-hover',c.dataset.date>=start.value&&c.dataset.date<=value));};
+ b.onclick=()=>{if(!choosingEnd||!start.value||value<=start.value){start.value=value;end.value='';choosingEnd=true;}else{end.value=value;choosingEnd=false;}notify();draw();};grid.append(b);}
+ grid.onpointerleave=()=>grid.querySelectorAll('.range-hover').forEach(c=>c.classList.remove('range-hover'));calendar.append(grid,node('small','● Low / Budget · ● Moderate · ● Peak / Weekend'),node('small','Weekday illustration only — not live prices, holidays or measured crowds.'));
+ const summary=node('p',start.value?PackSwiftTripContext.displayDate(start.value)+(end.value?' → '+PackSwiftTripContext.displayDate(end.value)+' · '+Math.round((Date.parse(end.value)-Date.parse(start.value))/86400000)+' Nights':' · Choose end date'):'No dates selected');summary.setAttribute('role','status');calendar.append(summary);const clear=node('button','Clear Dates');clear.type='button';clear.onclick=()=>{start.value='';end.value='';choosingEnd=false;notify();draw();};calendar.append(clear);}
+ for(const id of ['adults','children']){const input=$(id),wrapper=node('div');wrapper.className='traveller-stepper';input.before(wrapper);const minus=node('button','−'),plus=node('button','+');for(const [b,delta]of [[minus,-1],[plus,1]]){b.type='button';b.setAttribute('aria-label',(delta<0?'Decrease ':'Increase ')+id);b.onclick=()=>{input.value=Math.max(Number(input.min),Math.min(Number(input.max),Number(input.value||input.min)+delta));sync();notify();};}
+ wrapper.append(minus,input,plus);function sync(){minus.disabled=Number(input.value)<=Number(input.min);plus.disabled=Number(input.value)>=Number(input.max);}input.addEventListener('input',sync);sync();}
+ $('adults').max=12;$('children').max=8;
+ const currency=$('currency');for(const code of Object.keys(PackSwiftCurrency.currencies)){if(![...currency.options].some(o=>o.value===code)){const o=node('option',code);o.value=code;currency.append(o);}}
+ const note=node('p');note.className='studio-note';currency.closest('.studio-money').after(note);let previous=currency.value;
+ function currencyChange(code){if(code===previous)return;if($('budget').value){$('budget').value='';note.textContent='Currency changed from '+previous+' to '+code+'. Re-enter your budget; no conversion has been applied.';}currency.value=code;previous=code;notify();}
+ $('destination-search').addEventListener('change',()=>currencyChange(PackSwiftCurrency.resolve($('destination-search').value).code));
+ currency.addEventListener('change',()=>currencyChange(currency.value));
+ function mode(){const local=form.elements.tripType.value==='local';$('origin-search').hidden=local;$('origin-label').hidden=local;$('origin-search').required=!local;$('trip-scope').value=local?'domestic':'international';form.querySelector('label[for="destination-search"]').textContent=local?'City':'Destination City';}
+ form.addEventListener('change',e=>{if(e.target.name==='tripType'){mode();notify();}});
+ function restored(){mode();previous=currency.value;const params=new URLSearchParams(location.search);if(!params.has('trip_id')&&!params.has('resume_draft')&&!$('budget').value&&$('destination-search').value)currencyChange(PackSwiftCurrency.resolve($('destination-search').value).code);if(start.value)month=new Date(start.value.slice(0,7)+'-01T00:00:00Z');draw();}
+ window.addEventListener('packswift:planner-loaded',restored);window.addEventListener('packswift:draft-restored',restored);restored();
 })();

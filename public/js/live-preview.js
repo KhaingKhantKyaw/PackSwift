@@ -14,7 +14,7 @@
   window.addEventListener('packswift:preview-incomplete',event=>{
     input=event.detail;revision++;clearTimeout(timer);clearTimeout(reviewTimer);reviewController?.abort();noteController?.abort();liveReview=null;
     $('preview-thinking').hidden=true;$('preview-skeleton').hidden=true;$('preview-content').hidden=true;$('preview-board').hidden=true;$('preview-idle').hidden=false;
-    const message=$('preview-idle').querySelector('p');if(message)message.textContent='Choose your departure city and travel dates to start your live plan.';
+    const message=$('preview-idle').querySelector('p');if(message)message.textContent='Choose your origin city and travel dates to start your live plan.';
     $('preview-save').disabled=true;$('preview-board-open').disabled=true;reviewBox.replaceChildren();
   });
   const reviewBox=document.createElement('section');reviewBox.className='live-review-summary';reviewBox.setAttribute('aria-live','polite');

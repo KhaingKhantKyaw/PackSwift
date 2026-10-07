@@ -23,6 +23,9 @@ export const currencyRatesToUsd = Object.freeze({
   CNY: 1 / 7.2,
   INR: 0.012,
   MMK: 1 / 2100,
+  VND: 1 / 25000, IDR: 1 / 16000, PHP: 1 / 56, CHF: 1.1, NZD: .6,
+  AED: 1 / 3.67, QAR: 1 / 3.64, SAR: 1 / 3.75, ZAR: 1 / 18,
+  MAD: .1, EGP: .02, KES: 1 / 130, MXN: 1 / 18, BRL: .2,
 });
 
 export const minimumDailyBudgetUsd = 40;
@@ -335,11 +338,13 @@ function parseInput(input = {}) {
     throw new RangeError("Travelers must be between 1 and 20.");
   }
 
-  const tripScope = String(input.tripScope || "international").toLowerCase();
+  const tripType = input.tripType || 'worldwide';
+  if (!['local','worldwide'].includes(tripType)) throw new RangeError('Choose Local Trip or Worldwide.');
+  const tripScope = tripType === 'local' ? 'domestic' : String(input.tripScope || "international").toLowerCase();
   if (!["domestic", "international"].includes(tripScope)) {
     throw new RangeError("Choose a valid trip scope.");
   }
-  const originQuery = String(input.origin || "Yangon").trim().slice(0, 100);
+  const originQuery = String(tripType === 'local' ? input.destination || '' : input.origin || "Yangon").trim().slice(0, 100);
   const destinationQuery = String(input.destination || "").trim().slice(0, 100);
   const explicitRoute = input.tripScope !== undefined || input.origin !== undefined || hasBreakdown;
   const origin = routeLocation(originQuery);
@@ -397,6 +402,8 @@ function parseInput(input = {}) {
     adults,
     children,
     tripScope,
+    tripType,
+    localTripCity: tripType === 'local' ? destinationQuery : '',
     origin: originQuery,
     route: {
       scope: tripScope,
@@ -617,7 +624,7 @@ function buildItinerary(destination, days, input) {
       title: index === 0 ? "Arrive and orient" : `Explore ${first}`,
       morning:
         index === 0
-          ? `${input.smartPace.lateRiser ? "10:30" : "08:30"} · Arrival, ${["private", "premium"].includes(input.transportStyle) ? "pre-arranged private transfer" : "practical airport transfer"}, check-in, and orientation`
+          ? `${input.smartPace.lateRiser ? "10:30" : "08:30"} · ${input.tripType === 'local' ? 'Local orientation and check-in' : 'Arrival, transfer, check-in, and orientation'}`
           : input.tripPurpose === "business" && index === 1
             ? "Protected work or meeting block"
             : `${input.smartPace.lateRiser ? "10:30" : "08:30"} · ${first}`,
@@ -706,6 +713,7 @@ export function buildPackingList(input = {}) {
   const withPets = Boolean(input.travelingWithPets);
   const days = Math.max(1, Math.min(30, Number(input.days) || 5));
   const list = structuredClone(basePackingItems);
+  if(input.tripType==='local')list.Essentials[0]='Personal identification';
 
   list.Clothing.push(`${Math.min(days, 7)} versatile tops`);
   list.Clothing.push(`${Math.max(2, Math.ceil(days / 3))} comfortable bottoms`);
@@ -880,6 +888,7 @@ export function createTravelPlan(rawInput) {
     itinerary: buildItinerary(destination, days, input),
     activityPreviews: buildActivityPreviews(destination, input),
     packingList: buildPackingList({
+      tripType: input.tripType,
       climate: destination.weather.climate,
       rain: destination.weather.rain,
       days,

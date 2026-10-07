@@ -518,19 +518,8 @@ async function savePackingListToAccount() {
 }
 
 function formatTripDates(start, end) {
-  if (!start || !end) return "";
-  try {
-    const formatter = new Intl.DateTimeFormat(undefined, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      timeZone: "UTC",
-    });
-    return `${formatter.format(new Date(`${start}T00:00:00Z`))} – ` +
-      formatter.format(new Date(`${end}T00:00:00Z`));
-  } catch {
-    return `${start} – ${end}`;
-  }
+  if (!start || !end) return "Flexible travel dates";
+  return PackSwiftTripContext.displayDate(start) + " – " + PackSwiftTripContext.displayDate(end);
 }
 
 function applyPackingContext(context, serverItems = null) {

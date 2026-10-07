@@ -1,3 +1,4 @@
+import {destinationCurrency} from './destination-currency.js';
 export const requirementKeys = ['passport','entry','arrival','onward','accommodation','insurance'];
 
 // The captured form is the user's exact input; older trips fall back to stored columns.
@@ -9,8 +10,8 @@ export function tripDetails(trip) {
   }
   const start = String(fields.startDate || trip.dates.start || '').slice(0,10);
   const end = String(fields.endDate || trip.dates.end || '').slice(0,10);
-  return {origin:fields.origin || trip.route.origin.name, destination:fields.destination || trip.destination.name,
-    country:trip.destination.countryName, nationality:fields.passportCountry || '', start,end,
+  return {tripType:fields.tripType||trip.preferences?.tripType||'worldwide',origin:(fields.tripType||trip.preferences?.tripType)==='local'?(fields.destination||trip.destination.name):fields.origin || trip.route.origin.name, destination:fields.destination || trip.destination.name,
+    country:fields.destination ? destinationCurrency(fields.destination).country || '' : trip.destination.countryName, nationality:fields.passportCountry || '', start,end,
     nights:Math.max(0,Math.round((Date.parse(end)-Date.parse(start))/86400000)||0),
     adults:Number(fields.adults ?? trip.travelerBreakdown.adults), children:Number(fields.children ?? trip.travelerBreakdown.children),
     budget:Number(fields.budget ?? trip.budget.amount), currency:fields.currency || trip.budget.currency,
@@ -20,7 +21,7 @@ export function tripDetails(trip) {
 
 export function workspaceProgress(trip, workspace, packing) {
   const d=tripDetails(trip);
-  const requirements= requirementKeys.every(key=>workspace.requirements?.[key]);
+  const requirements= d.tripType==='local'||requirementKeys.every(key=>workspace.requirements?.[key]);
   const packed=packing.filter(p=>p.completed).length;
   const sections=[
     {key:'overview',label:'Trip details',done:Boolean(d.origin&&d.destination&&d.start&&d.end&&d.nights>0),status:'Saved'},

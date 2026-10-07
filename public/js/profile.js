@@ -46,8 +46,7 @@ renderThemePreference();
 
 function formatDate(value) {
   if (!value) return "Date not set";
-  const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
-  return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(date);
+  return PackSwiftTripContext.displayDate(value);
 }
 
 function emptyItem(message) {
