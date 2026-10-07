@@ -1,0 +1,31 @@
+/* Sole geometry owner for the shared header; no page-specific variants. */
+:root{--header-height:88px;--header-max-width:1440px;--header-padding:48px;--header-nav-gap:40px;--header-action-gap:16px;--header-button-height:48px;--header-button-radius:999px;--header-accent:#aee9d8}
+html body .ps-global-header{position:fixed;inset:0 0 auto;z-index:100;height:var(--header-height);background:rgba(4,43,48,.85);color:#faf8f2;border:0;backdrop-filter:blur(4px);box-sizing:border-box}
+html body .ps-global-header[data-variant=solid]{background:#063e43}
+html body .ps-header-inner{height:100%;max-width:var(--header-max-width);padding:0 var(--header-padding);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:var(--header-action-gap);box-sizing:border-box}
+html body .ps-header-brand{display:flex;align-items:center;gap:8px;flex:1;white-space:nowrap;color:inherit;text-decoration:none;font:500 25px/1 "Times New Roman",serif;letter-spacing:-.5px}
+html body .ps-header-brand>span{color:var(--header-accent);font-size:28px}
+html body .ps-header-navigation,html body .ps-header-links,html body .ps-header-auth>span{display:flex;align-items:center}
+html body .ps-header-navigation{gap:40px}
+html body .ps-header-links{gap:var(--header-nav-gap)}
+html body .ps-header-link{position:relative;padding:12px 0;color:inherit;font:400 14px/20px "Times New Roman",serif;white-space:nowrap;text-decoration:none;border:0;background:none}
+html body .ps-header-link::after{content:"";position:absolute;left:0;right:0;bottom:3px;height:3px;background:var(--header-accent);opacity:0;transition:opacity .2s ease}
+html body .ps-header-link[aria-current=page]{color:var(--header-accent)}
+html body .ps-header-link[aria-current=page]::after{opacity:1}
+html body .ps-header-auth>span{gap:var(--header-action-gap)}
+html body .ps-global-header [hidden]{display:none!important}
+html body .ps-header-action,html body .ps-header-theme,html body .ps-header-menu{display:inline-flex;align-items:center;justify-content:center;height:var(--header-button-height);padding:0 28px;border:1px solid rgba(255,255,255,.35);border-radius:var(--header-button-radius);background:transparent;color:inherit;text-decoration:none;font:400 14px/1 "Times New Roman",serif;box-sizing:border-box;white-space:nowrap;cursor:pointer;box-shadow:none}
+html body .ps-header-start{padding:0 30px;background:var(--header-accent);border-color:var(--header-accent);color:#062d33}
+html body .ps-header-theme{width:56px;flex:0 0 56px;padding:0}
+html body .ps-header-theme>span{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#fff4d4;color:#463b23;font-size:18px}
+html[data-theme=dark] body .ps-header-theme>span{font-size:0}
+html[data-theme=dark] body .ps-header-theme>span::after{content:"☾";font-size:20px}
+html body .ps-header-menu{display:none;padding:0;width:48px}
+html body .ps-global-header :focus-visible{outline:2px solid var(--header-accent);outline-offset:4px}
+html body .ps-header-spacer{height:var(--header-height);flex-shrink:0}
+/* The homepage search is page content, not part of header geometry. */
+html body .home-hero-shell>.slider-search-wrap{margin:12px auto 0;position:relative;z-index:5}
+#world-explorer{scroll-margin-top:var(--header-height)}
+@media(max-width:1200px){:root{--header-nav-gap:24px;--header-padding:32px}html body .ps-header-navigation{gap:24px}}
+@media(max-width:1000px){:root{--header-padding:20px}html body .ps-header-menu{display:inline-flex}html body .ps-header-navigation{display:none;position:absolute;top:var(--header-height);left:0;right:0;padding:24px var(--header-padding);background:#063e43;max-height:calc(100dvh - var(--header-height));overflow:auto;box-sizing:border-box}html body .ps-global-header[data-open] .ps-header-navigation{display:flex;align-items:stretch;flex-direction:column}html body .ps-header-links{align-items:flex-start;flex-direction:column;gap:8px}html body .ps-header-brand{font-size:23px}}
+@media(prefers-reduced-motion:reduce){html body .ps-header-link::after{transition:none}}

@@ -75,59 +75,52 @@ const mainNavigation = `
   <a class="nav-link" data-nav="help" href="/help">Help</a>
   <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/trips">My Trips</a>`;
 
-const mobileNavigation = `
-  <a data-nav="home" href="/"><span aria-hidden="true">⌂</span><span>Home</span></a>
-  <a data-nav="explore" href="/#world-explorer"><span aria-hidden="true">◎</span><span>Explore</span></a>
-  <a data-nav="planner" href="/trip-planner"><span aria-hidden="true">◇</span><span>Plan</span></a>
-  <a data-nav="help" href="/help"><span aria-hidden="true">?</span><span>Help</span></a>
-  <a data-nav="trips" data-auth="user" hidden href="/my-trips"><span aria-hidden="true">▤</span><span>My Trips</span></a>
-  <a data-nav="profile" href="/profile"><span aria-hidden="true">○</span><span>Account</span></a>`;
-
-for (const navigation of document.querySelectorAll(".desktop-nav")) {
-  navigation.innerHTML = mainNavigation;
-}
-for (const navigation of document.querySelectorAll(".mobile-nav")) {
-  navigation.innerHTML = mobileNavigation;
-}
-for (const navigation of document.querySelectorAll('.slider-menu')) navigation.innerHTML = mainNavigation;
+// One runtime component replaces legacy page shells. Unique classes isolate its
+// geometry from the retired .site-header/.slider-header page overrides.
+const headerStyles=document.createElement('link');
+headerStyles.rel='stylesheet';headerStyles.href='/css/global-header.css';document.head.append(headerStyles);
+const globalHeader=document.createElement('header');
+globalHeader.className='ps-global-header';
+globalHeader.dataset.variant=page==='planner-studio'?'solid':'overlay';
+globalHeader.innerHTML=`<div class="ps-header-inner">
+ <a class="ps-header-brand" href="/" aria-label="PackSwift home"><span aria-hidden="true">◇</span> PackSwift</a>
+ <button class="ps-header-menu" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="ps-header-navigation">☰</button>
+ <div class="ps-header-navigation" id="ps-header-navigation">
+  <nav class="ps-header-links" aria-label="Primary navigation">${mainNavigation.replaceAll('class="nav-link"','class="ps-header-link"')}</nav>
+  <div class="ps-header-auth">
+   <span data-auth="guest"><a class="ps-header-action" href="/login">Login</a><a class="ps-header-action ps-header-start" href="/signup">Get Started</a></span>
+   <span data-auth="user" hidden><a class="ps-header-action" href="/profile"><span data-profile-name>Profile</span></a><button class="ps-header-action" type="button" data-logout>Logout</button></span>
+  </div>
+ </div>
+ <button class="ps-header-theme" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><span aria-hidden="true">☀</span></button>
+</div>`;
+const oldHomeHeader=document.querySelector('.slider-header');
+const homeSearch=oldHomeHeader?.querySelector('.slider-search-wrap');
+if(homeSearch) oldHomeHeader.before(homeSearch);
+document.querySelectorAll('.site-header,.slider-header,.mobile-nav').forEach(element=>element.remove());
+document.body.prepend(globalHeader);
+const headerSpacer=document.createElement('div');headerSpacer.className='ps-header-spacer';headerSpacer.setAttribute('aria-hidden','true');globalHeader.after(headerSpacer);
+const menuButton=globalHeader.querySelector('.ps-header-menu');
+const closeHeaderMenu=()=>{globalHeader.removeAttribute('data-open');menuButton.setAttribute('aria-expanded','false');menuButton.setAttribute('aria-label','Open navigation');};
+menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('aria-expanded')!=='true';globalHeader.toggleAttribute('data-open',open);menuButton.setAttribute('aria-expanded',String(open));menuButton.setAttribute('aria-label',open?'Close navigation':'Open navigation');});
+globalHeader.addEventListener('click',event=>{if(event.target.closest('a'))closeHeaderMenu();});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&globalHeader.hasAttribute('data-open')){closeHeaderMenu();menuButton.focus();}});
+document.addEventListener('click',event=>{if(!globalHeader.contains(event.target))closeHeaderMenu();});
 for (const signup of document.querySelectorAll('a[href="/signup"]')) signup.textContent = 'Get Started';
 const footer=document.querySelector('.site-footer .footer-inner, .slider-footer');
 if(footer){const links=document.createElement('nav');links.className='footer-help-links';links.setAttribute('aria-label','Information and support');for(const [label,url] of [['About PackSwift','/about'],['Contact & Feedback','/help#contact'],['Privacy','/help#privacy'],['Terms','/help#terms']]){const a=document.createElement('a');a.textContent=label;a.href=url;links.append(a);}footer.append(links);}
 document.addEventListener('click',event=>{if(event.target.closest('[data-open-concierge]'))window.PackSwift?.concierge?.open(true);});
 
-for (const oldAction of document.querySelectorAll(".header-action, .slider-account")) {
-  const accountNavigation = document.createElement("div");
-  accountNavigation.className = oldAction.classList.contains('slider-account') ? "account-navigation slider-account" : "account-navigation";
-  accountNavigation.innerHTML = `
-    <span data-auth="guest" class="account-guest">
-      <a class="account-link" href="/login">Login</a>
-      <a class="account-link" href="/signup">Get Started</a>
-    </span>
-    <span data-auth="user" class="account-user" hidden>
-      <a class="account-link" href="/profile"><span data-profile-name>Profile</span></a>
-      <button class="account-link account-logout" type="button" data-logout>Logout</button>
-    </span>
-    <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme">
-      <span class="theme-toggle-thumb" aria-hidden="true">☀</span>
-    </button>`;
-  oldAction.replaceWith(accountNavigation);
-}
-
 syncHeaderThemeToggles();
-for(const logo of document.querySelectorAll('.brand,.slider-brand')){
-  logo.innerHTML='<span class="unified-brand-mark" aria-hidden="true">◇</span><span>Pack<span class="unified-brand-accent">Swift</span></span>';
-}
 
-for (const link of document.querySelectorAll("[data-nav]")) {
-  if (link.dataset.nav === (page === 'planner-studio' ? 'planner' : page) || (page === "trips" && link.dataset.nav === "profile")) {
-    link.setAttribute("aria-current", "page");
-  } else {
-    link.removeAttribute("aria-current");
-  }
+function updateHeaderRoute(){
+ const path=location.pathname;
+ const active=path==='/explore'||(path==='/'&&location.hash==='#world-explorer')?'explore':path==='/trip-planner'?'planner':path==='/help'?'help':/^\/(trips|my-trips)(\/|$)/.test(path)?'trips':path==='/'?'home':null;
+ for(const link of globalHeader.querySelectorAll('[data-nav]')){if(link.dataset.nav===active)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}
 }
+updateHeaderRoute();window.addEventListener('hashchange',updateHeaderRoute);
 
 // Measure the shared header instead of hardcoding a desktop offset in the planner.
-const globalHeader = document.querySelector('.site-header');
 if (globalHeader) {
   const measureHeader = () => document.documentElement.style.setProperty('--ps-header-height', `${globalHeader.getBoundingClientRect().height}px`);
   new ResizeObserver(measureHeader).observe(globalHeader);
