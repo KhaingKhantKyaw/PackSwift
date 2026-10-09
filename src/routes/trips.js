@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {placeReference} from '../services/place-search-service.js';
 import { getDatabasePool } from "../config/database.js";
 import { randomUUID } from "node:crypto";
 import { body, param } from "express-validator";
@@ -59,6 +60,7 @@ tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async (req,res
     const errors=globalThis.PackSwiftItineraryPreferenceModel.validate(preferences,days);
     if(errors.length)return res.status(400).json({message:errors.join(' ')});
     details.itineraryPreferences=preferences;
+    details.selected=details.selected.map(placeReference);
     details.fields=details.fields.filter(f=>!['itineraryPreferences','itinerary-mode-choice'].includes(f.name));
     const [result]=await getDatabasePool().execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.detailPlanning', JSON_EXTRACT(?, '$'), '$.workspace.itineraryReviewedAt', NULL, '$.workspace.requirements', JSON_OBJECT(), '$.workspace.revision', COALESCE(JSON_EXTRACT(preferences_json,'$.workspace.revision'),0)+1), updated_at=CURRENT_TIMESTAMP WHERE public_id=? AND user_id=?",[JSON.stringify(details),req.params.tripId,req.auth.userId]);
     if(!result.affectedRows)return res.status(404).json({message:'Trip not found.'});

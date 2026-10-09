@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {placeSearchRouter} from './place-search.js';
 import {travelAdvisoryRouter} from './travel-advisory.js';
 import {tripDraftRouter} from './trip-drafts.js';
 import { liveReviewRouter } from './live-review.js';
@@ -26,6 +27,7 @@ import { tripWorkspaceRouter } from './trip-workspace.js';
 import { tripPlanRouter } from "./trip-plan.js";
 
 export const apiRouter = Router();
+apiRouter.use('/places',placeSearchRouter);
 apiRouter.use(travelAdvisoryRouter);
 apiRouter.use('/trip-drafts',tripDraftRouter);
 apiRouter.use(liveReviewRouter);

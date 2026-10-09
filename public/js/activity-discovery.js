@@ -27,7 +27,7 @@ globalThis.PackSwiftActivityDiscovery=(()=>{
    }section.append(grid);root.append(section);
   }
   if(filtered.length>visible){const more=el('button',`Show more activities (${filtered.length-visible} remaining)`,'studio-secondary');more.type='button';more.onclick=()=>{visible+=20;render(root,state,onSelect,onSkip,onRemove);};root.append(more);}
-  for(const p of state.selected){const row=el('div',null,'studio-selected');row.append(el('span','✓ '+(p.title||p.name)));const b=el('button','Remove');b.type='button';b.setAttribute('aria-label','Remove '+(p.title||p.name));b.onclick=()=>onRemove(p);row.append(b);root.append(row);}
+  for(const p of state.selected.filter(p=>p.source!=='user_search')){const row=el('div',null,'studio-selected');row.append(el('span','✓ '+(p.title||p.name)));const b=el('button','Remove');b.type='button';b.setAttribute('aria-label','Remove '+(p.title||p.name));b.onclick=()=>onRemove(p);row.append(b);root.append(row);}
  }
  return {render};
 })();

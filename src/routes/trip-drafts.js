@@ -1,4 +1,5 @@
 import {Router} from 'express';
+import {placeReference} from '../services/place-search-service.js';
 import {randomBytes,createHash} from 'node:crypto';
 import {rateLimit} from 'express-rate-limit';
 import {getDatabasePool} from '../config/database.js';
@@ -14,6 +15,7 @@ tripDraftRouter.post('/',async(req,res)=>{
   const {payload,action}=req.body||{};
   if(!['plan','save','board'].includes(action)||!payload||typeof payload!=='object'||Array.isArray(payload)||JSON.stringify(payload).length>100000)return res.status(400).json({message:'Trip draft is too large or incomplete.'});
   try{
+    if(Array.isArray(payload.preview?.places))payload.preview.places=payload.preview.places.map(placeReference);
     const db=getDatabasePool();const token=randomBytes(32).toString('hex');
     await db.execute('DELETE FROM temporary_trip_drafts WHERE expires_at <= UTC_TIMESTAMP()');
     await db.execute('INSERT INTO temporary_trip_drafts (token_hash,payload,action,expires_at) VALUES (?,?,?,DATE_ADD(UTC_TIMESTAMP(), INTERVAL 20 MINUTE))',[hash(token),JSON.stringify(payload),action]);

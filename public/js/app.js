@@ -151,6 +151,11 @@ async function api(path, options = {}) {
     error.fields = payload?.fields || [];
     throw error;
   }
+  if (/^\/api\/trips(?:\/|$)/.test(path) && !['GET', 'HEAD'].includes((options.method || 'GET').toUpperCase())) {
+    window.dispatchEvent(new Event('packswift:trips-changed'));
+    // Invalidation only: no trip details or credentials are stored in the browser.
+    try { localStorage.setItem('packswift:trips-changed', crypto.randomUUID()); } catch { /* Focus refresh still works. */ }
+  }
   return payload;
 }
 

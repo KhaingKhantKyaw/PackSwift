@@ -4,14 +4,15 @@ const settingsForm = document.querySelector("#settings-form");
 const passwordForm = document.querySelector("#password-form");
 const inProgressTripsList = document.querySelector("#profile-in-progress-trips");
 const readyTripsList = document.querySelector("#profile-ready-trips");
-const cancelReadyDialog = document.querySelector("#cancel-ready-dialog");
-const confirmCancelReady = document.querySelector("#confirm-cancel-ready");
 const themeButtons = [...document.querySelectorAll("[data-theme-option]")];
 const activeThemeLabel = document.querySelector("#active-theme-label");
 const themeFeedback = document.querySelector("#theme-feedback");
 let readyTrips = [];
 let inProgressTrips = [];
-let cancellingTripId = null;
+let profileSequence = 0;
+let profileController;
+let reloadTimer;
+const profileStatus = document.querySelector("#profile-load-status");
 
 function themeLabel(preference) {
   return {
@@ -68,20 +69,6 @@ function formatBudget(amount, currency) {
   }
 }
 
-function openCancelReadyTrip(trip) {
-  cancellingTripId = trip.trip_id;
-  document.querySelector("#cancel-ready-title").textContent =
-    `Cancel ${trip.destination}?`;
-  document.querySelector("#cancel-ready-feedback").textContent = "";
-  if (typeof cancelReadyDialog.showModal === "function") {
-    cancelReadyDialog.showModal();
-    return;
-  }
-  if (window.confirm("Are you sure you want to cancel this ready trip?")) {
-    cancelReadyTrip();
-  }
-}
-
 function renderReadyTrips() {
   readyTripsList.replaceChildren();
   document.querySelector("#ready-trip-count").textContent =
@@ -102,18 +89,18 @@ function renderReadyTrips() {
     const label = document.createElement("small");
     label.textContent = "Destination";
     const title = document.createElement("h3");
-    title.textContent = trip.destination;
+    title.textContent = trip.details.destination;
     destination.append(label, title);
     const badge = document.createElement("span");
     badge.className = "ready-badge";
-    badge.textContent = "Fully Prepared ✓";
+    badge.textContent = "Plan Complete ✓";
     head.append(destination, badge);
 
     const details = document.createElement("dl");
     details.className = "ready-profile-details";
     const detailRows = [
-      ["Travel dates", `${formatDate(trip.start_date)} – ${formatDate(trip.end_date)}`],
-      ["Budget", formatBudget(trip.budget_amount, trip.budget_currency)],
+      ["Travel dates", `${formatDate(trip.details.start)} – ${formatDate(trip.details.end)}`],
+      ["Budget", formatBudget(trip.details.budget, trip.details.currency)],
     ];
     for (const [term, value] of detailRows) {
       const row = document.createElement("div");
@@ -129,13 +116,12 @@ function renderReadyTrips() {
     actions.className = "ready-profile-actions";
     const edit = document.createElement("a");
     edit.className = "button button-primary";
-    edit.href = `/assist-trip?trip=${encodeURIComponent(trip.trip_id)}`;
+    edit.href = `/trip-planner?trip_id=${encodeURIComponent(trip.tripId)}`;
     edit.textContent = "Edit Trip";
-    const cancel = document.createElement("button");
+    const cancel = document.createElement("a");
     cancel.className = "button button-secondary";
-    cancel.type = "button";
-    cancel.textContent = "Cancel Trip";
-    cancel.addEventListener("click", () => openCancelReadyTrip(trip));
+    cancel.textContent = "View Trip";
+    cancel.href = `/trips/${encodeURIComponent(trip.tripId)}`;
     actions.append(edit, cancel);
     card.append(head, details, actions);
     readyTripsList.append(card);
@@ -148,14 +134,13 @@ function renderInProgressTrips() {
     `${inProgressTrips.length} in progress`;
   if (!inProgressTrips.length) {
     inProgressTripsList.append(
-      emptyItem("Trips with confirmed flights or hotels and unfinished checklist items will appear here."),
+      emptyItem("No trips in progress. Start a new trip to plan your next adventure."),
     );
     return;
   }
 
   for (const trip of inProgressTrips) {
-    const percentage = Math.max(0, Math.min(100, Number(trip.progress_percentage) || 0));
-    const remaining = Math.max(0, Number(trip.remaining_count) || 0);
+    const percentage = Math.max(0, Math.min(100, Number(trip.progress.percent) || 0));
     const card = document.createElement("article");
     card.className = "ready-profile-card in-progress-profile-card";
 
@@ -165,18 +150,18 @@ function renderInProgressTrips() {
     const label = document.createElement("small");
     label.textContent = "Destination";
     const title = document.createElement("h3");
-    title.textContent = trip.destination;
+    title.textContent = trip.details.destination;
     destination.append(label, title);
     const badge = document.createElement("span");
     badge.className = "ready-badge in-progress-badge";
-    badge.textContent = "Booked & Confirmed";
+    badge.textContent = "In progress";
     head.append(destination, badge);
 
     const details = document.createElement("dl");
     details.className = "ready-profile-details";
     for (const [term, value] of [
-      ["Travel dates", `${formatDate(trip.start_date)} – ${formatDate(trip.end_date)}`],
-      ["Budget", formatBudget(trip.budget_amount, trip.budget_currency)],
+      ["Travel dates", `${formatDate(trip.details.start)} – ${formatDate(trip.details.end)}`],
+      ["Budget", formatBudget(trip.details.budget, trip.details.currency)],
     ]) {
       const row = document.createElement("div");
       const dt = document.createElement("dt");
@@ -190,11 +175,11 @@ function renderInProgressTrips() {
     const progress = document.createElement("div");
     progress.className = "trip-readiness-progress";
     const progressText = document.createElement("p");
-    progressText.textContent = `${percentage}% Prepared — ${remaining} ${remaining === 1 ? "packing item" : "packing items"} remaining`;
+    progressText.textContent = `${percentage}% planned`;
     const track = document.createElement("div");
     track.className = "trip-readiness-progress-track";
     track.setAttribute("role", "progressbar");
-    track.setAttribute("aria-label", `${trip.destination} preparation progress`);
+    track.setAttribute("aria-label", `${trip.details.destination} preparation progress`);
     track.setAttribute("aria-valuemin", "0");
     track.setAttribute("aria-valuemax", "100");
     track.setAttribute("aria-valuenow", String(percentage));
@@ -207,31 +192,11 @@ function renderInProgressTrips() {
     actions.className = "ready-profile-actions single-action";
     const continueButton = document.createElement("a");
     continueButton.className = "button button-primary";
-    continueButton.href = `/assist-trip?trip=${encodeURIComponent(trip.trip_id)}`;
-    continueButton.textContent = "Continue Preparing";
+    continueButton.href = `/trips/${encodeURIComponent(trip.tripId)}`;
+    continueButton.textContent = "Continue Planning";
     actions.append(continueButton);
     card.append(head, details, progress, actions);
     inProgressTripsList.append(card);
-  }
-}
-
-async function cancelReadyTrip() {
-  if (!cancellingTripId) return;
-  confirmCancelReady.disabled = true;
-  const feedback = document.querySelector("#cancel-ready-feedback");
-  feedback.textContent = "Returning this trip to your saved plans…";
-  try {
-    await window.PackSwift.api(
-      `/api/trips/${encodeURIComponent(cancellingTripId)}/readiness/cancel`,
-      { method: "POST" },
-    );
-    cancellingTripId = null;
-    cancelReadyDialog.close();
-    await loadProfile();
-  } catch (error) {
-    feedback.textContent = error.message;
-  } finally {
-    confirmCancelReady.disabled = false;
   }
 }
 
@@ -243,79 +208,54 @@ function renderProfile(profile) {
   document.querySelector("#profile-handle").textContent = `@${user.username} · ${user.email}`;
   document.querySelector("#profile-initials").textContent = user.fullName
     .split(" ").slice(0, 2).map((part) => part[0]).join("").toUpperCase();
-  settingsForm.elements.fullName.value = user.fullName;
-  settingsForm.elements.username.value = user.username;
-  settingsForm.elements.email.value = user.email;
+  if (!settingsForm.contains(document.activeElement)) {
+    settingsForm.elements.fullName.value = user.fullName;
+    settingsForm.elements.username.value = user.username;
+    settingsForm.elements.email.value = user.email;
+  }
   renderInProgressTrips();
   renderReadyTrips();
 
   const trips = document.querySelector("#profile-trips");
   trips.replaceChildren();
-  if (!savedTrips.length) trips.append(emptyItem("No server-saved trips yet. Your next signed-in plan will appear here."));
+  if (!savedTrips.length) trips.append(emptyItem("No trips yet. Your next saved plan will appear here."));
   for (const trip of savedTrips) {
-    let plan = trip.trip_data || {};
-    if (typeof plan === "string") {
-      try {
-        plan = JSON.parse(plan);
-      } catch {
-        plan = {};
-      }
-    }
-    const item = document.createElement("article");
-    item.className = "profile-list-item";
-    const title = document.createElement("strong");
-    title.textContent = trip.destination;
-    const meta = document.createElement("span");
-    const score = plan.destination?.score
-      ? ` · ${Math.round(plan.destination.score)}% match`
-      : "";
-    meta.textContent = `${trip.travel_month} · USD ${Number(trip.budget).toLocaleString()} budget${score}`;
-    item.append(title, meta);
-    trips.append(item);
+    const item = document.createElement('article');item.className='profile-list-item';
+    const title=document.createElement('a');title.className='profile-trip-link';title.textContent=trip.details.destination;title.href='/trips/'+encodeURIComponent(trip.tripId);
+    const meta=document.createElement('span');meta.textContent=`${trip.details.origin} → ${trip.details.destination} · ${formatDate(trip.details.start)} – ${formatDate(trip.details.end)} · ${trip.progress.percent}% planned`;
+    item.append(title,meta);trips.append(item);
   }
 }
 
 async function loadProfile() {
-  const user = await window.PackSwift.authReady;
-  if (!user) {
-    profileGuest.hidden = false;
-    return;
-  }
+  const sequence=++profileSequence;
+  profileController?.abort();profileController=new AbortController();
+  profileStatus.textContent='Loading trips…';profileStatus.hidden=false;
+  document.querySelector('#in-progress-trip-count').textContent='Loading…';
+  document.querySelector('#ready-trip-count').textContent='Loading…';
+  const user=await window.PackSwift.authReady;
+  if(sequence!==profileSequence)return;
+  if(!user){profileGuest.hidden=false;profileContent.hidden=true;profileStatus.hidden=true;return;}
   try {
-    const result = await window.PackSwift.api("/api/profile");
-    renderProfile(result.profile);
-    profileContent.hidden = false;
-    const localSection = document.createElement('section');
-    localSection.className = 'panel';
-    const localTitle = document.createElement('h2');
-    localTitle.textContent = 'Saved Preview Plans · This device';
-    localSection.append(localTitle);
-    try {
-      const plans = JSON.parse(localStorage.getItem(`packswift_saved_plans:${user.id}`) || '[]');
-      if (Array.isArray(plans) && plans.length) {
-        plans.forEach(plan => {
-          const details = document.createElement('details'), summary = document.createElement('summary');
-          summary.textContent = `${plan.destination} · ${plan.startDate} – ${plan.endDate}`;
-          details.append(summary);
-          (plan.routes || []).forEach((stops, index) => {
-            const line = document.createElement('p');
-            line.textContent = `Day ${index+1}: ${stops.map(p => p.title || p.name).join(' → ') || 'Free time'}`;
-            details.append(line);
-          });
-          localSection.append(details);
-        });
-        profileContent.append(localSection);
-      }
-    } catch { /* Other profile data remains available if local storage cannot be read. */ }
-  } catch (error) {
-    if (error.status === 401) profileGuest.hidden = false;
-    else {
-      profileGuest.hidden = false;
-      profileGuest.querySelector("h1").textContent = "Your profile is temporarily unavailable.";
-      profileGuest.querySelector("p:not(.eyebrow)").textContent = error.message;
-    }
+    const result=await window.PackSwift.api('/api/profile',{cache:'no-store',signal:profileController.signal});
+    if(sequence!==profileSequence)return;
+    renderProfile(result.profile);profileContent.hidden=false;profileGuest.hidden=true;profileStatus.hidden=true;
+  }catch(error){
+    if(error.name==='AbortError'||sequence!==profileSequence)return;
+    document.querySelector('#in-progress-trip-count').textContent='Unavailable';
+    document.querySelector('#ready-trip-count').textContent='Unavailable';
+    inProgressTripsList.replaceChildren();readyTripsList.replaceChildren();document.querySelector('#profile-trips').replaceChildren();
+    profileStatus.textContent="We couldn't load your trips. ";
+    const retry=document.createElement('button');retry.type='button';retry.className='button button-secondary';retry.textContent='Try again';retry.onclick=loadProfile;profileStatus.append(retry);
+    if(error.status===401){profileContent.hidden=true;profileGuest.hidden=false;}
   }
 }
+function queueProfileRefresh(){clearTimeout(reloadTimer);reloadTimer=setTimeout(loadProfile,60);}
+window.addEventListener('packswift:trips-changed',queueProfileRefresh);
+window.addEventListener('storage',event=>{if(event.key==='packswift:trips-changed')queueProfileRefresh();});
+window.addEventListener('focus',queueProfileRefresh);
+window.addEventListener('pageshow',event=>{if(event.persisted)queueProfileRefresh();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)queueProfileRefresh();});
 
 settingsForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -357,5 +297,4 @@ passwordForm.addEventListener("submit", async (event) => {
   }
 });
 
-confirmCancelReady.addEventListener("click", cancelReadyTrip);
 loadProfile();

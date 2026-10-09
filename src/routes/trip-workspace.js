@@ -2,9 +2,10 @@ import {Router} from 'express';
 import {requireAuth} from '../middleware/auth.js';
 import {requireDatabase} from '../middleware/database.js';
 import {getDatabasePool} from '../config/database.js';
-import {getOwnedTrip,listTripTimeline,listPackingItems} from '../repositories/trip-repository.js';
-import {tripDetails,workspaceProgress,validateWorkspaceChange} from '../services/trip-workspace.js';
+import {getOwnedTrip} from '../repositories/trip-repository.js';
+import {tripDetails,validateWorkspaceChange} from '../services/trip-workspace.js';
 import {destinationCatalog} from '../services/travel-planner.js';
+import {getTripWorkspace as snapshot,getTripsForUser} from '../repositories/trip-workspace-repository.js';
 
 export const tripWorkspaceRouter=Router();
 const guard=[requireAuth,requireDatabase];
@@ -19,20 +20,12 @@ tripWorkspaceRouter.delete('/:tripId',...guard,async(req,res,next)=>{
     res.status(200).json({removed:true,tripId:req.params.tripId});
   }catch(e){next(e);}
 });
-async function snapshot(user,id) {
-  const trip=await getOwnedTrip(user,id);if(!trip)return null;
-  const workspace=trip.preferences.workspace || {revision:0,requirements:{},needs:[]};
-  const packing=await listPackingItems(user,id);
-  const timeline=await listTripTimeline(user,id);
-  return {tripId:id,details:tripDetails(trip),workspace,timeline,packing,itineraryPreferences:trip.preferences.detailPlanning?.itineraryPreferences||null,progress:workspaceProgress(trip,workspace,packing)};
-}
 tripWorkspaceRouter.get('/',...guard,async(req,res,next)=>{
-  try {const [rows]=await getDatabasePool().execute('SELECT public_id FROM trip_sessions WHERE user_id=? ORDER BY updated_at DESC LIMIT 100',[req.auth.userId]);
-    const trips=[];for(const row of rows){const s=await snapshot(req.auth.userId,row.public_id);if(s)trips.push({tripId:s.tripId,details:s.details,progress:s.progress});}res.json({trips});
+  try {res.set('Cache-Control','no-store').json({trips:await getTripsForUser(req.auth.userId)});
   }catch(e){next(e);}
 });
 tripWorkspaceRouter.get('/:tripId/workspace',...guard,async(req,res,next)=>{
-  try {if(!validId(req.params.tripId))return res.status(400).json({error:'Invalid trip ID.'});const result=await snapshot(req.auth.userId,req.params.tripId);if(!result)return res.status(404).json({error:'Trip not found.'});res.json(result);}catch(e){next(e);}
+  try {if(!validId(req.params.tripId))return res.status(400).json({error:'Invalid trip ID.'});const result=await snapshot(req.auth.userId,req.params.tripId,true);if(!result)return res.status(404).json({error:'Trip not found.'});res.set('Cache-Control','no-store').json(result);}catch(e){next(e);}
 });
 tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
   let connection;
@@ -75,6 +68,6 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
     if(change.action==='review-itinerary')state.itineraryReviewedAt=new Date().toISOString();
     state.revision=(state.revision||0)+1;state.updatedAt=new Date().toISOString();
     await connection.execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.workspace',JSON_EXTRACT(?, '$')), updated_at=CURRENT_TIMESTAMP WHERE id=? AND user_id=?",[JSON.stringify(state),rows[0].id,req.auth.userId]);
-    await connection.commit();res.json(await snapshot(req.auth.userId,req.params.tripId));
+    await connection.commit();res.json(await snapshot(req.auth.userId,req.params.tripId,true));
   }catch(e){if(connection)await connection.rollback();if(e instanceof RangeError)return res.status(422).json({error:e.message});next(e);}finally{connection?.release();}
 });
