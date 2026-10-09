@@ -347,7 +347,7 @@ activitiesRouter.get(
     try {
       const photo = await fetchGooglePlacePhoto(request.params.placeId);
       if (!photo) {
-        response.status(404).end();
+        response.status(404).json({code:'PHOTO_NOT_FOUND',error:'No photo supplied for this place.'});
         return;
       }
       const buffer = Buffer.from(await photo.arrayBuffer());
@@ -362,7 +362,8 @@ activitiesRouter.get(
       });
       response.send(buffer);
     } catch (error) {
-      next(error);
+      if(process.env.NODE_ENV!=='production')console.warn('[Places photo]',{code:error.code||'PHOTO_REQUEST_FAILED',providerStatus:error.providerStatus||null});
+      response.status(error.status===429?429:502).json({code:error.code||'PHOTO_REQUEST_FAILED',error:'Place photo is temporarily unavailable.'});
     }
   },
 );

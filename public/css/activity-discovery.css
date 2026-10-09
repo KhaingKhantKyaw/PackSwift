@@ -1,12 +1,12 @@
 #studio-places .activity-context,#studio-places .activity-notice{font-size:12px;line-height:1.6;margin:10px 0;color:var(--ps-ink,#183c40)}
-@media(min-width:1001px){body.planner-studio .studio-columns:has([data-step="4"]:not([hidden])){grid-template-columns:minmax(520px,1.3fr) minmax(0,1fr)}}
+/* Keep the Live Preview width stable; cards follow available container width. */
 #studio-places .activity-notice{opacity:.75}
 .activity-filters{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}
 .activity-filters button{font:inherit;font-size:11px;text-transform:capitalize;border:1px solid var(--ps-border,#dbe5e1);background:transparent;color:inherit;border-radius:20px;padding:6px 10px;cursor:pointer}
 .activity-filters button[aria-pressed=true]{background:#d5f0e4;color:#125b55}
 .activity-group{margin:24px 0}.activity-group>h4{font-size:15px;margin:5px 0 12px}
 .activity-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
-.activity-card{min-width:0;min-height:min-content;display:flex;flex-direction:column;border:1px solid var(--ps-border,#dbe5e1);border-radius:14px;overflow:hidden;background:var(--ps-surface,#fff);aspect-ratio:1/1.1;height:auto}
+.activity-card{min-width:0;display:flex;flex-direction:column;border:1px solid var(--ps-border,#dbe5e1);border-radius:18px;overflow:hidden;background:var(--ps-surface,#fff);aspect-ratio:auto;height:auto;max-height:none}
 .activity-media{aspect-ratio:16/10;flex-shrink:0;background:linear-gradient(135deg,#e2f2eb,#d4e5eb);display:grid;place-items:center;color:#486763;font-size:11px;overflow:hidden}
 .activity-media img{width:100%;height:100%;object-fit:cover;display:block}
 .activity-card-content{padding:12px;display:flex;flex:1;flex-direction:column;gap:6px;min-width:0}
@@ -15,3 +15,27 @@
 .activity-card details{font-size:11px;line-height:1.5}.activity-card details p{font-size:11px;overflow-wrap:anywhere}.activity-card summary{cursor:pointer}
 .activity-actions{margin-top:auto;display:flex;gap:6px;padding-top:6px;flex-wrap:wrap}.activity-actions button{font:inherit;font-size:11px;padding:8px;border:1px solid var(--ps-border,#dbe5e1);border-radius:20px;background:transparent;color:inherit;cursor:pointer}.activity-actions button:first-child{background:#d5f0e4;color:#125b55}
 @media(max-width:600px){.activity-pair{grid-template-columns:1fr}.activity-card{aspect-ratio:auto}.activity-card-content{min-height:145px}}
+/* Planner-scoped media, content and actions stay in normal document flow. */
+body.planner-studio #studio-places{container-type:inline-size;min-width:0}
+body.planner-studio .activity-pair{grid-template-columns:minmax(0,1fr);gap:18px;grid-auto-rows:auto}
+@container(min-width:520px){body.planner-studio .activity-pair{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body.planner-studio .activity-card{box-shadow:0 3px 12px #062d3308;transition:border-color 180ms ease,box-shadow 180ms ease}
+body.planner-studio .activity-card:hover{border-color:var(--ps-accent);box-shadow:0 5px 16px #062d3310}
+body.planner-studio .activity-media{position:relative;aspect-ratio:16/9;max-height:190px;min-height:120px;background:linear-gradient(135deg,color-mix(in srgb,var(--ps-mint) 22%,var(--ps-surface)),var(--ps-surface));color:var(--ps-ink)}
+body.planner-studio .activity-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 240ms ease}
+body.planner-studio .activity-media[data-state=ready] img{opacity:1}
+body.planner-studio .activity-fallback{display:grid;justify-items:center;gap:6px;padding:12px;text-align:center;font-size:12px}
+body.planner-studio .activity-fallback>span{font-size:28px;color:var(--ps-accent)}
+body.planner-studio .activity-fallback small{font-size:10px;color:var(--ps-muted)}
+body.planner-studio .activity-media[data-state=loading]::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent,#aee9d840,transparent);animation:activity-loading 1.2s ease-in-out infinite}
+body.planner-studio .activity-card-content{padding:16px;gap:8px;overflow:visible;min-height:0}
+body.planner-studio .activity-card-content h5{font-size:17px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+body.planner-studio .activity-card-content small{font-size:12px;line-height:1.5}
+body.planner-studio .activity-card details,body.planner-studio .activity-card details p{font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+body.planner-studio .activity-actions{margin-top:auto;padding:0 16px 16px;position:static;gap:8px}
+body.planner-studio .activity-actions button{flex:1 1 auto;min-height:40px;white-space:nowrap;font-size:12px;padding:9px 14px}
+body.planner-studio .activity-actions button:first-child{background:var(--ps-mint);color:#123f43;min-width:120px}
+body.planner-studio .activity-card[data-selected=true]{border-color:var(--ps-accent)}
+body.planner-studio #studio-places .activity-notice{padding:10px 12px;border-left:2px solid var(--ps-mint);background:color-mix(in srgb,var(--ps-mint) 10%,transparent);border-radius:8px}
+@keyframes activity-loading{from{opacity:.3}50%{opacity:.9}to{opacity:.3}}
+@media(prefers-reduced-motion:reduce){body.planner-studio .activity-media::after{animation:none!important}body.planner-studio .activity-media img{transition:none}}

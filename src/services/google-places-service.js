@@ -252,8 +252,7 @@ function paceLevelForTypes(types) {
 function photoCredit(photo) {
   const names = (photo?.authorAttributions || [])
     .map((author) => author.displayName)
-    .filter(Boolean)
-    .slice(0, 2);
+    .filter(Boolean);
   return names.length ? `Photo: ${names.join(", ")} · Google Maps` : "Google Maps";
 }
 
@@ -287,6 +286,7 @@ export function normalizeGooglePlace(place, { destination, index = 0 } = {}) {
       : `/images/packswift${(index % 3) + 1}.jpg`,
     imageAlt: `${title} in ${destination}`,
     imageCredit: photo ? photoCredit(photo) : "PackSwift travel collection",
+    imageAuthors: photo?.authorAttributions?.map(author=>({name:author.displayName||'',url:author.uri||''}))||[],
     imageSourceUrl: photo ? place.googleMapsUri || "" : "",
     suitableGroups: suitableGroupsForTypes(types),
     purposeTags: purposeTagsForTypes(types),
@@ -428,7 +428,12 @@ export async function fetchGooglePlacePhoto(
   placeId,
   { fetchImpl = globalThis.fetch, apiKey = process.env.GOOGLE_PLACES_API_KEY } = {},
 ) {
-  if (!isGooglePlacesConfigured(apiKey)) return null;
+  const photoError = (status) => Object.assign(new Error('Place photo request failed.'), {
+    status: status === 429 ? 429 : 502,
+    providerStatus: status,
+    code: [401,403].includes(status) ? 'PHOTO_CONFIGURATION' : 'PHOTO_REQUEST_FAILED',
+  });
+  if (!isGooglePlacesConfigured(apiKey)) throw photoError(403);
   const details = await fetchImpl(`${placesDetailsEndpoint}/${encodeURIComponent(placeId)}`, {
     headers: {
       "x-goog-api-key": apiKey,
@@ -436,18 +441,18 @@ export async function fetchGooglePlacePhoto(
     },
     signal: AbortSignal.timeout(8000),
   });
-  if (!details.ok) throw googleError(details.status);
+  if (!details.ok) throw photoError(details.status);
   const place = await details.json();
   const photoName = place.photos?.[0]?.name;
   if (!photoName) return null;
   const photo = await fetchImpl(
-    `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=1200&maxHeightPx=800`,
+    `https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=720&maxHeightPx=480`,
     {
       headers: { "x-goog-api-key": apiKey },
       redirect: "follow",
       signal: AbortSignal.timeout(8000),
     },
   );
-  if (!photo.ok) throw googleError(photo.status);
+  if (!photo.ok) throw photoError(photo.status);
   return photo;
 }
