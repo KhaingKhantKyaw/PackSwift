@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="/css/activity-discovery.css">
 <script src="/js/activity-recommendation-model.js" defer></script><script src="/js/activity-discovery.js" defer></script>
 <script src="/js/itinerary-preferences-model.js" defer></script><script src="/js/itinerary-preferences.js" defer></script><script src="/js/trip-draft-gate.js" defer></script><script src="/js/planner-studio.js" defer></script>
+<link rel="stylesheet" href="/css/planner-editorial.css">
 </head>
 <body data-page="planner-studio" class="planner-studio">
 <a class="skip-link" href="#studio-main">Skip to trip setup</a>
@@ -25,12 +26,12 @@
 <a href="/" class="workspace-brand">◇ PackSwift</a>
 <header class="studio-panel-heading"><div><h1>Plan Your Trip</h1><p>Create your personalized travel plan with real-time recommendations.</p></div></header>
 <nav id="studio-steps" class="studio-steps" aria-label="Planning steps"></nav>
-<section class="studio-step" data-step="0"><span class="studio-eyebrow">01 / THE JOURNEY</span><h3>Where are we going?</h3>
+<section class="studio-step" data-step="0"><div class="planner-destination-card"><span class="studio-eyebrow">01 / THE JOURNEY</span><h3>Where are we going?</h3>
 <fieldset class="trip-type-control"><legend>Where are you traveling?</legend><label><input type="radio" name="tripType" value="local"> Local Trip</label><label><input type="radio" name="tripType" value="anywhere" checked> Explore Anywhere</label></fieldset>
 <label for="origin-search" id="origin-label">Origin City</label><input id="origin-search" name="origin" placeholder="e.g. Yangon" list="studio-cities" autocomplete="off" required>
 <label for="destination-search">Destination</label><input id="destination-search" name="destination" placeholder="e.g. Bangkok" list="studio-cities" autocomplete="off" required><datalist id="studio-cities"></datalist>
-<div class="studio-pair"><div><label for="start-date">Departure date</label><input id="start-date" name="startDate" type="date" required></div><div><label for="end-date">Return date</label><input id="end-date" name="endDate" type="date" required></div></div>
-<input id="trip-scope" name="tripScope" type="hidden" value="anywhere">
+</div><div class="planner-date-card"><h3>Travel Dates</h3><div class="studio-pair"><div><label for="start-date">Departure date</label><input id="start-date" name="startDate" type="date" required></div><div><label for="end-date">Return date</label><input id="end-date" name="endDate" type="date" required></div></div>
+</div><input id="trip-scope" name="tripScope" type="hidden" value="anywhere">
 <p class="studio-note">Start with your route and dates. Everything stays editable.</p></section>
 <section class="studio-step" data-step="1" hidden><span class="studio-eyebrow">02 / YOUR PEOPLE</span><h3>Who’s coming along?</h3>
 <div class="studio-pair"><div><label for="adults">Adults · 18+</label><input id="adults" name="adults" type="number" min="1" max="20" value="1" required></div><div><label for="children">Children · under 18</label><input id="children" name="children" type="number" min="0" max="19" value="0" required></div></div>

@@ -1,0 +1,54 @@
+/* Plan Trip only: presentation adapter over the existing planner controllers. */
+html[data-theme="dark"] body.planner-studio[data-page="planner-studio"] :is(.workspace-link,.workspace-card a,.workspace-stats button) { color:#aee9d8!important; }
+html body.planner-studio[data-page="planner-studio"] .studio-step[data-step="0"]>.studio-note { color:#d7e7df!important; }
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button]:has(~[aria-current="step"]) .workspace-step-number { background:#aee9d833; border-color:#aee9d8; }
+html:has(body.planner-studio[data-page="planner-studio"]) { height:auto; overflow:auto; }
+html body.planner-studio[data-page="planner-studio"] { height:auto; min-height:100dvh; overflow:visible; }
+html body.planner-studio[data-page="planner-studio"] main.studio-shell { position:relative!important; inset:auto!important; height:auto!important; overflow:visible!important; padding:28px clamp(18px,3vw,48px) 56px!important; margin-top:0!important; }
+html body.planner-studio[data-page="planner-studio"] .studio-columns { display:grid; grid-template-columns:minmax(0,34fr) minmax(0,66fr); gap:24px; height:auto; align-items:start; }
+html body.planner-studio[data-page="planner-studio"] :is(.studio-setup,.studio-dashboard) { position:relative; top:auto; height:auto!important; max-height:none!important; min-height:0; overflow:visible!important; padding:0!important; border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; }
+html body.planner-studio[data-page="planner-studio"] .studio-panel-heading h1 { color:#fff9eb!important; font-size:clamp(25px,2.3vw,36px)!important; }
+html body.planner-studio[data-page="planner-studio"] .studio-panel-heading p { color:#d7e7df!important; max-width:32ch; }
+html body.planner-studio[data-page="planner-studio"] .studio-dashboard>.studio-panel-heading { padding:0 4px; margin:18px 0; }
+html body.planner-studio[data-page="planner-studio"] .studio-dashboard>.studio-panel-heading h2 { color:#fff9eb!important; }
+html body.planner-studio[data-page="planner-studio"] .studio-state { color:#c3ddd4; }
+html body.planner-studio[data-page="planner-studio"] .studio-steps { display:grid; grid-template-columns:72px minmax(0,1fr); grid-template-rows:repeat(7,66px) auto; gap:0 14px; align-items:start; margin-top:24px; }
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button] { grid-column:1; border:0; color:#d3e2dc!important; padding:8px 0; display:flex; flex-direction:column; gap:5px; text-align:center; font-size:10px; line-height:1.25; }
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button="0"] {grid-row:1}
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button="1"] {grid-row:2}
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button="2"] {grid-row:3}
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button="3"] {grid-row:4}
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button="4"] {grid-row:5}
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button="5"] {grid-row:6}
+html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button="6"] {grid-row:7}
+html body.planner-studio[data-page="planner-studio"] .workspace-step-number { width:30px; height:30px; border-color:#bad9cf70; background:#123f43; color:#dcebe5; }
+html body.planner-studio[data-page="planner-studio"] [aria-current="step"] .workspace-step-number { background:var(--ps-mint); color:#123f43; border-color:var(--ps-mint); box-shadow:0 0 0 4px #aee9d818; }
+html body.planner-studio[data-page="planner-studio"] :is(.studio-step,.planner-destination-card,.planner-date-card,.workspace-card,.studio-readiness) { padding:20px; border:1px solid var(--ps-border); background:var(--ps-surface)!important; color:var(--ps-ink); border-radius:22px; box-shadow:0 8px 24px #001b2310; min-width:0; }
+html body.planner-studio[data-page="planner-studio"] .studio-step { grid-column:2; grid-row:1 / span 8; }
+html body.planner-studio[data-page="planner-studio"] .studio-step[data-step="0"] { padding:0; border:0; background:transparent!important; box-shadow:none; }
+html body.planner-studio[data-page="planner-studio"] .planner-date-card { margin-top:18px; padding:16px 12px; }
+html body.planner-studio[data-page="planner-studio"] :is(.studio-step>h3,.planner-destination-card>h3,.planner-date-card>h3) { display:block; font-size:21px!important; line-height:1.25; margin:0 0 18px; }
+html body.planner-studio[data-page="planner-studio"] .planner-destination-card>.studio-eyebrow { display:none; }
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar { border:0; padding:0; margin:0; background:transparent; box-shadow:none; }
+html body.planner-studio[data-page="planner-studio"] .studio-setup :is(input:not([type=checkbox]):not([type=radio]),select,textarea) { border-radius:12px!important; min-width:0; max-width:100%; }
+html body.planner-studio[data-page="planner-studio"] .studio-form-actions { position:static; margin:18px 0 0 86px; padding:0; background:transparent!important; border:0; }
+html body.planner-studio[data-page="planner-studio"] .studio-form-actions .studio-secondary { background:var(--ps-surface); }
+html body.planner-studio[data-page="planner-studio"] .studio-primary { background:var(--ps-mint)!important; color:#123f43!important; border-color:var(--ps-mint)!important; }
+html body.planner-studio[data-page="planner-studio"] .workspace-nav { position:sticky; top:calc(var(--ps-header-height,80px) + 12px); margin:0; padding:10px 18px; border:1px solid #d6ece32e; border-radius:18px; background:#103b40e8!important; backdrop-filter:blur(12px); z-index:5; }
+html body.planner-studio[data-page="planner-studio"] .workspace-nav>div { width:100%; justify-content:space-between; gap:10px; }
+html body.planner-studio[data-page="planner-studio"] .workspace-nav button { color:#dcebe5!important; font-size:13px; }
+html body.planner-studio[data-page="planner-studio"] .workspace-nav button[aria-current] { color:var(--ps-mint)!important; border-bottom-color:var(--ps-mint); }
+html body.planner-studio[data-page="planner-studio"] .workspace-hero { min-height:260px; border-radius:26px; overflow:hidden; margin-bottom:18px; }
+html body.planner-studio[data-page="planner-studio"] .workspace-hero-content { min-height:260px; padding:28px; background:linear-gradient(90deg,#052a32e8,#052a3250),linear-gradient(0deg,#052a32a8,transparent); }
+html body.planner-studio[data-page="planner-studio"] .workspace-hero h2 { color:#fff9eb!important; font-size:clamp(28px,3.1vw,46px)!important; }
+html body.planner-studio[data-page="planner-studio"] .workspace-hero .workspace-link { padding:6px 14px; border:1px solid #fff6; border-radius:30px; color:#fff!important; }
+html body.planner-studio[data-page="planner-studio"] .workspace-stats { margin:0 0 20px; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+html body.planner-studio[data-page="planner-studio"] .workspace-stats>div { background:var(--ps-surface)!important; border:1px solid var(--ps-border); border-radius:18px; padding:16px; gap:10px; }
+html body.planner-studio[data-page="planner-studio"] .workspace-stats small { color:var(--ps-muted); font-size:11px; }
+html body.planner-studio[data-page="planner-studio"] .workspace-stats strong { color:var(--ps-ink); font-size:18px; overflow-wrap:anywhere; }
+html body.planner-studio[data-page="planner-studio"] .workspace-map-row { grid-template-columns:minmax(0,3fr) minmax(0,2fr); gap:18px; }
+html body.planner-studio[data-page="planner-studio"] .workspace-cost { padding:12px 0; border-bottom:1px solid var(--ps-border); }
+html body.planner-studio[data-page="planner-studio"] .studio-save-row { background:var(--ps-surface); padding:20px; border-radius:20px; }
+@media(max-width:600px){html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button]{flex:0 0 calc((100% - 24px)/4);font-size:11px!important}html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button]>span:last-child{max-width:100%;overflow-wrap:anywhere}}
+@media(max-width:1100px){html body.planner-studio[data-page="planner-studio"] .studio-columns{grid-template-columns:1fr}html body.planner-studio[data-page="planner-studio"] .studio-steps{grid-template-columns:95px minmax(0,1fr)}html body.planner-studio[data-page="planner-studio"] .studio-form-actions{margin-left:109px}}
+@media(max-width:600px){html body.planner-studio[data-page="planner-studio"] main.studio-shell{padding:20px 12px 36px!important}html body.planner-studio[data-page="planner-studio"] .studio-steps{display:flex;flex-wrap:wrap;gap:8px}html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button]{width:calc((100% - 48px)/7);order:0;font-size:9px}html body.planner-studio[data-page="planner-studio"] .studio-step{order:1;width:100%}html body.planner-studio[data-page="planner-studio"] .studio-form-actions{margin-left:0}html body.planner-studio[data-page="planner-studio"] .workspace-stats{grid-template-columns:1fr 1fr}html body.planner-studio[data-page="planner-studio"] .workspace-map-row{grid-template-columns:1fr}html body.planner-studio[data-page="planner-studio"] .workspace-hero-content{padding:22px}html body.planner-studio[data-page="planner-studio"] .workspace-nav{padding:8px 12px}}
