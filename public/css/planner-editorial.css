@@ -1,4 +1,21 @@
 /* Plan Trip only: presentation adapter over the existing planner controllers. */
+body.planner-studio[data-page="planner-studio"] { --planner-ease:cubic-bezier(.22,1,.36,1);--planner-micro:150ms;--planner-normal:240ms; }
+body.planner-studio[data-page="planner-studio"] .studio-steps { position:relative; }
+body.planner-studio[data-page="planner-studio"] :is(.studio-step,.workspace-card,.studio-summary) { scroll-margin-top:150px; }
+body.planner-studio[data-page="planner-studio"] :is(button,input,select,textarea,.preference-mode,.workspace-step-number,.studio-check) { transition:background-color var(--planner-micro) var(--planner-ease),border-color var(--planner-micro) var(--planner-ease),box-shadow var(--planner-micro) var(--planner-ease),color var(--planner-micro) var(--planner-ease),transform var(--planner-micro) var(--planner-ease); }
+body.planner-studio[data-page="planner-studio"] button:not(:disabled):active { transform:scale(.985); }
+body.planner-studio[data-page="planner-studio"] :is(.studio-primary,.studio-secondary):not(:disabled):hover { transform:translateY(-1px);box-shadow:0 3px 10px #062d3318; }
+body.planner-studio[data-page="planner-studio"] .studio-steps [data-completed="true"] { color:var(--ps-mint)!important; }
+body.planner-studio[data-page="planner-studio"] .workspace-stats>div { min-height:100px; }
+body.planner-studio[data-page="planner-studio"] .workspace-hero-content { z-index:1; }
+body.planner-studio[data-page="planner-studio"] .calendar-grid { min-height:240px;align-content:start; }
+body.planner-studio[data-page="planner-studio"] .is-recalculating .workspace-card { animation:none!important; }
+body.planner-studio[data-page="planner-studio"] #studio-state { min-height:18px; }
+body.planner-studio[data-page="planner-studio"] .studio-form-actions { min-height:48px; }
+html body.planner-studio[data-page="planner-studio"] :is(.workspace-map-row,.workspace-recommendations,.workspace-tools) { align-items:start; }
+body.planner-studio[data-page="planner-studio"] .place-search-results { animation:planner-reveal 200ms var(--planner-ease); }
+@keyframes planner-reveal {from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){body.planner-studio[data-page="planner-studio"] *,body.planner-studio[data-page="planner-studio"] *::before,body.planner-studio[data-page="planner-studio"] *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 html[data-theme="dark"] body.planner-studio[data-page="planner-studio"] :is(.workspace-link,.workspace-card a,.workspace-stats button) { color:#aee9d8!important; }
 html body.planner-studio[data-page="planner-studio"] .studio-step[data-step="0"]>.studio-note { color:#d7e7df!important; }
 html body.planner-studio[data-page="planner-studio"] .studio-steps>[data-step-button]:has(~[aria-current="step"]) .workspace-step-number { background:#aee9d833; border-color:#aee9d8; }

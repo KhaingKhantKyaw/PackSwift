@@ -9,7 +9,7 @@
  const iso=date=>date.toISOString().slice(0,10);
  const notify=()=>form.dispatchEvent(new Event('input',{bubbles:true}));
  function draw(){calendar.replaceChildren();const header=node('div');header.className='calendar-month';
- for(const [label,delta]of [['←',-1],['→',1]]){const b=node('button',label);b.type='button';b.setAttribute('aria-label',delta<0?'Previous month':'Next month');b.onclick=()=>{month=new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()+delta,1));draw();};header.append(b);}
+ for(const [label,delta]of [['←',-1],['→',1]]){const b=node('button',label);b.type='button';b.setAttribute('aria-label',delta<0?'Previous month':'Next month');b.onclick=()=>{month=new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()+delta,1));draw();window.PackSwiftPlannerMotion?.animate(calendar.querySelector('.calendar-grid'),[{opacity:.4,transform:'translateX('+delta*8+'px)'},{opacity:1,transform:'none'}],240);calendar.querySelector('[aria-label="'+(delta<0?'Previous month':'Next month')+'"]').focus({preventScroll:true});};header.append(b);}
  header.insertBefore(node('strong',month.toLocaleDateString('en',{month:'long',year:'numeric',timeZone:'UTC'})),header.lastChild);calendar.append(header,node('p',choosingEnd?'Choose an end date after the start date.':'Choose a start date, then an end date.'));
  const grid=node('div');grid.className='calendar-grid';['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>grid.append(node('small',d)));
  for(let j=0;j<(month.getUTCDay()+6)%7;j++)grid.append(node('span'));

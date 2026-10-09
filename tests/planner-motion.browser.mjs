@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||undefined});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto((process.env.PLANNER_TEST_URL||'http://127.0.0.1:3000')+'/trip-planner?destination=Bangkok');
+ await page.waitForSelector('.calendar-day');await page.waitForFunction(()=>document.querySelector('#studio-summary>img')?.complete);
+ const retained=await page.evaluate(()=>{const image=document.querySelector('#studio-summary>img'),route=document.querySelector('#workspace-map'),metrics=document.querySelector('#workspace-metrics'),packing=document.querySelector('#workspace-packing');document.querySelector('#adults').value='2';document.querySelector('#adults').dispatchEvent(new Event('input',{bubbles:true}));return{image:image===document.querySelector('#studio-summary>img'),route:route===document.querySelector('#workspace-map'),metrics:metrics===document.querySelector('#workspace-metrics'),packing:packing===document.querySelector('#workspace-packing')};});
+ assert.deepEqual(retained,{image:true,route:true,metrics:true,packing:true});
+ await page.evaluate(()=>{for(const[id,value]of Object.entries({'origin-search':'Yangon','start-date':'2026-12-03','end-date':'2026-12-10','passport-country':'Myanmar',budget:'30000',currency:'THB','dietary-style':'halal','trip-notes':'Culture, food and beaches'}))document.getElementById(id).value=value;document.querySelector('#trip-planner-form').dispatchEvent(new Event('input',{bubbles:true}));});
+ await page.evaluate(()=>{for(let n=0;n<8;n++){document.querySelector('#studio-next').click();document.querySelector('#studio-back').click();}});
+ await page.waitForTimeout(450);
+ assert.equal(await page.locator('.planner-step-ghost').count(),0);
+ assert.equal(await page.locator('[data-step]:not([hidden])').count(),1);
+ assert.equal(await page.locator('[data-step="0"]').isVisible(),true);
+ await page.getByRole('button',{name:'Next month',exact:true}).click();
+ assert.equal(await page.getByRole('button',{name:'Next month',exact:true}).evaluate(e=>e===document.activeElement),true);
+ await page.route('**/images/destination-tokyo.jpg',async route=>{await new Promise(r=>setTimeout(r,500));await route.continue();});
+ await page.locator('#destination-search').fill('Tokyo');
+ assert.match(await page.locator('#studio-summary>img').first().getAttribute('src'),/bangkok/);
+ await page.waitForFunction(()=>document.querySelector('#studio-summary>img')?.src.includes('tokyo')&&!document.querySelector('#studio-summary').hasAttribute('aria-busy'));
+ await page.waitForTimeout(450);assert.equal(await page.locator('#studio-summary>img').count(),1);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.locator('#studio-next').click();
+ assert.equal(await page.locator('.planner-step-ghost').count(),0);
+ assert.equal(await page.locator('[data-step="1"]').evaluate(e=>e.getAnimations().length),0);
+ await page.route('**/api/v1/trips/live-review',async route=>{await new Promise(r=>setTimeout(r,600));await route.continue();});
+ await page.locator('#adults').fill('3');
+ assert.equal(await page.locator('#workspace-metrics').count(),1);
+ assert.equal(await page.locator('#workspace-map').count(),1);
+ await page.waitForTimeout(1200);assert.deepEqual(errors,[]);
+ console.log('PASS: unchanged hero/route/metric/packing nodes, rapid Next/Back cleanup, calendar keyboard focus, slow image retains old photo, single final hero image, reduced motion, delayed review stability.');
+}finally{await browser.close();}
