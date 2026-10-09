@@ -69,135 +69,38 @@ function formatBudget(amount, currency) {
   }
 }
 
-function renderReadyTrips() {
-  readyTripsList.replaceChildren();
-  document.querySelector("#ready-trip-count").textContent =
-    `${readyTrips.length} ${readyTrips.length === 1 ? "trip" : "trips"} ready`;
-  if (!readyTrips.length) {
-    readyTripsList.append(
-      emptyItem("No trips are fully prepared yet. Complete a trip checklist and it will appear here."),
-    );
-    return;
-  }
-
-  for (const trip of readyTrips) {
-    const card = document.createElement("article");
-    card.className = "ready-profile-card";
-    const head = document.createElement("div");
-    head.className = "ready-profile-head";
-    const destination = document.createElement("div");
-    const label = document.createElement("small");
-    label.textContent = "Destination";
-    const title = document.createElement("h3");
-    title.textContent = trip.details.destination;
-    destination.append(label, title);
-    const badge = document.createElement("span");
-    badge.className = "ready-badge";
-    badge.textContent = "Plan Complete ✓";
-    head.append(destination, badge);
-
-    const details = document.createElement("dl");
-    details.className = "ready-profile-details";
-    const detailRows = [
-      ["Travel dates", `${formatDate(trip.details.start)} – ${formatDate(trip.details.end)}`],
-      ["Budget", formatBudget(trip.details.budget, trip.details.currency)],
-    ];
-    for (const [term, value] of detailRows) {
-      const row = document.createElement("div");
-      const dt = document.createElement("dt");
-      const dd = document.createElement("dd");
-      dt.textContent = term;
-      dd.textContent = value;
-      row.append(dt, dd);
-      details.append(row);
-    }
-
-    const actions = document.createElement("div");
-    actions.className = "ready-profile-actions";
-    const edit = document.createElement("a");
-    edit.className = "button button-primary";
-    edit.href = `/trip-planner?trip_id=${encodeURIComponent(trip.tripId)}`;
-    edit.textContent = "Edit Trip";
-    const cancel = document.createElement("a");
-    cancel.className = "button button-secondary";
-    cancel.textContent = "View Trip";
-    cancel.href = `/trips/${encodeURIComponent(trip.tripId)}`;
-    actions.append(edit, cancel);
-    card.append(head, details, actions);
-    readyTripsList.append(card);
-  }
+const node=(tag,text,cls)=>{const el=document.createElement(tag);if(text!=null)el.textContent=text;if(cls)el.className=cls;return el;};
+const journeyLink=(text,href,primary=false)=>{const a=node('a',text,'button '+(primary?'button-primary':'button-secondary'));a.href=href;return a;};
+function tripImage(destination){
+ const names=['bangkok','singapore','bali','tokyo','paris'];const city=String(destination).split(',')[0].trim().toLowerCase();
+ const img=node('img');img.src=names.includes(city)?'/images/destination-'+city+'.jpg':'/images/community-sunset.jpg';img.alt=names.includes(city)?destination:'Travel inspiration';img.loading='lazy';img.onerror=()=>{img.remove();};return img;
 }
-
-function renderInProgressTrips() {
-  inProgressTripsList.replaceChildren();
-  document.querySelector("#in-progress-trip-count").textContent =
-    `${inProgressTrips.length} in progress`;
-  if (!inProgressTrips.length) {
-    inProgressTripsList.append(
-      emptyItem("No trips in progress. Start a new trip to plan your next adventure."),
-    );
-    return;
-  }
-
-  for (const trip of inProgressTrips) {
-    const percentage = Math.max(0, Math.min(100, Number(trip.progress.percent) || 0));
-    const card = document.createElement("article");
-    card.className = "ready-profile-card in-progress-profile-card";
-
-    const head = document.createElement("div");
-    head.className = "ready-profile-head";
-    const destination = document.createElement("div");
-    const label = document.createElement("small");
-    label.textContent = "Destination";
-    const title = document.createElement("h3");
-    title.textContent = trip.details.destination;
-    destination.append(label, title);
-    const badge = document.createElement("span");
-    badge.className = "ready-badge in-progress-badge";
-    badge.textContent = "In progress";
-    head.append(destination, badge);
-
-    const details = document.createElement("dl");
-    details.className = "ready-profile-details";
-    for (const [term, value] of [
-      ["Travel dates", `${formatDate(trip.details.start)} – ${formatDate(trip.details.end)}`],
-      ["Budget", formatBudget(trip.details.budget, trip.details.currency)],
-    ]) {
-      const row = document.createElement("div");
-      const dt = document.createElement("dt");
-      const dd = document.createElement("dd");
-      dt.textContent = term;
-      dd.textContent = value;
-      row.append(dt, dd);
-      details.append(row);
-    }
-
-    const progress = document.createElement("div");
-    progress.className = "trip-readiness-progress";
-    const progressText = document.createElement("p");
-    progressText.textContent = `${percentage}% planned`;
-    const track = document.createElement("div");
-    track.className = "trip-readiness-progress-track";
-    track.setAttribute("role", "progressbar");
-    track.setAttribute("aria-label", `${trip.details.destination} preparation progress`);
-    track.setAttribute("aria-valuemin", "0");
-    track.setAttribute("aria-valuemax", "100");
-    track.setAttribute("aria-valuenow", String(percentage));
-    const fill = document.createElement("span");
-    fill.style.width = `${percentage}%`;
-    track.append(fill);
-    progress.append(progressText, track);
-
-    const actions = document.createElement("div");
-    actions.className = "ready-profile-actions single-action";
-    const continueButton = document.createElement("a");
-    continueButton.className = "button button-primary";
-    continueButton.href = `/trips/${encodeURIComponent(trip.tripId)}`;
-    continueButton.textContent = "Continue Planning";
-    actions.append(continueButton);
-    card.append(head, details, progress, actions);
-    inProgressTripsList.append(card);
-  }
+function journeyEmpty(title,copy,label='Plan a Trip',href='/trip-planner'){
+ const box=node('div',null,'journey-empty');const icon=node('span','◇','empty-compass');icon.setAttribute('aria-hidden','true');const text=node('div');text.append(node('h3',title),node('p',copy));box.append(icon,text,journeyLink(label,href));return box;
+}
+function journeyCard(trip,compact=false){
+ const d=trip.details,card=node('article',null,'journey-card'+(compact?' journey-card-compact':''));card.dataset.tripId=trip.tripId;
+ const image=node('div',null,'journey-image');image.append(tripImage(d.destination));image.append(node('span',trip.progress.complete?'Plan complete':'In progress','journey-status'));
+ const body=node('div',null,'journey-card-body');body.append(node('h3',d.destination),node('p',d.tripType==='local'?'Local journey':d.origin+' → '+d.destination,'journey-route'),node('p',formatDate(d.start)+' – '+formatDate(d.end),'journey-dates'));
+ const progress=node('div',null,'journey-progress');const label=node('div');label.append(node('span','Planning progress'),node('strong',trip.progress.percent+'% planned'));const bar=node('progress');bar.max=100;bar.value=trip.progress.percent;bar.setAttribute('aria-label',d.destination+' planning progress');progress.append(label,bar);body.append(progress);
+ if(!compact){const sections=node('div',null,'journey-milestones');for(const s of trip.progress.sections)sections.append(node('span',(s.done?'✓ ':'○ ')+s.label));body.append(sections,node('p',d.nights+' nights · '+(Number(d.adults)+Number(d.children))+' travelers · '+d.style,'journey-meta'));}
+ const actions=node('div',null,'profile-actions');actions.append(journeyLink(compact?'View Trip':'Continue Planning','/trips/'+encodeURIComponent(trip.tripId),!compact));if(!compact)actions.append(journeyLink('Edit Trip','/trip-planner?trip_id='+encodeURIComponent(trip.tripId)));body.append(actions);card.append(image,body);return card;
+}
+function renderReadyTrips(){
+ document.querySelector('#ready-trip-count').textContent=readyTrips.length+' '+(readyTrips.length===1?'trip':'trips')+' ready';
+ readyTripsList.replaceChildren(...readyTrips.map(t=>journeyCard(t,true)));
+ if(!readyTrips.length)readyTripsList.append(journeyEmpty('A little preparation, then you’re off.','Complete your itinerary, requirements and packing to move a journey here.','View My Trips','/trips'));
+}
+function renderInProgressTrips(){
+ document.querySelector('#in-progress-trip-count').textContent=inProgressTrips.length+' in progress';
+ inProgressTripsList.replaceChildren(...inProgressTrips.map(t=>journeyCard(t)));
+ if(!inProgressTrips.length)inProgressTripsList.append(journeyEmpty('No journeys in progress','Your next adventure can start whenever you’re ready.'));
+}
+function renderPreferences(preferences){
+ const root=document.querySelector('#profile-preferences');root.replaceChildren();
+ const fields=[['planning_goal','Budget approach'],['accommodation_style','Stay style'],['food_style','Food style'],['transport_style','Getting around'],['activity_style','Activities'],['shopping_style','Shopping']];
+ for(const [key,label] of fields){if(!preferences?.[key])continue;const item=node('div',null,'preference-tile');item.append(node('small',label),node('strong',String(preferences[key]).replaceAll('-',' ').replaceAll('_',' ')));root.append(item);}
+ if(!root.children.length)root.append(journeyEmpty('A journey that feels like you','Set your travel preferences in the planner to make future planning faster.','Set Preferences','/trip-planner'));
 }
 
 function renderProfile(profile) {
@@ -216,21 +119,20 @@ function renderProfile(profile) {
   renderInProgressTrips();
   renderReadyTrips();
 
-  const trips = document.querySelector("#profile-trips");
-  trips.replaceChildren();
-  if (!savedTrips.length) trips.append(emptyItem("No trips yet. Your next saved plan will appear here."));
-  for (const trip of savedTrips) {
-    const item = document.createElement('article');item.className='profile-list-item';
-    const title=document.createElement('a');title.className='profile-trip-link';title.textContent=trip.details.destination;title.href='/trips/'+encodeURIComponent(trip.tripId);
-    const meta=document.createElement('span');meta.textContent=`${trip.details.origin} → ${trip.details.destination} · ${formatDate(trip.details.start)} – ${formatDate(trip.details.end)} · ${trip.progress.percent}% planned`;
-    item.append(title,meta);trips.append(item);
-  }
+  document.querySelector('#stat-total').textContent=savedTrips.length;
+  document.querySelector('#stat-active').textContent=inProgressTrips.length;
+  document.querySelector('#stat-ready').textContent=readyTrips.length;
+  renderPreferences(profile.travelPreferences);
+  const trips=document.querySelector('#profile-trips');trips.replaceChildren(...savedTrips.map(t=>journeyCard(t,true)));
+  if(!savedTrips.length)trips.append(journeyEmpty('Your story starts here','Save your first journey and find it here whenever you need it.'));
+
 }
 
 async function loadProfile() {
   const sequence=++profileSequence;
   profileController?.abort();profileController=new AbortController();
   profileStatus.textContent='Loading trips…';profileStatus.hidden=false;
+  for(const id of ['stat-total','stat-active','stat-ready'])document.getElementById(id).textContent='—';
   document.querySelector('#in-progress-trip-count').textContent='Loading…';
   document.querySelector('#ready-trip-count').textContent='Loading…';
   const user=await window.PackSwift.authReady;

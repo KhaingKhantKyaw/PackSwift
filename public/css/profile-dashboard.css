@@ -1,0 +1,92 @@
+/* Profile presentation only. Shared theme, header and typography remain authoritative. */
+html body[data-page=profile]:not(.slider-home){background:linear-gradient(180deg,#062d33d9,#062d33f5 650px),url('/images/packswift1.jpg') center top/cover fixed,#062d33!important}
+html body[data-page=profile] .traveler-hero{background:linear-gradient(90deg,#062d33ed,#062d3360),url('/images/destination-bali.jpg') center 55%/cover}
+html body[data-page=profile] .traveler-hero h1{color:#faf8f2!important;font-size:clamp(32px,4vw,48px)!important;font-weight:500!important}
+html body[data-page=profile] .hero-signature p{font-size:34px!important}
+html body[data-page=profile] .profile-section-head h2{color:#faf8f2!important;font-size:28px!important;font-weight:500!important}
+html body[data-page=profile] .profile-section-head .eyebrow,html body[data-page=profile] .traveler-hero .eyebrow{color:#aee9d8!important}
+html body[data-page=profile] .profile-section-head>a{color:#d5f2e8!important}
+html body[data-page=profile] .journey-card h3{font-size:30px!important;font-weight:500!important}
+html body[data-page=profile] .journey-card-compact h3{font-size:24px!important}
+html body[data-page=profile] .journey-empty{background:#123e43;color:#faf8f2;border-color:#507275}
+html body[data-page=profile] .journey-empty h3{color:#faf8f2!important;font-size:19px!important;font-weight:500!important}
+html body[data-page=profile] .journey-empty p,html body[data-page=profile] .readiness-note{color:#c0d5cf}
+html body[data-page=profile] .journey-empty .button{color:#e1f5ed!important;border-color:#73948f;background:transparent!important}
+html body[data-page=profile] .appearance-compact{color:#faf8f2}
+html body[data-page=profile] #active-theme-label,html body[data-page=profile] #theme-feedback{color:#c0d5cf}
+html body[data-page=profile] .settings-grid .panel-title{font-size:22px!important}
+html body[data-page=profile] #profile-load-status{color:#e1f5ed}
+body[data-page=profile] .page-shell{max-width:1240px;padding-top:28px;padding-bottom:48px}
+body[data-page=profile] .traveler-hero{position:relative;isolation:isolate;min-height:260px;padding:40px;border-radius:26px;overflow:hidden;background:linear-gradient(90deg,#062d33ed,#062d3370),url('/images/packswift1.jpg') center 55%/cover;color:#faf8f2;display:flex;align-items:center;justify-content:space-between;gap:24px}
+body[data-page=profile] .traveler-identity{display:flex;gap:26px;align-items:center;min-width:0}
+body[data-page=profile] .profile-avatar{width:88px;height:88px;flex:0 0 88px;border-radius:50%;background:#aee9d826;color:#d5fff1;border:1px solid #d5fff180;box-shadow:0 0 0 7px #aee9d80c;font-size:32px;display:grid;place-items:center}
+body[data-page=profile] .traveler-hero h1{font-size:clamp(32px,4vw,48px);line-height:1.05;color:#faf8f2;margin:8px 0 12px;font-weight:500}
+body[data-page=profile] .traveler-hero p{margin:6px 0;color:#e2eae5;overflow-wrap:anywhere}
+body[data-page=profile] .traveler-hero .eyebrow{color:#b9efdf;font-size:10px;letter-spacing:.2em}
+body[data-page=profile] .hero-caption{font-size:14px}
+body[data-page=profile] .hero-signature{padding:18px 10px 18px 30px;border-left:1px solid #ffffff35;flex-shrink:0}
+body[data-page=profile] .hero-signature span{font-size:9px;letter-spacing:.2em;color:#b9efdf}
+body[data-page=profile] .hero-signature p{font-style:italic;font-size:34px;line-height:1.15;margin-top:12px}
+body[data-page=profile] .profile-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+body[data-page=profile] .profile-actions .button{min-height:40px;padding:10px 18px;font-size:13px;border-radius:999px}
+body[data-page=profile] .button-primary{background:var(--ps-mint)!important;color:#062d33!important;border-color:var(--ps-mint)!important}
+body[data-page=profile] .traveler-hero .button-secondary{color:#f4f1e8!important;border:1px solid #ffffff66;background:#ffffff0b!important}
+body[data-page=profile] .journey-stats{display:grid;grid-template-columns:repeat(3,1fr);margin:16px 0 30px;border:1px solid var(--ps-border);border-radius:20px;background:var(--ps-surface);overflow:hidden}
+body[data-page=profile] .journey-stats a{display:flex;align-items:center;justify-content:center;gap:14px;padding:20px;color:var(--ps-ink);text-decoration:none}
+body[data-page=profile] .journey-stats a+a{border-left:1px solid var(--ps-border)}
+body[data-page=profile] .journey-stats strong{font-size:30px;font-weight:500;line-height:1}
+body[data-page=profile] .journey-stats span{font-size:13px;color:var(--ps-muted)}
+body[data-page=profile] .journey-section{margin:28px 0}
+body[data-page=profile] .profile-section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+body[data-page=profile] .profile-section-head h2{font-size:28px;line-height:1.15;font-weight:500;margin:4px 0;color:var(--ps-ink)}
+body[data-page=profile] .profile-section-head .eyebrow{font-size:9px;letter-spacing:.18em;color:var(--ps-muted);margin:0 0 7px}
+body[data-page=profile] .profile-section-head>a{font-size:13px;color:var(--ps-ink)}
+body[data-page=profile] .ready-count{font-size:12px;background:color-mix(in srgb,var(--ps-mint) 20%,var(--ps-surface));color:var(--ps-ink);padding:7px 12px;border-radius:999px;white-space:nowrap}
+body[data-page=profile] .current-journey-grid{display:grid;gap:16px}
+body[data-page=profile] .journey-card{display:grid;grid-template-columns:35% 1fr;border:1px solid var(--ps-border);border-radius:22px;overflow:hidden;background:var(--ps-surface);min-width:0}
+body[data-page=profile] .journey-image{position:relative;background:linear-gradient(130deg,#0a3d42,#4f8178);min-height:230px;overflow:hidden}
+body[data-page=profile] .journey-image img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;display:block}
+body[data-page=profile] .journey-status{position:absolute;top:14px;left:14px;border:1px solid #ffffff50;border-radius:999px;background:#062d33db;color:#f4fff9;padding:6px 11px;font-size:11px}
+body[data-page=profile] .journey-card-body{padding:24px 28px;min-width:0}
+body[data-page=profile] .journey-card h3{font-size:30px;font-weight:500;color:var(--ps-ink);margin:0 0 8px}
+body[data-page=profile] .journey-route{font-size:14px;margin:0 0 5px;color:var(--ps-ink)}
+body[data-page=profile] .journey-dates,body[data-page=profile] .journey-meta{font-size:12px;color:var(--ps-muted);margin:0}
+body[data-page=profile] .journey-progress{margin:18px 0 8px}
+body[data-page=profile] .journey-progress>div{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:7px}
+body[data-page=profile] .journey-progress progress{width:100%;height:5px;display:block;appearance:none;border:0;border-radius:10px;overflow:hidden;background:var(--ps-border)}
+body[data-page=profile] progress::-webkit-progress-bar{background:var(--ps-border)}
+body[data-page=profile] progress::-webkit-progress-value{background:#268e7a;border-radius:10px}
+body[data-page=profile] progress::-moz-progress-bar{background:#268e7a}
+body[data-page=profile] .journey-milestones{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:11px;color:var(--ps-muted);margin-bottom:14px}
+body[data-page=profile] .journey-library{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+body[data-page=profile] .journey-card-compact{display:block}
+body[data-page=profile] .journey-card-compact .journey-image{height:150px;min-height:150px}
+body[data-page=profile] .journey-card-compact .journey-card-body{padding:18px}
+body[data-page=profile] .journey-card-compact h3{font-size:24px}
+body[data-page=profile] .journey-empty{grid-column:1/-1;display:flex;align-items:center;gap:18px;padding:22px 24px;border:1px dashed var(--ps-border);border-radius:20px;background:color-mix(in srgb,var(--ps-surface) 65%,transparent)}
+body[data-page=profile] .journey-empty h3{font-size:19px;margin:0 0 5px;font-weight:500}
+body[data-page=profile] .journey-empty p{font-size:13px;color:var(--ps-muted);margin:0}
+body[data-page=profile] .journey-empty .button{margin-left:auto;flex-shrink:0;min-height:40px;padding:10px 16px;font-size:12px}
+body[data-page=profile] .empty-compass{font-size:30px;color:var(--ps-accent)}
+body[data-page=profile] .readiness-note{font-size:11px;color:var(--ps-muted);margin:10px 0 0}
+body[data-page=profile] #profile-preferences{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+body[data-page=profile] .preference-tile{padding:18px 20px;border-radius:16px;background:color-mix(in srgb,var(--ps-mint) 15%,var(--ps-surface));border:1px solid var(--ps-border)}
+body[data-page=profile] .preference-tile small{display:block;color:var(--ps-muted);margin-bottom:6px}
+body[data-page=profile] .preference-tile strong{text-transform:capitalize;font-size:16px;font-weight:500}
+body[data-page=profile] .appearance-compact{display:flex;align-items:center;gap:18px;flex-wrap:wrap;border-bottom:1px solid var(--ps-border);padding:8px 0 18px;margin-bottom:18px}
+body[data-page=profile] #active-theme-label{margin-left:12px;font-size:12px;color:var(--ps-muted)}
+body[data-page=profile] .theme-segments{display:flex;gap:4px;background:var(--ps-surface);border:1px solid var(--ps-border);padding:4px;border-radius:999px;margin-left:auto}
+body[data-page=profile] .theme-segments button{background:transparent;color:var(--ps-ink);border:0;border-radius:999px;padding:10px 16px;min-height:40px;cursor:pointer}
+body[data-page=profile] .theme-segments button[aria-pressed=true]{background:var(--ps-mint);color:#062d33;box-shadow:inset 0 0 0 1px #408675;font-weight:bold}
+body[data-page=profile] #theme-feedback:empty{display:none}
+body[data-page=profile] #theme-feedback{font-size:12px;flex-basis:100%;margin:0;color:var(--ps-muted)}
+body[data-page=profile] .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0}
+body[data-page=profile] .settings-grid .panel{padding:24px;border-radius:20px;box-shadow:none;background:var(--ps-surface)}
+body[data-page=profile] .settings-grid .panel-title{font-size:22px;margin-bottom:6px}
+body[data-page=profile] .settings-grid .panel-copy{font-size:13px;margin-bottom:16px}
+body[data-page=profile] .settings-grid .form-grid{gap:12px}
+body[data-page=profile] .settings-grid .field-hint{font-size:11px}
+body[data-page=profile] :is(a,button,input):focus-visible{outline:2px solid #29917e;outline-offset:4px}
+body[data-page=profile] #account-settings{scroll-margin-top:110px}
+@media(max-width:850px){body[data-page=profile] .hero-signature{display:none}body[data-page=profile] .journey-library{grid-template-columns:repeat(2,minmax(0,1fr))}body[data-page=profile] .settings-grid{grid-template-columns:1fr}}
+@media(max-width:600px){body[data-page=profile] .page-shell{padding-top:16px}body[data-page=profile] .traveler-hero{padding:26px;min-height:0}body[data-page=profile] .traveler-identity{align-items:flex-start;flex-direction:column;gap:16px}body[data-page=profile] .profile-avatar{width:62px;height:62px;flex-basis:62px;font-size:24px}body[data-page=profile] .journey-stats a{padding:16px 6px;flex-direction:column;gap:6px}body[data-page=profile] .journey-stats span{font-size:11px}body[data-page=profile] .journey-card{grid-template-columns:1fr}body[data-page=profile] .journey-image{min-height:180px}body[data-page=profile] .journey-card-body{padding:20px}body[data-page=profile] .journey-library{grid-template-columns:1fr}body[data-page=profile] .profile-section-head h2{font-size:24px}body[data-page=profile] .journey-empty{flex-wrap:wrap;padding:18px}body[data-page=profile] .journey-empty>div{flex:1;min-width:170px}body[data-page=profile] .journey-empty .button{margin-left:0}body[data-page=profile] #profile-preferences{grid-template-columns:1fr}body[data-page=profile] .theme-segments{margin-left:0}body[data-page=profile] .settings-grid .form-grid{grid-template-columns:1fr}}

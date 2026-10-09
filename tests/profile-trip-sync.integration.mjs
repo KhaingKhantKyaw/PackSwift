@@ -23,6 +23,19 @@ try{
  const profilePage=await context.newPage(),tripsPage=await context.newPage();for(const page of [profilePage,tripsPage])page.on('pageerror',e=>errors.push(e.message));
  await profilePage.goto(base+'/profile');await profilePage.waitForFunction(()=>document.querySelector('#in-progress-trip-count').textContent==='1 in progress');
  assert.match(await profilePage.locator('#profile-trips').innerText(),/Bangkok.*25% planned/s);
+ if(process.env.PROFILE_VISUAL_TEST){
+  for(const [width,height] of [[1440,900],[1366,768],[1280,800],[768,1024],[390,844]]){
+   await profilePage.setViewportSize({width,height});
+   for(const theme of ['light','dark']){
+    await profilePage.evaluate(theme=>PackSwift.setThemePreference(theme),theme);
+    await profilePage.evaluate(()=>document.fonts.ready);
+    assert.equal(await profilePage.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`${width} ${theme} overflow`);
+    assert.equal(await profilePage.locator(`[data-theme-option="${theme}"]`).getAttribute('aria-pressed'),'true');
+    await profilePage.screenshot({path:`/tmp/packswift-profile-${width}-${theme}.png`,fullPage:true});
+   }
+  }
+  await profilePage.setViewportSize({width:1440,height:900});
+ }
  await tripsPage.goto(base+'/trips');await tripsPage.getByRole('link',{name:'Continue Planning',exact:true}).waitFor();
  assert.match(await tripsPage.locator('#saved-trip-content').innerText(),/25% planned/);
  assert.equal(await tripsPage.getByRole('link',{name:'Edit Trip',exact:true}).getAttribute('href'),'/trip-planner?trip_id='+id);
