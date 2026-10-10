@@ -8,6 +8,7 @@ import path from "node:path";
 import { apiRouter } from "./src/routes/api.js";
 import { pageRouter } from "./src/routes/pages.js";
 import { requireSameOrigin } from "./src/middleware/same-origin.js";
+import { preserveRequestIp } from "./src/middleware/request-ip.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDirectory = path.join(__dirname, "public");
@@ -17,6 +18,7 @@ const host = process.env.HOST || "127.0.0.1";
 
 app.disable("x-powered-by");
 if (process.env.NODE_ENV === "production") app.set("trust proxy", 1);
+app.use(preserveRequestIp);
 app.use(
   helmet({
     contentSecurityPolicy: {

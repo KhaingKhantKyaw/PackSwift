@@ -1,6 +1,17 @@
 import test from 'node:test';import assert from 'node:assert/strict';
+import {placeSearchFailure} from '../src/services/place-search-service.js';
 import {PlaceSearchService,placeReference,hydrateSelected} from '../src/services/place-search-service.js';
 const model=globalThis.PackSwiftPlaceSearchModel;
+test('public search errors distinguish actionable failures without exposing diagnostics',()=>{
+ for(const [diagnostic,code] of [
+  [{providerStatus:429},'QUOTA_EXCEEDED'],[{code:'TIMEOUT'},'TIMEOUT'],
+  [{code:'NETWORK_ERROR'},'NETWORK_ERROR'],[{code:'MISSING_API_KEY'},'MISSING_API_KEY'],
+  [{providerStatus:403,message:'Billing must be enabled: secret-value'},'BILLING_REQUIRED'],
+  [{providerStatus:403,message:'API has not been used or is disabled: secret-value'},'API_DISABLED'],
+  [{providerStatus:401,message:'secret-value'},'INVALID_KEY'],[{providerStatus:403,message:'secret-value'},'ACCESS_DENIED'],
+  [{providerStatus:400,message:'secret-value'},'PROVIDER_REQUEST_ERROR'],[{providerStatus:500},'PROVIDER_UNAVAILABLE']
+ ]){const result=placeSearchFailure({diagnostic});assert.equal(result.code,code);assert.ok(!JSON.stringify(result).includes('secret-value'));}
+});
 const fixture={id:'test-place-12345',displayName:{text:'Test Beach'},formattedAddress:'Test address',location:{latitude:12.57,longitude:99.95},types:['beach'],addressComponents:[{types:['country'],shortText:'TH',longText:'Thailand'}],rating:4.5,userRatingCount:200};
 test('autocomplete uses bias not boundary and passes session token',async()=>{let request;const service=new PlaceSearchService({apiKey:'test-only',fetchImpl:async(url,options)=>{request={url,...options};return {ok:true,json:async()=>({suggestions:[{placePrediction:{placeId:fixture.id,structuredFormat:{mainText:{text:'Test Beach'},secondaryText:{text:'Thailand'}},types:['beach']}}]})};}});const r=await service.autocomplete({query:'test beach',destination:'Bangkok',sessionToken:'test-session'});const b=JSON.parse(request.body);assert.ok(b.locationBias);assert.equal(b.locationRestriction,undefined);assert.equal(b.sessionToken,'test-session');assert.equal(r[0].id,fixture.id);});
 test('details normalizes real fields, classifies day trips and only keeps references for persistence',async()=>{const service=new PlaceSearchService({apiKey:'test-only',fetchImpl:async()=>({ok:true,json:async()=>fixture})});const p=await service.details({id:fixture.id,destination:'Bangkok'});assert.equal(p.tripType,'day_trip');assert.equal(p.rating,4.5);assert.equal(p.estimatedCost,null);const saved=placeReference(p);assert.equal(saved.providerPlaceId,fixture.id);assert.equal(saved.rating,undefined);assert.equal(saved.coordinates,undefined);assert.equal(saved.title,'Saved place');assert.equal((await hydrateSelected([saved],'Bangkok',service))[0].title,'Test Beach');});

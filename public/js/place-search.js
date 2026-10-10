@@ -8,7 +8,11 @@ globalThis.PackSwiftPlaceSearch=(()=>{
   let destination=getInput().destination;
   root.closest('form').addEventListener('input',e=>{if(!['destination','origin','tripType'].includes(e.target.name))return;if(destination===getInput().destination)return;destination=getInput().destination;clearTimeout(timer);controller?.abort();revision++;current=null;preview.replaceChildren();list.replaceChildren();input.value='';input.setAttribute('aria-expanded','false');token=crypto.randomUUID();status.textContent='Type at least 2 characters.';});
   const url=(path,extra={})=>'/api/places/'+path+'?'+new URLSearchParams({destination:getInput().destination||'',...extra});
-  async function request(path,extra,signal){const r=await fetch(url(path,extra),{signal});const data=await r.json();if(!r.ok)throw Error(data.message||'Place search is temporarily unavailable.');return data;}
+  async function request(path,extra,signal){
+   let r;try{r=await fetch(url(path,extra),{signal});}catch(e){if(e.name==='AbortError')throw e;throw Error('Unable to connect to place search. Check your connection and try again.');}
+   let data;try{data=await r.json();}catch{throw Error(r.status===429?'Too many place searches. Please wait a minute and try again.':'Place search returned an unreadable response. Please try again.');}
+   if(!r.ok)throw Error(data.message||(r.status===400?'Check your search and try again.':'Place search is temporarily unavailable.'));return data;
+  }
   function link(text,href){if(!/^https:\/\//i.test(href||''))return el('span','');const a=el('a',text);a.href=href;a.target='_blank';a.rel='noopener noreferrer';return a;}
   function refresh(){added.replaceChildren();const places=getSelected().filter(p=>p.source==='user_search');if(places.length)added.append(el('h4','Your Added Places'));
    for(const p of places){const row=el('article',null,'searched-place-row');row.append(el('strong',p.title),el('small','ADDED BY YOU'));const details=el('button','View Details'),plan=el('button','Choose Day / Set Priority'),del=el('button','Remove');for(const b of [details,plan,del])b.type='button';details.onclick=()=>select({id:model.identity(p)});plan.onclick=preferences;del.onclick=()=>{remove(p);refresh();};row.append(details,plan,del);added.append(row);}if(current)drawPreview();

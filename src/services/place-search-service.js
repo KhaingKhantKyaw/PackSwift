@@ -7,6 +7,21 @@ export function destinationBase(destination){const city=catalog.find(c=>[c.name,
 const endpoint='https://places.googleapis.com/v1';
 const fields='id,displayName,formattedAddress,addressComponents,location,types,rating,userRatingCount,priceLevel,regularOpeningHours,photos,websiteUri,googleMapsUri,businessStatus';
 const lodging=types=>types.some(t=>['lodging','hotel','motel','resort_hotel','extended_stay_hotel'].includes(t));
+// Public, actionable messages only. Never return provider diagnostics or credentials.
+export function placeSearchFailure(error){
+ const d=error.diagnostic||{},message=String(d.message||'').toLowerCase();
+ if(error.status===422)return {status:422,code:'UNSUPPORTED_PLACE',message:error.message};
+ if(d.providerStatus===429)return {status:429,code:'QUOTA_EXCEEDED',message:'Place search has reached its request limit. Please try again shortly.'};
+ if(d.code==='TIMEOUT')return {status:504,code:'TIMEOUT',message:'Place search took too long. Please try again.'};
+ if(d.code==='NETWORK_ERROR')return {status:503,code:'NETWORK_ERROR',message:'Unable to reach the place search provider. Please try again.'};
+ if(d.code==='MISSING_API_KEY')return {status:503,code:'MISSING_API_KEY',message:'Place search is not configured yet. Please contact support.'};
+ if(/billing/.test(message))return {status:503,code:'BILLING_REQUIRED',message:'Place search requires a provider billing update. Please contact support.'};
+ if(/has not been used|disabled|not enabled|service_disabled/.test(message))return {status:503,code:'API_DISABLED',message:'The place search service is not enabled. Please contact support.'};
+ if(d.providerStatus===401||/api key not valid|invalid api key/.test(message))return {status:503,code:'INVALID_KEY',message:'Place search configuration needs attention. Please contact support.'};
+ if(d.providerStatus===403)return {status:503,code:'ACCESS_DENIED',message:'The place search provider denied access. Please contact support.'};
+ if(d.providerStatus===400)return {status:502,code:'PROVIDER_REQUEST_ERROR',message:'The place search provider could not process this request. Try another search.'};
+ return {status:503,code:'PROVIDER_UNAVAILABLE',message:'Place search is temporarily unavailable. Please try again.'};
+}
 export class PlaceSearchService{
  constructor({fetchImpl=globalThis.fetch,apiKey=process.env.GOOGLE_PLACES_API_KEY}={}){this.fetch=fetchImpl;this.apiKey=apiKey;}
  async request(path,{body,mask,sessionToken}={}){

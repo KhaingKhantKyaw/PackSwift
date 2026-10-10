@@ -2,9 +2,9 @@ import {Router} from 'express';
 import {rateLimit} from 'express-rate-limit';
 import {query,param} from 'express-validator';
 import {validateRequest} from '../middleware/validate.js';
-import {PlaceSearchService} from '../services/place-search-service.js';
+import {PlaceSearchService,placeSearchFailure} from '../services/place-search-service.js';
 export const placeSearchRouter=Router();
-placeSearchRouter.use(rateLimit({windowMs:60000,limit:45,standardHeaders:'draft-8',legacyHeaders:false}));
+placeSearchRouter.use(rateLimit({windowMs:60000,limit:45,standardHeaders:'draft-8',legacyHeaders:false,message:{code:'RATE_LIMITED',message:'Too many place searches. Please wait a minute and try again.'}}));
 const context=[query('destination').optional().isString().isLength({max:150}),query('sessionToken').optional().isUUID()];
 const handle=method=>async(req,res)=>{
  res.set('Cache-Control','no-store');
@@ -12,8 +12,8 @@ const handle=method=>async(req,res)=>{
  catch(e){
   const development=process.env.NODE_ENV!=='production';
   if(development&&e.diagnostic)console.error('Place search failed:',{operation:method,...e.diagnostic});
-  const configurationError=e.diagnostic?.code==='MISSING_API_KEY'||[401,403].includes(e.diagnostic?.providerStatus);
-  res.status(e.status||503).json({message:e.status===422?e.message:development&&configurationError?'Places API is not configured.':'Place search is temporarily unavailable.'});
+  const {status,...failure}=placeSearchFailure(e);
+  res.status(status).json(failure);
  }
 };
 placeSearchRouter.get('/autocomplete',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('autocomplete'));
