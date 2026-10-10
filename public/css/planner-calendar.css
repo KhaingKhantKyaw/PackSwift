@@ -1,0 +1,29 @@
+/* Travel Dates only; existing theme and date values remain authoritative. */
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-month button{width:42px;height:42px;padding:0;border-radius:50%;background:transparent;border-color:var(--ps-border);font-size:18px}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-month strong{font:600 16px/1.4 var(--ps-font);color:var(--ps-ink)}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar>.calendar-month+p{font-size:11px;color:var(--ps-muted);margin:12px 0;min-height:33px}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-grid{grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:24px repeat(6,46px);gap:0;min-height:300px;margin:8px 0 16px}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-grid>small{font-size:11px;color:var(--ps-muted);font-weight:400}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day{position:relative;isolation:isolate;display:grid;place-items:center;width:100%;height:46px;min-width:0;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--ps-ink)!important;box-shadow:none!important;font-size:13px;transform:none;opacity:1;transition:color 180ms ease}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day::before{content:'';position:absolute;inset:3px 0 3px;background:transparent;z-index:-2;transition:background-color 220ms ease}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day>span{display:grid;place-items:center;width:min(40px,100%);height:40px;border-radius:50%;padding-bottom:4px;transition:background-color 180ms ease,box-shadow 180ms ease}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day::after{content:'';position:absolute;width:4px;height:4px;border-radius:50%;bottom:10px;background:#2e8b61;pointer-events:none}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day.moderate::after{background:#be8b1a}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day.peak::after{background:#cb6251}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day:is(.in-range,.range-hover)::before{background:color-mix(in srgb,var(--ps-mint) 24%,transparent)}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day.has-range.range-start::before{left:50%;background:color-mix(in srgb,var(--ps-mint) 24%,transparent)}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day.has-range.range-end::before{right:50%;background:color-mix(in srgb,var(--ps-mint) 24%,transparent)}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day:not(:disabled):not(.endpoint):hover>span{background:color-mix(in srgb,var(--ps-mint) 28%,transparent)}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day.today:not(.endpoint)>span{box-shadow:inset 0 0 0 1px var(--ps-accent)}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day.endpoint>span{background:#0d6469;color:#fff9eb;box-shadow:0 0 0 1px #aee9d840}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day.endpoint::after{background:#aee9d8}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day:disabled{opacity:.35;cursor:not-allowed}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-day:focus-visible{outline:2px solid var(--ps-accent);outline-offset:-2px;border-radius:50%!important}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-legend{display:flex;justify-content:center;gap:16px;font-size:11px;color:var(--ps-muted)}
+.compact-trip-calendar .calendar-legend span::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;margin-right:5px;background:#2e8b61}.compact-trip-calendar .calendar-legend .moderate::before{background:#be8b1a}.compact-trip-calendar .calendar-legend .peak::before{background:#cb6251}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-disclaimer{font-size:10px;color:var(--ps-muted);line-height:1.5;margin:10px 0 16px}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-selection{border-top:1px solid var(--ps-border);padding-top:16px;min-height:66px;display:grid;align-content:start;gap:4px}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-selection strong{font-size:14px;font-weight:500}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-selection small{color:var(--ps-muted);font-size:11px}
+html body.planner-studio[data-page="planner-studio"] .compact-trip-calendar .calendar-clear{background:transparent;border:0;padding:8px 0;font-size:11px;text-decoration:underline;min-height:36px}
+@media(prefers-reduced-motion:reduce){.compact-trip-calendar *,.compact-trip-calendar *::before{transition:none!important}}
