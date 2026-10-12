@@ -376,7 +376,7 @@ export async function searchGooglePlacesPage(
       "content-type": "application/json",
       "x-goog-api-key": apiKey,
       "x-goog-fieldmask": itineraryDetails
-        ? `${searchFieldMask},places.location,places.currentOpeningHours,places.regularOpeningHours`
+        ? `${searchFieldMask},places.location`
         : searchFieldMask,
     },
     body: JSON.stringify({

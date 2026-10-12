@@ -11,7 +11,7 @@ export async function getTripWorkspace(user,id,includeSelected=false) {
   let itinerary=trip.preferences.canonicalItinerary;
   if(!itinerary)itinerary=canonical.legacy(saved?.selected||[],await listTripTimeline(user,id),details.nights+1,saved?.itineraryPreferences);
   if(includeSelected)itinerary=await displayItinerary(itinerary,details.destination);
-  return {tripId:id,details,workspace,timeline:canonical.rows(itinerary),itinerary,packing,itineraryPreferences:saved?.itineraryPreferences||null,progress:workspaceProgress(trip,workspace,packing)};
+  return {tripId:id,details,workspace,timeline:canonical.rows(itinerary),itinerary,itineraryWarnings:canonical.conflicts(itinerary,saved?.itineraryPreferences||{}),packing,itineraryPreferences:saved?.itineraryPreferences||null,progress:workspaceProgress(trip,workspace,packing)};
 }
 
 // Shared by My Trips and Profile. Ownership is checked again by getTripWorkspace.

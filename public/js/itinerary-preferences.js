@@ -38,5 +38,6 @@ window.PackSwiftItineraryPreferences={mount(form,getSelected){
    exactLabel.hidden=pf().preferredTimePeriod!=='specific';describe();row.append(controls);list.append(row);
   });
  }
- sync();return {get:()=>model.normalize({...read(),...(compact?{arrivalAt:form.elements.arrivalAt?.value||'',departureAt:form.elements.departureAt?.value||''}:{})},getSelected()),sync,validate:()=>model.validate(read(),days())};
+ function get(){const raw=read();if(compact){for(const key of ['arrivalAt','departureAt','arrivalTimezone','departureTimezone','travelMode'])raw[key]=form.elements[key]?.value||'';for(const key of ['arrivalBufferMin','departureBufferMin','transitionBufferMin'])raw[key]=Number(form.elements[key]?.value||0);for(const key of ['lightArrivalDay','lightDepartureDay'])raw[key]=Boolean(form.elements[key]?.checked);const num=key=>form.elements[key]?.value!==''?Number(form.elements[key]?.value):null;raw.accommodation={name:form.elements.hotelName?.value||'',address:form.elements.hotelAddress?.value||'',latitude:num('hotelLatitude'),longitude:num('hotelLongitude')};}return model.normalize(raw,getSelected());}
+ sync();return {get,sync,validate:()=>model.validate(get(),days())};
 }};

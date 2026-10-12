@@ -50,8 +50,10 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
       const current=await snapshot(req.auth.userId,req.params.tripId,true);
       let plan=current.itinerary;
       if(change.action==='regenerate'){
-        const fresh=canonical.reconcile(plan.selectedPlaces,null,details.nights+1,preferences.detailPlanning?.itineraryPreferences,details.start);
-        plan=change.day?{...plan,items:plan.items.map(i=>i.day===change.day?{...i,startTime:'',userModified:false}:i)}:fresh;
+        const original=new Map(plan.items.map(i=>[i.id,i]));
+        const protectedPlan=change.day?{...plan,items:plan.items.map(i=>i.day!==change.day?{...i,locked:true}:i)}:plan;
+        plan=canonical.suggest(plan.selectedPlaces,protectedPlan,details.nights+1,preferences.detailPlanning?.itineraryPreferences,details.start);
+        if(change.day)plan.items=plan.items.map(i=>original.get(i.id)?.day!==change.day?original.get(i.id)||i:i);
       }else{
         const selected=new Map(plan.selectedPlaces.map(p=>[canonical.identity(p),p]));
         const previous=new Map(plan.items.map(i=>[i.id,i]));
