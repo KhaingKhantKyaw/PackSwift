@@ -107,7 +107,7 @@ export async function saveTrip(plan, userId = null) {
       tripType: plan.input.tripType || 'worldwide',
       localTripCity: plan.input.localTripCity || '',
       preferredClimate: plan.input.preferredClimate,
-      actualClimate: plan.weather.climate,
+      actualClimate: plan.weather?.climate || null,
       travelerDemographic: plan.input.travelerDemographic,
       travelingWithPets: plan.input.travelingWithPets,
       interests: plan.input.interests,
@@ -213,7 +213,7 @@ export async function saveTrip(plan, userId = null) {
       ],
     );
 
-    await connection.execute(
+    if(plan.weather)await connection.execute(
       `INSERT INTO weather_snapshots
         (trip_session_id, average_low_c, average_high_c, rainfall_level,
          climate_summary, source_name, observed_at)
@@ -346,7 +346,7 @@ export async function getOwnedTrip(userId, publicId) {
     route: {
       scope: row.trip_scope || preferences.route?.scope || "international",
       origin: {
-        name: row.origin_name || preferences.route?.origin?.name || "Yangon",
+        name: row.origin_name || preferences.route?.origin?.name || "",
         country: row.origin_country || preferences.route?.origin?.country || "Myanmar",
         code: row.origin_airport_code || preferences.route?.origin?.code || "RGN",
       },

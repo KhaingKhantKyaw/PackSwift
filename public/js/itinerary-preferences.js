@@ -13,11 +13,11 @@ window.PackSwiftItineraryPreferences={mount(form,getSelected){
   radio.dataset.preferenceTransient='true';label.append(radio,el('strong',title));if(value==='collaborative')label.append(el('small','Default','preference-badge'));label.append(el('span',copy));modes.append(label);modeInputs.push(radio);
   radio.onchange=()=>{const p=read();p.planningMode=value;write(p);modeCopy();};
  }
- root.append(modes);const modeHelp=el('p',undefined,'studio-note');root.append(modeHelp);
+ const compact=form.dataset.workflow==='three-stage';if(compact){const advanced=el('details');advanced.append(el('summary','Arrangement preferences · optional'),modes);root.append(advanced);}else root.append(modes);const modeHelp=el('p',undefined,'studio-note');root.append(modeHelp);
  const paceLabel=el('label',"What’s your preferred pace?");paceLabel.htmlFor='pace';root.append(paceLabel,pace);
  for(const option of pace.options)option.textContent=option.value[0].toUpperCase()+option.value.slice(1)+' · up to '+PackSwiftCanonical.paceCaps[option.value]+' activities / day';
  pace.onchange=()=>{const p=read();p.tripPace=pace.value;write(p);};
- const heading=el('h4','Your Selected Places'),count=el('p',undefined,'studio-note'),list=el('div',undefined,'preference-places');root.append(heading,count,list);
+ const heading=el('h4','Your Selected Places'),count=el('p',undefined,'studio-note'),list=el('div',undefined,'preference-places');if(!compact)root.append(heading,count,list);
  const routine=el('details',undefined,'studio-detail');routine.append(el('summary','Typical Travel Day'),el('p','Optional — help PackSwift plan around your routine.','studio-note'));const pair=el('div',undefined,'studio-pair'),times={};
  for(const[key,title]of [['preferredDayStart','Start around'],['preferredDayEnd','Finish around']]){const label=el('label',title),input=el('input');input.type='time';input.id='preference-'+key;label.htmlFor=input.id;label.append(input);pair.append(label);times[key]=input;input.onchange=()=>{const p=read();p[key]=input.value;write(p);};}routine.append(pair);root.append(routine,el('strong','Not sure? Leave it to PackSwift.'),el('p','Anything you leave open can be arranged automatically. Auto suggestions respect your typical day. Times are tentative; verify venue hours and travel. Manual mode leaves places unassigned until you choose a day.','studio-note'));
  function modeCopy(){const mode=read().planningMode;modeHelp.textContent=mode==='auto'?'PackSwift will arrange your trip for you. Customization is optional.':mode==='manual'?'Set the days and times you want. Your choices are stored as user-defined preferences.':'Customize only the places that matter to you; leave the rest flexible.';}
@@ -38,5 +38,5 @@ window.PackSwiftItineraryPreferences={mount(form,getSelected){
    exactLabel.hidden=pf().preferredTimePeriod!=='specific';describe();row.append(controls);list.append(row);
   });
  }
- sync();return {get:read,sync,validate:()=>model.validate(read(),days())};
+ sync();return {get:()=>model.normalize({...read(),...(compact?{arrivalAt:form.elements.arrivalAt?.value||'',departureAt:form.elements.departureAt?.value||''}:{})},getSelected()),sync,validate:()=>model.validate(read(),days())};
 }};

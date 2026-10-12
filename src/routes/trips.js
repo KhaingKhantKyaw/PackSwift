@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {createPlannerTrip} from '../services/planner-trip.js';
 import {canonical,storedItinerary} from '../services/canonical-trip.js';
 import { getTripWorkspace as snapshot } from '../repositories/trip-workspace-repository.js';
 import {placeReference} from '../services/place-search-service.js';
@@ -88,7 +89,7 @@ function validateTripId() {
 
 tripsRouter.post("/analyze", optionalAuth, async (request, response, next) => {
   try {
-    const plan = createTravelPlan(request.body);
+    const plan = request.body.workflowVersion===3 ? createPlannerTrip(request.body) : createTravelPlan(request.body);
     if(request.body.itinerary){
       const days=Math.round((Date.parse(request.body.endDate)-Date.parse(request.body.startDate))/86400000)+1;
       plan.input.canonicalItinerary=storedItinerary(canonical.reconcile(request.body.selectedPlaces||[],request.body.itinerary,days,request.body.itineraryPreferences,request.body.startDate));

@@ -2,7 +2,7 @@
 globalThis.PackSwiftActivityDiscovery=(()=>{
  const model=globalThis.PackSwiftActivities;
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
- let filter='all',visible=20,lastPool;
+ let filter='all',visible=8,lastPool;
  const mediaCache=new Map();
  const photoObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){photoObserver.unobserve(entry.target);entry.target.loadPhoto?.();}},{rootMargin:'160px'});
  function category(p){const t=[...(p.types||[]),...(p.categories||[])].join(' ');return /cafe/.test(t)?['☕','Cafe']:/restaurant|food|dining/.test(t)?['🍽','Restaurant']:/beach/.test(t)?['☀','Beach']:/nature|park|hiking/.test(t)?['♧','Nature']:/nightlife|bar/.test(t)?['☾','Nightlife']:/shopping|market/.test(t)?['◇','Shopping']:['⌂','Culture'];}
@@ -19,7 +19,7 @@ globalThis.PackSwiftActivityDiscovery=(()=>{
   mediaCache.set(key,media);if(mediaCache.size>100){for(const[k,old]of mediaCache){if(!old.isConnected&&old!==media){photoObserver.unobserve(old);if(old.objectUrl)URL.revokeObjectURL(old.objectUrl);mediaCache.delete(k);break;}}}return media;
  }
  function render(root,state,onSelect,onSkip,onRemove){
-  root.replaceChildren();if(lastPool!==state.places){visible=20;filter='all';lastPool=state.places;}
+  root.replaceChildren();if(lastPool!==state.places){visible=8;filter='all';lastPool=state.places;}
   const result=state.activityResult,pool=state.places.filter(p=>!state.skipped.includes(model.identity(p)));
   if(result){const d=result.demand;root.append(el('p',`${d.tripDays-1} nights · approximately ${d.usableDays} exploration days · ${d.targetPerDay} experiences/day. ${state.places.length} options found; choose only what you love.`,'activity-context'));
    for(const note of result.notices||[])root.append(el('p',note,'activity-notice'));

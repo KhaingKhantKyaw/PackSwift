@@ -1,0 +1,30 @@
+/* Planner-only composition; shared navigation and other pages are untouched. */
+html body.planner-studio[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr)}
+html body.planner-studio[data-page="planner-studio"] #trip-planner-form,html body.planner-studio[data-page="planner-studio"] .studio-dashboard{padding:24px!important;background:var(--ps-surface,#fffdf5)!important;color:var(--ps-ink,#123f43);border:1px solid var(--ps-border,#bed4cf)!important;border-radius:24px!important}
+html body.planner-studio[data-page="planner-studio"] .studio-panel-heading h1,html body.planner-studio[data-page="planner-studio"] .studio-dashboard>.studio-panel-heading h2{color:var(--ps-ink,#123f43)!important}
+html body.planner-studio[data-page="planner-studio"] .studio-panel-heading p{color:var(--ps-muted,#526c69)!important}
+html body.planner-studio[data-page="planner-studio"] .planner-stage{grid-column:auto;grid-row:auto;padding:16px 0!important;border:0;box-shadow:none;background:transparent!important}
+html body.planner-studio[data-page="planner-studio"] .studio-form-actions{margin:18px 0 0;padding:12px 0;position:sticky;bottom:0;background:var(--ps-surface,#fffdf5)!important}
+html body.planner-studio[data-page="planner-studio"] #studio-steps>button[data-completed=true]{color:var(--ps-ink,#123f43)!important}
+.planner-studio .studio-columns{grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr)}
+.planner-studio #studio-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto;gap:8px;position:sticky;top:0;z-index:5;background:var(--ps-paper,#fffdf5);padding:12px 0}
+.planner-studio #studio-steps>button{grid-column:auto;grid-row:auto;display:flex;flex-direction:row;align-items:center;gap:8px;min-width:0;width:100%;font-size:13px;padding:12px 8px;border:1px solid #b6d5cf;border-radius:14px;color:var(--ps-ink,#123f43)!important}
+.planner-studio #studio-steps>button[aria-current=step]{background:#b7e8dc;color:#123f43}
+.planner-studio .planner-stage{padding:16px 0;min-width:0}.planner-studio .planner-section{padding:18px 0;border-bottom:1px solid #bdd2cb55}
+.planner-studio .planner-section h3{font-size:20px}.planner-studio .planner-stage h2{font-size:27px;margin:8px 0 20px}
+.planner-studio .planner-stage [hidden]{display:none!important}
+.planner-studio .studio-dashboard .workspace-nav[hidden],.planner-studio .studio-readiness[hidden],.planner-studio .studio-save-row[hidden]{display:none!important}
+.planner-studio .stage-day{border:1px solid #bed4cf;border-radius:16px;padding:18px;margin:14px 0}
+.planner-studio .stage-stop{padding:14px 0;border-top:1px solid #bed4cf66}.planner-studio .stage-stop-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:end}
+.planner-studio .stage-stop-controls label{flex:1 1 110px;min-width:0}.planner-studio .stage-stop-controls button{min-height:40px;padding:8px 12px}
+.planner-studio .stage-tray-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #bed4cf66}
+.planner-studio .stage-tray-row button{flex-shrink:0}.planner-studio .stage-tray-row span{overflow-wrap:anywhere}
+.planner-studio .studio-summary{min-height:0;background:none!important;color:inherit;padding:20px;border:1px solid #bed4cf;border-radius:18px}
+html body.planner-studio[data-page="planner-studio"] .studio-summary p,html body.planner-studio[data-page="planner-studio"] .studio-state{color:var(--ps-muted,#526c69)}
+html body.planner-studio[data-page="planner-studio"] .studio-summary .studio-eyebrow{color:var(--ps-accent,#087f82)}
+.planner-studio .studio-form-actions{position:sticky;bottom:0;z-index:5;background:var(--surface,#fffdf5);padding:14px 0}
+.planner-studio .planner-stage input:focus-visible,.planner-studio .planner-stage button:focus-visible,.planner-studio #studio-steps button:focus-visible{outline:3px solid #278e8a;outline-offset:3px}
+@media(max-width:900px){.planner-studio .studio-columns{grid-template-columns:minmax(0,1fr)}.planner-studio .studio-setup,.planner-studio .studio-dashboard{height:auto!important;max-height:none!important;overflow:visible!important}.planner-studio #studio-steps{position:relative}.planner-studio .studio-dashboard{position:static}.planner-studio .studio-shell{height:auto!important;overflow:visible!important}.planner-studio .studio-form-actions{bottom:env(safe-area-inset-bottom,0px)} }
+@media(max-width:1000px){html body.planner-studio[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:450px){.planner-studio #studio-steps>button{font-size:11px;gap:4px;padding:10px 5px}.planner-studio #studio-steps .workspace-step-number{width:22px;height:22px;min-width:22px}}
+@media(prefers-reduced-motion:reduce){.planner-studio .planner-stage *{animation:none!important;transition:none!important}}

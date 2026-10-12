@@ -6,7 +6,7 @@ globalThis.PackSwiftItineraryPreferenceModel=(()=>{
  function normalize(raw={},selected=[]){
   raw=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
   const known=new Map((Array.isArray(raw.activityPreferences)?raw.activityPreferences:[]).filter(p=>p&&typeof p==='object').map(p=>[String(p.activityId),p]));
-  return {planningMode:modes.includes(raw.planningMode)?raw.planningMode:'collaborative',tripPace:paces.includes(raw.tripPace)?raw.tripPace:'balanced',preferredDayStart:raw.preferredDayStart??'09:00',preferredDayEnd:raw.preferredDayEnd??'21:00',
+  return {planningMode:modes.includes(raw.planningMode)?raw.planningMode:'collaborative',tripPace:paces.includes(raw.tripPace)?raw.tripPace:'balanced',preferredDayStart:raw.preferredDayStart??'09:00',preferredDayEnd:raw.preferredDayEnd??'21:00',...(typeof raw.arrivalAt==='string'&&raw.arrivalAt?{arrivalAt:raw.arrivalAt}:{}),...(typeof raw.departureAt==='string'&&raw.departureAt?{departureAt:raw.departureAt}:{}),
    activityPreferences:[...new Set(selected.map(activityKey))].map(activityId=>{const p=known.get(activityId)||{},preferredDay=p.preferredDay==null||p.preferredDay===''?null:Number(p.preferredDay),preferredTimePeriod=periods.includes(p.preferredTimePeriod)?p.preferredTimePeriod:'any';return {activityId,preferredDay,preferredTimePeriod,specificTime:preferredTimePeriod==='specific'?(p.specificTime||null):null,priority:priorities.includes(p.priority)?p.priority:'would_like',isUserLocked:preferredDay!==null||preferredTimePeriod!=='any'};})};
  }
  function validate(p,days){

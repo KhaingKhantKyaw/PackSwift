@@ -13,6 +13,7 @@ globalThis.PackSwiftCanonical=(()=>{
  function proposedTime(place,items,day,preferences,choice,startDate){
   const duration=Number(place.suggestedStayMin)>0?Math.min(720,Number(place.suggestedStayMin)):90;
   let start=minutes(preferences.preferredDayStart)??540,end=minutes(preferences.preferredDayEnd)??1260;
+  if(startDate){const date=new Date(Date.parse(startDate+'T00:00:00Z')+(day-1)*86400000).toISOString().slice(0,10);if(preferences.arrivalAt){if(date<preferences.arrivalAt.slice(0,10))end=0;else if(date===preferences.arrivalAt.slice(0,10))start=Math.max(start,minutes(preferences.arrivalAt.slice(11,16))??start);}if(preferences.departureAt){if(date>preferences.departureAt.slice(0,10))end=0;else if(date===preferences.departureAt.slice(0,10))end=Math.min(end,minutes(preferences.departureAt.slice(11,16))??end);}}
   const period=choice.preferredTimePeriod;if(period==='morning')end=Math.min(end,720);if(period==='afternoon'){start=Math.max(start,720);end=Math.min(end,1020);}if(period==='evening')start=Math.max(start,1020);
   for(const item of items.filter(i=>i.day===day)){const time=minutes(item.startTime);if(time!==null)start=Math.max(start,time+(item.durationMin||90)+30);}
   const explicit=period==='specific'?minutes(choice.specificTime):null;if(explicit!==null)start=explicit;

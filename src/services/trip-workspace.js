@@ -11,12 +11,12 @@ export function tripDetails(trip) {
   }
   const start = String(fields.startDate || trip.dates.start || '').slice(0,10);
   const end = String(fields.endDate || trip.dates.end || '').slice(0,10);
-  const context=globalThis.PackSwiftTripContext.routeContext({tripType:fields.tripType||trip.preferences?.tripType,origin:fields.origin||trip.route.origin.name,destination:fields.destination||trip.destination.name});
+  const context=globalThis.PackSwiftTripContext.routeContext({tripType:fields.tripType||trip.preferences?.tripType,origin:fields.origin??trip.route.origin.name,destination:fields.destination||trip.destination.name});
   return {...context,
     country:fields.destination ? destinationCurrency(fields.destination).country || '' : trip.destination.countryName, nationality:fields.passportCountry || '', start,end,
     nights:Math.max(0,Math.round((Date.parse(end)-Date.parse(start))/86400000)||0),
     adults:Number(fields.adults ?? trip.travelerBreakdown.adults), children:Number(fields.children ?? trip.travelerBreakdown.children),
-    budget:Number(fields.budget ?? trip.budget.amount), currency:fields.currency || trip.budget.currency,
+    budget:fields.budget===''?null:Number(fields.budget ?? trip.budget.amount), currency:fields.currency || trip.budget.currency,
     style:fields.accommodationStyle || trip.preferences.accommodationStyle || 'comfortable',
     purpose:fields.tripPurpose || trip.tripPurpose, notes:fields.notes || ''};
 }
