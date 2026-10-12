@@ -50,7 +50,7 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
       const current=await snapshot(req.auth.userId,req.params.tripId,true);
       let plan=current.itinerary;
       if(change.action==='regenerate'){
-        const fresh=canonical.reconcile(plan.selectedPlaces,null,details.nights+1,preferences.detailPlanning?.itineraryPreferences);
+        const fresh=canonical.reconcile(plan.selectedPlaces,null,details.nights+1,preferences.detailPlanning?.itineraryPreferences,details.start);
         plan=change.day?{...plan,items:plan.items.map(i=>i.day===change.day?{...i,startTime:'',userModified:false}:i)}:fresh;
       }else{
         const selected=new Map(plan.selectedPlaces.map(p=>[canonical.identity(p),p]));
@@ -61,7 +61,7 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
           return {...old,id:old?.id||'item:'+id,selectedPlaceId:id,type:old?.type||'custom',day:p.day,startTime:p.startTime||'',notes:p.notes||'',title:p.title,order:index,userModified:true};
         });
         const refs=new Set(items.map(i=>i.selectedPlaceId));
-        plan={version:1,selectedPlaces:[...selected.values()].filter(p=>refs.has(canonical.identity(p))),items};
+        plan={...plan,selectedPlaces:[...selected.values()].filter(p=>refs.has(canonical.identity(p))),items};
       }
       canonical.validate(plan,details.nights+1);
       preferences.canonicalItinerary=storedItinerary(plan);

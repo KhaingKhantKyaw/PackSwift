@@ -11,6 +11,8 @@ generateItineraryRouter.post('/activity-recommendations',rateLimit({windowMs:600
  body('startDate').isISO8601({strict:true}),body('endDate').isISO8601({strict:true}),
  body('notes').optional().isString().isLength({max:600}),
  body('tripPurpose').optional().isString().isLength({max:100}),
+ body('dietaryStyle').optional().isIn(['any','halal','vegetarian','vegan']),
+ body('planningGoal').optional().isIn(['make-possible','fixed-budget','best-value','comfort-first','luxury']),
  body('pace').isIn(['relaxed','balanced','packed'])
 ],validateRequest,async(req,res,next)=>{try{res.set('Cache-Control','no-store').json(await recommendActivities(req.body));}catch(error){if(error instanceof RangeError)return res.status(400).json({message:error.message});next(error);}});
 generateItineraryRouter.post("/generate-itinerary", rateLimit({ windowMs: 60000, limit: 20, standardHeaders: "draft-8", legacyHeaders: false }), [

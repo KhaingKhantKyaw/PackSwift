@@ -71,7 +71,7 @@ tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async (req,res
       const stored=typeof rows[0].preferences_json==='string'?JSON.parse(rows[0].preferences_json):rows[0].preferences_json||{};
       const revision=stored.workspace?.revision||0;
       if(req.body.revision!==undefined&&req.body.revision!==revision){await connection.rollback();return res.status(409).json({message:'This trip changed in another tab. Reload before saving.'});}
-      const plan=canonical.reconcile(req.body.selected||[],req.body.itinerary||stored.canonicalItinerary,days,preferences);
+      const plan=canonical.reconcile(req.body.selected||[],req.body.itinerary||stored.canonicalItinerary,days,preferences,values.startDate||existing.dates.start);
       stored.canonicalItinerary=storedItinerary(plan);stored.detailPlanning=details;
       stored.workspace={...stored.workspace,revision:revision+1,itineraryReviewedAt:null};
       await connection.execute('UPDATE trip_sessions SET preferences_json=?,updated_at=CURRENT_TIMESTAMP WHERE public_id=? AND user_id=?',[JSON.stringify(stored),req.params.tripId,req.auth.userId]);
@@ -91,7 +91,7 @@ tripsRouter.post("/analyze", optionalAuth, async (request, response, next) => {
     const plan = createTravelPlan(request.body);
     if(request.body.itinerary){
       const days=Math.round((Date.parse(request.body.endDate)-Date.parse(request.body.startDate))/86400000)+1;
-      plan.input.canonicalItinerary=storedItinerary(canonical.reconcile(request.body.selectedPlaces||[],request.body.itinerary,days,request.body.itineraryPreferences));
+      plan.input.canonicalItinerary=storedItinerary(canonical.reconcile(request.body.selectedPlaces||[],request.body.itinerary,days,request.body.itineraryPreferences,request.body.startDate));
     }
     const persistence = await saveTrip(
       plan,
