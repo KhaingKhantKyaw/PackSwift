@@ -131,7 +131,8 @@ export async function saveTrip(plan, userId = null) {
       tripLengthFlexible: plan.input.tripLengthFlexible === true,
       mustHaveExperience: plan.input.mustHaveExperience || "",
     };
-    const timeline = buildDetailedTimeline(plan, {
+    if(plan.input.canonicalItinerary)preferences.canonicalItinerary=plan.input.canonicalItinerary;
+    const timeline = plan.input.canonicalItinerary ? [] : buildDetailedTimeline(plan, {
       slug: destination?.slug || plan.destination.slug,
       name: destination?.name || plan.destination.name,
       countryName:

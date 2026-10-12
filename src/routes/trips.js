@@ -1,4 +1,6 @@
 import { Router } from "express";
+import {canonical,storedItinerary} from '../services/canonical-trip.js';
+import { getTripWorkspace as snapshot } from '../repositories/trip-workspace-repository.js';
 import {placeReference} from '../services/place-search-service.js';
 import { getDatabasePool } from "../config/database.js";
 import { randomUUID } from "node:crypto";
@@ -10,9 +12,7 @@ import {
   getOwnedTrip,
   getPackingContext,
   listPackingItems,
-  listTripTimeline,
   replacePackingItems,
-  replaceTripTimeline,
   saveTrip,
   updatePackingItem,
 } from "../repositories/trip-repository.js";
@@ -32,7 +32,6 @@ import {
   minimumTripBudgetDetails,
   routeLocation,
 } from "../services/travel-planner.js";
-import { buildDetailedTimeline } from "../services/itinerary-timeline-service.js";
 import { cleanTripEntity, normalizeTripRecommendation } from "../services/ai-concierge-service.js";
 import '../../public/js/itinerary-preferences-model.js';
 
@@ -56,16 +55,29 @@ tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async (req,res
     if(!raw||typeof raw!=='object'||Array.isArray(raw))return res.status(400).json({message:'Invalid itinerary preferences.'});
     const preferences=globalThis.PackSwiftItineraryPreferenceModel.normalize(raw,details.selected);
     const values=Object.fromEntries(details.fields.map(f=>[f.name,f.value]));
-    const days=Math.round((Date.parse(values.endDate)-Date.parse(values.startDate))/86400000)+1;
+    const existing=await getOwnedTrip(req.auth.userId,req.params.tripId);
+    if(!existing)return res.status(404).json({message:'Trip not found.'});
+    const days=Math.round((Date.parse(values.endDate||existing.dates.end)-Date.parse(values.startDate||existing.dates.start))/86400000)+1;
     const errors=globalThis.PackSwiftItineraryPreferenceModel.validate(preferences,days);
     if(errors.length)return res.status(400).json({message:errors.join(' ')});
     details.itineraryPreferences=preferences;
     details.selected=details.selected.map(placeReference);
     details.fields=details.fields.filter(f=>!['itineraryPreferences','itinerary-mode-choice'].includes(f.name));
-    const [result]=await getDatabasePool().execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.detailPlanning', JSON_EXTRACT(?, '$'), '$.workspace.itineraryReviewedAt', NULL, '$.workspace.requirements', JSON_OBJECT(), '$.workspace.revision', COALESCE(JSON_EXTRACT(preferences_json,'$.workspace.revision'),0)+1), updated_at=CURRENT_TIMESTAMP WHERE public_id=? AND user_id=?",[JSON.stringify(details),req.params.tripId,req.auth.userId]);
-    if(!result.affectedRows)return res.status(404).json({message:'Trip not found.'});
-    res.json({success:true});
-  }catch(error){next(error);}
+    const connection=await getDatabasePool().getConnection();
+    try{
+      await connection.beginTransaction();
+      const [rows]=await connection.execute('SELECT preferences_json FROM trip_sessions WHERE public_id=? AND user_id=? FOR UPDATE',[req.params.tripId,req.auth.userId]);
+      if(!rows.length){await connection.rollback();return res.status(404).json({message:'Trip not found.'});}
+      const stored=typeof rows[0].preferences_json==='string'?JSON.parse(rows[0].preferences_json):rows[0].preferences_json||{};
+      const revision=stored.workspace?.revision||0;
+      if(req.body.revision!==undefined&&req.body.revision!==revision){await connection.rollback();return res.status(409).json({message:'This trip changed in another tab. Reload before saving.'});}
+      const plan=canonical.reconcile(req.body.selected||[],req.body.itinerary||stored.canonicalItinerary,days,preferences);
+      stored.canonicalItinerary=storedItinerary(plan);stored.detailPlanning=details;
+      stored.workspace={...stored.workspace,revision:revision+1,itineraryReviewedAt:null};
+      await connection.execute('UPDATE trip_sessions SET preferences_json=?,updated_at=CURRENT_TIMESTAMP WHERE public_id=? AND user_id=?',[JSON.stringify(stored),req.params.tripId,req.auth.userId]);
+      await connection.commit();res.json({success:true,revision:revision+1});
+    }catch(error){await connection.rollback();throw error;}finally{connection.release();}
+  }catch(error){if(error instanceof RangeError)return res.status(422).json({message:error.message});next(error);}
 });
 
 function validateTripId() {
@@ -74,53 +86,13 @@ function validateTripId() {
     .withMessage("Choose a valid trip.");
 }
 
-function planFromStoredTrip(trip) {
-  const catalogDestination =
-    destinationCatalog.find(
-      (destination) => destination.slug === trip.destination.slug,
-    ) || {
-      slug: trip.destination.slug,
-      code: trip.destination.primaryAirportCode,
-      name: trip.destination.name,
-      country: trip.destination.countryName,
-      attractions: [
-        `Central ${trip.destination.name}`,
-        `${trip.destination.name} cultural district`,
-      ],
-    };
-  const start = trip.dates.start
-    ? new Date(`${trip.dates.start}T00:00:00Z`)
-    : null;
-  const end = trip.dates.end
-    ? new Date(`${trip.dates.end}T00:00:00Z`)
-    : null;
-  const days =
-    start &&
-    end &&
-    !Number.isNaN(start.valueOf()) &&
-    !Number.isNaN(end.valueOf())
-      ? Math.max(1, Math.round((end - start) / 86400000) + 1)
-      : 1;
-
-  return {
-    days,
-    destination: catalogDestination,
-    input: {
-      tripPurpose: trip.tripPurpose,
-      pace: trip.pace,
-      smartPace: trip.preferences?.smartPace || {
-        lateRiser: false,
-        middayRest: false,
-        clusterNearby: false,
-      },
-      arrivalAt: trip.arrival.arrivalAt,
-    },
-  };
-}
-
 tripsRouter.post("/analyze", optionalAuth, async (request, response, next) => {
   try {
     const plan = createTravelPlan(request.body);
+    if(request.body.itinerary){
+      const days=Math.round((Date.parse(request.body.endDate)-Date.parse(request.body.startDate))/86400000)+1;
+      plan.input.canonicalItinerary=storedItinerary(canonical.reconcile(request.body.selectedPlaces||[],request.body.itinerary,days,request.body.itineraryPreferences));
+    }
     const persistence = await saveTrip(
       plan,
       request.auth?.userId ?? null,
@@ -430,10 +402,7 @@ tripsRouter.get(
         response.status(404).json({ error: "Trip not found." });
         return;
       }
-      const timeline = await listTripTimeline(
-        request.auth.userId,
-        request.params.tripId,
-      );
+      const {timeline} = await snapshot(request.auth.userId,request.params.tripId,true);
       response.json({ trip: { ...trip, timeline } });
     } catch (error) {
       next(error);
@@ -455,21 +424,9 @@ tripsRouter.post(
         response.status(404).json({ error: "Trip not found." });
         return;
       }
-      const timeline = buildDetailedTimeline(planFromStoredTrip(trip), {
-        slug: trip.destination.slug,
-        name: trip.destination.name,
-        countryName: trip.destination.countryName,
-        primaryAirportCode:
-          trip.destination.primaryAirportCode,
-        arrivalAt: trip.arrival.arrivalAt,
-        hotelName: trip.arrival.hotelName,
-      });
-      await replaceTripTimeline(
-        request.auth.userId,
-        request.params.tripId,
-        timeline,
-      );
-      response.json({ timeline });
+      // Legacy callers receive the same itinerary, never an unrelated second generator.
+      const current=await snapshot(request.auth.userId,request.params.tripId,true);
+      response.json({timeline:current.timeline,itinerary:current.itinerary,message:'Use the itinerary workspace to rearrange or explicitly regenerate selected places.'});
     } catch (error) {
       next(error);
     }

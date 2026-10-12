@@ -1,4 +1,5 @@
 import {readFileSync} from 'node:fs';
+import '../../public/js/canonical-itinerary.js';
 import '../../public/js/place-search-model.js';
 const model=globalThis.PackSwiftPlaceSearchModel;
 const catalog=JSON.parse(readFileSync(new URL('../../public/data/destinations.json',import.meta.url),'utf8'));

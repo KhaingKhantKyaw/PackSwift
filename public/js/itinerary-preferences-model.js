@@ -2,7 +2,7 @@
 globalThis.PackSwiftItineraryPreferenceModel=(()=>{
  const modes=['auto','collaborative','manual'],paces=['relaxed','balanced','packed'];
  const periods=['any','morning','afternoon','evening','specific'],priorities=['must_visit','would_like','optional'];
- const activityKey=p=>String(p.placeId||p.place_id||p.id||p.title||p.name);
+ const activityKey=p=>String(p.providerPlaceId||p.placeId||p.place_id||p.id||'');
  function normalize(raw={},selected=[]){
   raw=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
   const known=new Map((Array.isArray(raw.activityPreferences)?raw.activityPreferences:[]).filter(p=>p&&typeof p==='object').map(p=>[String(p.activityId),p]));

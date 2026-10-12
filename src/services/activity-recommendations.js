@@ -1,4 +1,5 @@
 import {readFileSync} from 'node:fs';
+import '../../public/js/canonical-itinerary.js';
 import '../../public/js/activity-recommendation-model.js';
 import '../../public/js/tripEngine.js';
 import {isGooglePlacesConfigured,searchGooglePlacesPage} from './google-places-service.js';

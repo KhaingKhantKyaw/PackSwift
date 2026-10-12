@@ -15,6 +15,7 @@ window.PackSwiftItineraryPreferences={mount(form,getSelected){
  }
  root.append(modes);const modeHelp=el('p',undefined,'studio-note');root.append(modeHelp);
  const paceLabel=el('label',"What’s your preferred pace?");paceLabel.htmlFor='pace';root.append(paceLabel,pace);
+ for(const option of pace.options)option.textContent=option.value[0].toUpperCase()+option.value.slice(1)+' · up to '+PackSwiftCanonical.paceCaps[option.value]+' activities / day';
  pace.onchange=()=>{const p=read();p.tripPace=pace.value;write(p);};
  const heading=el('h4','Your Selected Places'),count=el('p',undefined,'studio-note'),list=el('div',undefined,'preference-places');root.append(heading,count,list);
  const routine=el('details',undefined,'studio-detail');routine.append(el('summary','Typical Travel Day'),el('p','Optional — help PackSwift plan around your routine.','studio-note'));const pair=el('div',undefined,'studio-pair'),times={};

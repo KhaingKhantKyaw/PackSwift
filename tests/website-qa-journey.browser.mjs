@@ -64,7 +64,7 @@ try {
  await page.getByRole('button',{name:'✓ I Have It',exact:true}).first().click();
  await page.waitForFunction(()=>document.querySelector('.saved-trip-packing button[aria-pressed="true"]'));
  await page.reload();await page.waitForFunction(()=>document.querySelector('.saved-trip-packing button[aria-pressed="true"]'));
- await page.goto(base+'/trip-planner?trip_id='+id);await page.waitForSelector('.calendar-day');
+ await page.goto(base+'/trip-planner?trip_id='+id);await page.waitForSelector('#trip-planner-form[aria-busy="false"]');
  assert.equal(await page.locator('#start-date').inputValue(),'2026-12-03');assert.equal(await page.locator('#readiness-0').isChecked(),true);
  await page.locator('[data-step-button="4"]').click();assert.equal(await page.locator('.searched-place-row').count(),4);
  await page.goto(base+'/profile');await page.waitForFunction(()=>document.querySelector('#in-progress-trip-count')?.textContent==='1 in progress');
