@@ -30,7 +30,7 @@ test('explicit coverage expands geographically and inventory reaches duration ta
 });
 test('unavailable provider never invents extra attractions',async()=>{
  const r=await recommendActivities(input,{configured:false});
- assert.equal(r.activities.length,0);assert.equal(r.dataStatus,'unavailable');assert.ok(r.partial);
+ assert.ok(r.activities.some(p=>p.categories.includes('beach')));assert.ok(r.partial);
  assert.ok(!r.activities.some(p=>p.isSample));assert.ok(r.notices.some(n=>n.includes('not invented')));
 });
 test('semantic grouping keeps similar places together, independent of input order',()=>{

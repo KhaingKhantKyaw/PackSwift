@@ -1,11 +1,10 @@
 import {Router} from 'express';
-import {randomUUID} from 'node:crypto';
-import {canonical,storedItinerary} from '../services/canonical-trip.js';
 import {requireAuth} from '../middleware/auth.js';
 import {requireDatabase} from '../middleware/database.js';
 import {getDatabasePool} from '../config/database.js';
 import {getOwnedTrip} from '../repositories/trip-repository.js';
 import {tripDetails,validateWorkspaceChange} from '../services/trip-workspace.js';
+import {destinationCatalog} from '../services/travel-planner.js';
 import {getTripWorkspace as snapshot,getTripsForUser} from '../repositories/trip-workspace-repository.js';
 
 export const tripWorkspaceRouter=Router();
@@ -47,37 +46,28 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
     }
     if(change.action==='itinerary'||change.action==='regenerate'){
       const trip=await getOwnedTrip(req.auth.userId,req.params.tripId),details=tripDetails(trip);
-      const current=await snapshot(req.auth.userId,req.params.tripId,true);
-      let plan=current.itinerary;
+      const [existing]=await connection.execute('SELECT * FROM itinerary_timeline_items WHERE trip_session_id=?',[rows[0].id]);
       if(change.action==='regenerate'){
-        const original=new Map(plan.items.map(i=>[i.id,i]));
-        const protectedPlan=change.day?{...plan,items:plan.items.map(i=>i.day!==change.day?{...i,locked:true}:i)}:plan;
-        plan=canonical.suggest(plan.selectedPlaces,protectedPlan,details.nights+1,preferences.detailPlanning?.itineraryPreferences,details.start);
-        if(change.day)plan.items=plan.items.map(i=>original.get(i.id)?.day!==change.day?original.get(i.id)||i:i);
-      }else{
-        const selected=new Map(plan.selectedPlaces.map(p=>[canonical.identity(p),p]));
-        const previous=new Map(plan.items.map(i=>[i.id,i]));
-        const items=change.items.map((p,index)=>{
-          const old=previous.get(p.id);const id=old?.selectedPlaceId||p.selectedPlaceId||'custom:'+randomUUID();
-          if(!selected.has(id)){if(old||p.selectedPlaceId)throw new RangeError('Unknown selected place.');selected.set(id,{id,source:'custom',title:p.title});}
-          return {...old,id:old?.id||'item:'+id,selectedPlaceId:id,type:old?.type||'custom',day:p.day,startTime:p.startTime||'',notes:p.notes||'',title:p.title,order:index,userModified:true};
-        });
-        const refs=new Set(items.map(i=>i.selectedPlaceId));
-        plan={...plan,selectedPlaces:[...selected.values()].filter(p=>refs.has(canonical.identity(p))),items};
+        const spots=trip.preferences.detailPlanning?.selected?.map(p=>p.title||p.name).filter(Boolean)||[];
+        if(!spots.length)spots.push(...(destinationCatalog.find(c=>c.name.toLowerCase()===details.destination.toLowerCase())?.attractions||[]));
+        change.items=[];
+        for(let day=1;day<=details.nights+1;day++){
+          if(change.day&&day!==change.day){change.items.push(...existing.filter(p=>p.day_number===day).map(p=>({id:p.id,day,title:p.title,startTime:String(p.start_time||'').slice(0,5)})));continue;}
+          const titles=day===1?['Arrival and transfer','Check in and explore nearby']:day===details.nights+1?['Check out and prepare for departure']:[spots[(day-2)%Math.max(1,spots.length)]||`Explore ${details.destination} at your own pace`,'Local meal and time to rest'];
+          change.items.push(...titles.map(title=>({day,title,startTime:null})));
+        }
       }
-      canonical.validate(plan,details.nights+1);
-      preferences.canonicalItinerary=storedItinerary(plan);
-      if(preferences.detailPlanning){
-        preferences.detailPlanning.selected=preferences.canonicalItinerary.selectedPlaces;
-        const ids=new Set(plan.selectedPlaces.map(canonical.identity)),p=preferences.detailPlanning.itineraryPreferences;
-        if(p)p.activityPreferences=(p.activityPreferences||[]).filter(a=>ids.has(a.activityId));
+      if(change.items.some(p=>p.day>details.nights+1))throw new RangeError('An activity is outside your travel dates.');
+      await connection.execute('DELETE FROM itinerary_timeline_items WHERE trip_session_id=?',[rows[0].id]);
+      for(const [index,p] of change.items.entries()){
+        const old=existing.find(item=>item.id===p.id);
+        await connection.execute('INSERT INTO itinerary_timeline_items (trip_session_id,day_number,sequence_number,start_time,item_type,title,description,location_name) VALUES (?,?,?,?,?,?,?,?)',[rows[0].id,p.day,index+1,p.startTime||null,old?.item_type||'activity',p.title.trim(),old?.description||'User-planned activity; verify timing and venue details.',old?.location_name||null]);
       }
       state.itineraryReviewedAt=null;
     }
     if(change.action==='review-itinerary')state.itineraryReviewedAt=new Date().toISOString();
     state.revision=(state.revision||0)+1;state.updatedAt=new Date().toISOString();
-    preferences.workspace=state;
-    await connection.execute("UPDATE trip_sessions SET preferences_json=?, updated_at=CURRENT_TIMESTAMP WHERE id=? AND user_id=?",[JSON.stringify(preferences),rows[0].id,req.auth.userId]);
+    await connection.execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.workspace',JSON_EXTRACT(?, '$')), updated_at=CURRENT_TIMESTAMP WHERE id=? AND user_id=?",[JSON.stringify(state),rows[0].id,req.auth.userId]);
     await connection.commit();res.json(await snapshot(req.auth.userId,req.params.tripId,true));
   }catch(e){if(connection)await connection.rollback();if(e instanceof RangeError)return res.status(422).json({error:e.message});next(e);}finally{connection?.release();}
 });

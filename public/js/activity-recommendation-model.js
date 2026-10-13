@@ -10,7 +10,7 @@ globalThis.PackSwiftActivities=(()=>{
   const tripDays=Math.round((Date.parse(endDate+'T00:00:00Z')-Date.parse(startDate+'T00:00:00Z'))/86400000)+1;
   if(tripDays<1||tripDays>91)throw new RangeError('Choose a trip of up to 90 nights.');
   const allowance=Number.isFinite(arrivalDepartureAllowance)?Math.max(0,Math.min(tripDays-1,arrivalDepartureAllowance)):tripDays>4?2:tripDays>1?1:0;
-  const usableDays=Math.max(1,tripDays-allowance),targetPerDay=globalThis.PackSwiftCanonical.paceCaps[pace]||3,requiredSlots=usableDays*targetPerDay;
+  const usableDays=Math.max(1,tripDays-allowance),targetPerDay={relaxed:2,balanced:3,packed:4}[pace]||3,requiredSlots=usableDays*targetPerDay;
   return {tripDays,usableDays,targetPerDay,requiredSlots,recommendationTarget:Math.ceil(requiredSlots*1.25)};
  }
  const identity=p=>String(p.providerPlaceId||p.placeId||p.id||normalize(p.title||p.name));

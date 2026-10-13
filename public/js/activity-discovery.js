@@ -2,7 +2,7 @@
 globalThis.PackSwiftActivityDiscovery=(()=>{
  const model=globalThis.PackSwiftActivities;
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
- let filter='all',visible=8,lastPool;
+ let filter='all',visible=20,lastPool;
  const mediaCache=new Map();
  const photoObserver=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting){photoObserver.unobserve(entry.target);entry.target.loadPhoto?.();}},{rootMargin:'160px'});
  function category(p){const t=[...(p.types||[]),...(p.categories||[])].join(' ');return /cafe/.test(t)?['☕','Cafe']:/restaurant|food|dining/.test(t)?['🍽','Restaurant']:/beach/.test(t)?['☀','Beach']:/nature|park|hiking/.test(t)?['♧','Nature']:/nightlife|bar/.test(t)?['☾','Nightlife']:/shopping|market/.test(t)?['◇','Shopping']:['⌂','Culture'];}
@@ -19,7 +19,7 @@ globalThis.PackSwiftActivityDiscovery=(()=>{
   mediaCache.set(key,media);if(mediaCache.size>100){for(const[k,old]of mediaCache){if(!old.isConnected&&old!==media){photoObserver.unobserve(old);if(old.objectUrl)URL.revokeObjectURL(old.objectUrl);mediaCache.delete(k);break;}}}return media;
  }
  function render(root,state,onSelect,onSkip,onRemove){
-  root.replaceChildren();if(lastPool!==state.places){visible=8;filter='all';lastPool=state.places;}
+  root.replaceChildren();if(lastPool!==state.places){visible=20;filter='all';lastPool=state.places;}
   const result=state.activityResult,pool=state.places.filter(p=>!state.skipped.includes(model.identity(p)));
   if(result){const d=result.demand;root.append(el('p',`${d.tripDays-1} nights · approximately ${d.usableDays} exploration days · ${d.targetPerDay} experiences/day. ${state.places.length} options found; choose only what you love.`,'activity-context'));
    for(const note of result.notices||[])root.append(el('p',note,'activity-notice'));
@@ -35,7 +35,6 @@ globalThis.PackSwiftActivityDiscovery=(()=>{
     const content=el('div',null,'activity-card-content'),title=el('h5',p.title||p.name);title.title=p.title||p.name;content.append(el('small',(p.tripType||'in_city').replaceAll('_',' ').toUpperCase()),title,el('small',category(p)[1]));
     if(p.matchedInterests?.length)content.append(el('small',`Matches “${p.matchedInterests.join(', ')}”`,'activity-match'));
     const dining=/restaurant|cafe|food|dining/.test([...(p.types||[]),...(p.categories||[])].join(' '));
-    if(p.dietary)content.append(el('small',p.dietary.message,'activity-notice'));
     content.append(el('small',`${p.priceLevel==='PRICE_LEVEL_FREE'?'Provider indicates free':p.ticket||(dining?'Price information unavailable':'Admission price unavailable')}${p.suggestedStayMin?' · '+(p.suggestedStayMin/60).toFixed(1)+' hrs suggested':''}`));
     const detail=el('details');detail.append(el('summary','Location & travel details'),el('p',p.travelContext||p.location||'Verify location before travel'));
     if(p.imageUrl){const credit=el('small',null,'activity-photo-credit');if(p.imageAuthors?.length){credit.append(document.createTextNode('Photo: '));for(const author of p.imageAuthors){const name=el(/^https:\/\//.test(author.url)?'a':'span',author.name);if(name.tagName==='A'){name.href=author.url;name.target='_blank';name.rel='noopener noreferrer';}credit.append(name,document.createTextNode(' · '));}credit.append(document.createTextNode('Google Maps'));}else credit.textContent=p.imageCredit||'Photo supplied by provider';content.append(credit);}content.append(detail);

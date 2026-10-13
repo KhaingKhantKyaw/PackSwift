@@ -18,6 +18,4 @@ const handle=method=>async(req,res)=>{
 };
 placeSearchRouter.get('/autocomplete',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('autocomplete'));
 placeSearchRouter.get('/search',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('textSearch'));
-placeSearchRouter.get('/planning/search',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('planningLocations'));
-placeSearchRouter.get('/planning/:id',[param('id').matches(/^[A-Za-z0-9_-]{10,255}$/),...context],validateRequest,handle('planningLocationDetails'));
 placeSearchRouter.get('/:id',[param('id').matches(/^[A-Za-z0-9_-]{10,255}$/),...context],validateRequest,handle('details'));

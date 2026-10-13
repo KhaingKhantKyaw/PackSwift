@@ -277,11 +277,10 @@ export function normalizeGooglePlace(place, { destination, index = 0 } = {}) {
     description:
       place.editorialSummary?.text ||
       `${category} in ${destination}${place.formattedAddress ? ` · ${place.formattedAddress}` : ""}.`,
-    costUsd: null,
-    costStatus: 'UNKNOWN',
+    costUsd: price.costUsd,
     priceRange: price.label,
-    rating: place.rating == null ? null : Number(place.rating),
-    reviewCount: place.userRatingCount == null ? null : Number(place.userRatingCount),
+    rating: Number(place.rating || 0),
+    reviewCount: Number(place.userRatingCount || 0),
     imageUrl: photo
       ? `/api/activities/photo/${encodeURIComponent(place.id)}`
       : `/images/packswift${(index % 3) + 1}.jpg`,
@@ -297,8 +296,7 @@ export function normalizeGooglePlace(place, { destination, index = 0 } = {}) {
     sortOrder: index,
     types,
     coordinates: place.location || null,
-    openingPeriods: place.regularOpeningHours?.periods || null,
-    openingHours: place.regularOpeningHours?.weekdayDescriptions?.join(" · ") || place.currentOpeningHours?.weekdayDescriptions?.join(" · ") || "",
+    openingHours: place.currentOpeningHours?.weekdayDescriptions?.join(" · ") || "",
     priceLevel: place.priceLevel || null,
     googleMapsUri: place.googleMapsUri || "",
     hasPhoto: Boolean(photo),
@@ -376,7 +374,7 @@ export async function searchGooglePlacesPage(
       "content-type": "application/json",
       "x-goog-api-key": apiKey,
       "x-goog-fieldmask": itineraryDetails
-        ? `${searchFieldMask},places.location`
+        ? `${searchFieldMask},places.location,places.currentOpeningHours`
         : searchFieldMask,
     },
     body: JSON.stringify({
