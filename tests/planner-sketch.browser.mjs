@@ -1,0 +1,52 @@
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+const {chromium}=createRequire(import.meta.url)(process.env.PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1080}}),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.goto((process.env.QA_TEST_URL||'http://127.0.0.1:3000')+'/trip-planner');
+ await page.waitForSelector('.sketch-fields');
+ await page.waitForTimeout(1000);
+ assert.deepEqual(await page.locator('.sketch-field').evaluateAll(nodes=>nodes.map(n=>n.dataset.field)),['Trip Type','Location','Dates','Travelers','Pets','Nationality','Entry Mode','Expected Budget','Travel Purpose','Must-have Places','Itinerary Preferences']);
+ assert.deepEqual(await page.locator('.workspace-nav button').allTextContents(),['Flight & Stay','Transportation','Itinerary','Packing List','Overview']);
+ await page.locator('#origin-search').fill('Yangon');await page.locator('#destination-search').fill('Bangkok');await page.locator('#destination-search').press('Tab');
+ await page.locator('#start-date-display').fill('16/12/26');await page.locator('#start-date-display').press('Tab');
+ await page.locator('#end-date-display').fill('03/01/27');await page.locator('#end-date-display').press('Tab');
+ assert.equal(await page.locator('#start-date').inputValue(),'2026-12-16');
+ assert.equal(await page.locator('#end-date').inputValue(),'2027-01-03');
+ await page.getByRole('button',{name:'Increase adults',exact:true}).click();
+ await page.getByRole('button',{name:'Dog',exact:true}).click();
+ await page.locator('#passport-nationality').selectOption('Myanmar (Burma)');
+ await page.locator('#entry-mode').selectOption('train');
+ await page.locator('#budget').fill('30000');
+ await page.locator('#sketch-itinerary-mode').selectOption('collaborative');
+ assert.equal(await page.locator('#studio-pets').isChecked(),true);
+ assert.equal(JSON.parse(await page.locator('#itinerary-preferences-state').inputValue()).planningMode,'collaborative');
+ await page.getByRole('tab',{name:'Overview',exact:true}).click();
+ assert.match(await page.locator('#studio-dashboard-content').innerText(),/Yangon → Bangkok/);
+ assert.match(await page.locator('#studio-dashboard-content').innerText(),/2 adults/);
+ await page.reload();await page.waitForSelector('.sketch-fields');await page.waitForTimeout(800);
+ assert.equal(await page.locator('#start-date-display').inputValue(),'16/12/26');
+ assert.equal(await page.locator('#passport-nationality').inputValue(),'Myanmar (Burma)');
+ assert.equal(await page.locator('#entry-mode').inputValue(),'train');
+ assert.equal(await page.locator('#budget').inputValue(),'30000');
+ await page.getByRole('tab',{name:'Overview',exact:true}).click();
+ assert.equal(await page.locator('.studio-setup').evaluate(n=>getComputedStyle(n).backgroundColor),'rgb(255, 254, 250)');
+ assert.equal(await page.locator('body').evaluate(n=>getComputedStyle(n).backgroundImage),'none');
+ for(const width of [1440,768,390,320]){
+  await page.setViewportSize({width,height:1080});
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow at ${width}`);
+  await page.screenshot({path:`/tmp/packswift-sketch-${width}.png`,fullPage:true});
+ }
+ const draftResponse=page.waitForResponse(r=>r.url().endsWith('/api/trip-drafts')&&r.request().method()==='POST');
+ await page.getByRole('button',{name:'Save Trip',exact:true}).click();
+ const draft=await draftResponse;assert.equal(draft.status(),201);
+ const payload=draft.request().postDataJSON().payload;
+ assert.equal(payload.fields.find(f=>f.name==='startDate').value,'2026-12-16');
+ assert.equal(payload.fields.find(f=>f.name==='passportCountry').value,'Myanmar (Burma)');
+ assert.equal(payload.fields.find(f=>f.name==='budget').value,'30000');
+ await page.getByRole('button',{name:'Close sign-in prompt'}).click();
+ assert.deepEqual(errors,[]);
+ console.log('PASS: field order, preview tabs, dates, counters, pets, preferences, live summary and responsive widths.');
+}finally{await browser.close();}
