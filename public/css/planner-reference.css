@@ -58,3 +58,9 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dash
 html body.planner-studio.planner-sketch[data-page="planner-studio"]::before{background-position:center,left center,calc(100% + 28vw) center}
 @media(max-width:760px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1::after{display:none}html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard>h2::after{width:110px;right:0}.reference-preview-content{overflow-wrap:anywhere}}
 @media(prefers-reduced-motion:reduce){body.planner-sketch *{scroll-behavior:auto!important;transition:none!important}}
+.planner-sketch .pet-other-field{margin-top:10px;animation:pet-reveal .18s ease-out}.planner-sketch .pet-other-field[hidden]{display:none!important}
+@keyframes pet-reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field="Interested Places to Include in Trip"]>h2{white-space:normal;line-height:1.45}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields :is(input,select,button):focus-visible{outline:2px solid #078c84!important;outline-offset:3px;box-shadow:0 0 0 4px #ddf2e9!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields input:invalid:not(:placeholder-shown){border-color:#b75242!important}
+@media(prefers-reduced-motion:reduce){.planner-sketch .pet-other-field{animation:none}}

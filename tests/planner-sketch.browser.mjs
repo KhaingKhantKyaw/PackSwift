@@ -8,7 +8,11 @@ try{
  await page.goto((process.env.QA_TEST_URL||'http://127.0.0.1:3000')+'/trip-planner');
  await page.waitForSelector('.sketch-fields');
  await page.waitForTimeout(1000);
- assert.deepEqual(await page.locator('.sketch-field').evaluateAll(nodes=>nodes.map(n=>n.dataset.field)),['Trip Type','Location','Dates','Travelers','Pets','Nationality','Entry Mode','Expected Budget','Travel Purpose','Must-have Places','Itinerary Preferences']);
+ assert.deepEqual(await page.locator('.sketch-field').evaluateAll(nodes=>nodes.map(n=>n.dataset.field)),['Trip Type','Location','Dates','Travelers','Pets','Nationality','Entry Mode','Expected Budget','Travel Purpose','Travel Style','Interested Places to Include in Trip','Itinerary Preferences']);
+ for(const [start,end,nights] of [['03/12/2026','10/12/2026','7'],['01/11/2026','02/11/2026','1'],['28/02/2027','01/03/2027','1']]){await page.locator('#start-date-display').fill(start);await page.locator('#start-date-display').press('Tab');await page.locator('#end-date-display').fill(end);await page.locator('#end-date-display').press('Tab');assert.equal(await page.locator('#trip-duration').inputValue(),nights);}
+ await page.locator('#end-date-display').fill('27/02/2027');await page.locator('#end-date-display').press('Tab');assert.equal(await page.locator('#end-date-display').evaluate(n=>n.checkValidity()),false);
+ assert.equal(await page.locator('#travel-purpose-category option').count(),10);assert.equal(await page.locator('#travel-style option').count(),5);
+ await page.getByRole('button',{name:'Others',exact:true}).click();await page.locator('#pet-other').fill('Rabbit');await page.getByRole('button',{name:'Cat',exact:true}).click();assert.equal(await page.locator('#pet-other').isVisible(),false);assert.equal(await page.locator('#pet-other').inputValue(),'');await page.getByRole('button',{name:'None',exact:true}).click();
  assert.deepEqual(await page.locator('.reference-preview-card>summary>span:last-child').allTextContents(),['Flight & Stay','Transportation','Itinerary','Packing List','Overview']);
  await page.locator('#start-date-display').fill('13/03/2027');await page.locator('#start-date-display').press('Tab');await page.locator('#trip-duration').selectOption('2');assert.equal(await page.locator('#end-date').inputValue(),'2027-03-15');
  await page.locator('#origin-search').fill('Yangon');await page.locator('#destination-search').fill('Bangkok');await page.locator('#destination-search').press('Tab');
@@ -26,6 +30,7 @@ try{
  await page.locator('#passport-nationality').selectOption('Myanmar (Burma)');
  await page.getByRole('button',{name:'Train',exact:true}).click();
  await page.locator('#budget').fill('30000');
+ await page.locator('#travel-purpose-category').selectOption('Water & Marine Activities');await page.locator('#travel-style').selectOption('Ultimate Luxury');assert.equal(await page.locator('#budget').inputValue(),'30000');assert.equal(await page.locator('#accommodation').inputValue(),'luxury');
  await page.locator('#pace').selectOption('packed');
  assert.equal(await page.locator('#studio-pets').isChecked(),true);
  assert.equal(JSON.parse(await page.locator('#itinerary-preferences-state').inputValue()).tripPace,'packed');
@@ -36,6 +41,7 @@ try{
  assert.equal(await page.locator('#passport-nationality').inputValue(),'Myanmar (Burma)');
  assert.equal(await page.locator('#entry-mode').inputValue(),'train');
  assert.equal(await page.locator('#budget').inputValue(),'30000');
+ assert.equal(await page.locator('#travel-purpose-category').inputValue(),'Water & Marine Activities');assert.equal(await page.locator('#travel-style').inputValue(),'Ultimate Luxury');
  assert.equal(await page.locator('body').evaluate(n=>getComputedStyle(n).backgroundImage),'none');
  for(const width of [1536,1024,768,390,320]){
   await page.setViewportSize({width,height:1080});
