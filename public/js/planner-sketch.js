@@ -26,6 +26,8 @@
   window.addEventListener('packswift:planner-loaded',sync);window.addEventListener('packswift:draft-restored',sync);sync();
  }dates.append(pair);
  const duration=el('select');duration.id='trip-duration';duration.setAttribute('aria-label','Trip duration');duration.append(new Option('Nights',''));for(let n=1;n<=90;n++)duration.append(new Option(`${n} night${n===1?'':'s'}`,n));const durationWrap=el('div',null,'sketch-control'),durationLabel=el('label','Trip Duration');durationLabel.htmlFor=duration.id;durationWrap.append(durationLabel,duration);pair.append(durationWrap);
+ // Keep the existing duration adapter for compatibility, but display nights in Overview.
+ durationWrap.hidden=true;
  const parse=value=>{const [y,m,d]=value.split('-').map(Number);return new Date(y,m-1,d,12);};
  const isoLocal=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
  function syncDuration(){const a=$('start-date').value,b=$('end-date').value;const endDisplay=$('end-date-display'),picker=document.querySelector('[aria-label="End Date calendar"]');if(a){const next=parse(a);next.setDate(next.getDate()+1);picker.min=isoLocal(next);}endDisplay.setCustomValidity(a&&b&&b<=a?'End Date must be after Start Date.':'');if(!a||!b){duration.value='';return;}let cursor=parse(a),n=0;while(isoLocal(cursor)<b&&n<=90){cursor.setDate(cursor.getDate()+1);n++;}duration.value=n>0&&n<=90?String(n):'';}

@@ -18,13 +18,14 @@ try{
  await page.getByRole('button',{name:'Others',exact:true}).click();await page.locator('#pet-other').fill('Rabbit');await page.getByRole('button',{name:'Cat',exact:true}).click();assert.equal(await page.locator('#pet-other').isVisible(),false);assert.equal(await page.locator('#pet-other').inputValue(),'');await page.getByRole('button',{name:'None',exact:true}).click();
  assert.deepEqual(await page.locator('.reference-preview-card>summary>span:last-child').allTextContents(),['Flight & Stay','Transportation','Itinerary','Packing List','Overview']);
  await page.getByRole('button',{name:'Choose start date',exact:true}).click();assert.equal(await page.locator('.sketch-calendar-panel').isVisible(),true);assert.ok(await page.locator('.sketch-calendar-panel .calendar-day.low').count());assert.ok(await page.locator('.sketch-calendar-panel .calendar-day.peak').count());await page.locator('.sketch-calendar-panel .calendar-day:not(:disabled)').first().click();assert.ok(await page.locator('#start-date-display').inputValue());await page.getByRole('button',{name:'Done',exact:true}).click();assert.equal(await page.locator('.sketch-calendar-panel').isVisible(),false);
- await page.locator('#start-date-display').fill('13/03/2027');await page.locator('#start-date-display').press('Tab');await page.locator('#trip-duration').selectOption('2');assert.equal(await page.locator('#end-date').inputValue(),'2027-03-15');
+ assert.equal(await page.locator('#trip-duration').isVisible(),false);
+ await page.locator('#start-date-display').fill('13/03/2027');await page.locator('#start-date-display').press('Tab');await page.locator('#end-date-display').fill('15/03/2027');await page.locator('#end-date-display').press('Tab');assert.equal(await page.locator('.overview-duration strong').textContent(),'2 nights');
  await page.locator('#origin-search').fill('Yangon');await page.locator('#destination-search').fill('Bangkok');await page.locator('#destination-search').press('Tab');
  await page.locator('#start-date-display').fill('16/12/2026');await page.locator('#start-date-display').press('Tab');
  await page.locator('#end-date-display').fill('03/01/2027');await page.locator('#end-date-display').press('Tab');
  assert.equal(await page.locator('#start-date').inputValue(),'2026-12-16');
  assert.equal(await page.locator('#end-date').inputValue(),'2027-01-03');
- await page.locator('#trip-duration').selectOption('7');
+ await page.locator('#end-date-display').fill('23/12/2026');await page.locator('#end-date-display').press('Tab');
  assert.equal(await page.locator('#end-date').inputValue(),'2026-12-23');
  await page.locator('#end-date-display').fill('03/01/2027');await page.locator('#end-date-display').press('Tab');
  assert.equal(await page.locator('#trip-duration').inputValue(),'18');
