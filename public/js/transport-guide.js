@@ -5,6 +5,8 @@
   singapore:{country:'Singapore',mode:'MRT and public buses',url:'https://www.lta.gov.sg/content/ltagov/en/getting_around.html'},
   tokyo:{country:'Japan',mode:'Tokyo Metro',url:'https://www.tokyometro.jp/en/'}
  };
+ const providers={grab:{name:'Grab',url:'https://www.grab.com/sg/locations/'},bolt:{name:'Bolt',url:'https://bolt.eu/en-ao/cities/bangkok/'},uber:{name:'Uber',url:'https://www.uber.com/global/en/r/cities/'}};
+ const appCities={bangkok:['Thailand','grab','bolt'],singapore:['Singapore','grab'],hanoi:['Vietnam','grab'],bali:['Indonesia','grab'],tokyo:['Japan','uber'],paris:['France','uber'],london:['United Kingdom','uber']};
  function recommend(input){
   const destination=String(input.destination||'').trim(),parts=destination.toLowerCase().split(',').map(s=>s.trim());
   let guide=guides[parts[0]];if(guide&&parts.length>1&&!parts.slice(1).join(' ').includes(guide.country.toLowerCase()))guide=null;
@@ -21,7 +23,9 @@
   if(input.travelingWithPets)cautions.push('Confirm pet acceptance and carrier rules directly before travel; no service is assumed pet-friendly.');
   if(input.accessibility&&input.accessibility!=='standard')cautions.push('Verify step-free access and accessible vehicles for the exact route.');
   if(input.entryMode==='air')cautions.push('Airport transfer: confirm your arrival airport before choosing a connection.');
-  return {destination,guide,style,title,reason,cautions};
+  const coverage=appCities[parts[0]],matches=coverage&&(parts.length===1||parts.slice(1).join(' ').includes(coverage[0].toLowerCase()));
+  const apps=matches?coverage.slice(1).map(id=>({id,...providers[id]})):[];
+  return {destination,guide,style,title,reason,cautions,apps};
  }
  window.PackSwiftTransportGuide={recommend};
 })();

@@ -77,6 +77,7 @@
  function referenceIcon(kind){const paths={pin:'M12 22s7-8 7-14a7 7 0 1 0-14 0c0 6 7 14 7 14Zm0-11a3 3 0 1 0 0-6 3 3 0 0 0 0 6',plane:'m22 2-8 20-4-8-8-4L22 2ZM10 14 22 2',car:'m4 9 2-5h12l2 5M3 9h18v9H3ZM6 18v3m12-3v3M6 13h2m8 0h2',train:'M5 3h14v14H5ZM5 10h14M8 17l-3 5m11-5 3 5M8 14h1m6 0h1',bag:'M5 7h14v15H5ZM9 7V3h6v4M8 10v8m8-8v8',calendar:'M3 5h18v16H3ZM3 10h18M7 2v6m10-6v6M7 14h3m4 0h3',people:'M8 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM1 22v-5a7 7 0 0 1 14 0v5M17 3a4 4 0 0 1 0 8m2 3a5 5 0 0 1 4 5v3',globe:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20ZM2 12h20M12 2c-6 6-6 14 0 20 6-6 6-14 0-20',wallet:'M3 5h18v16H3ZM3 5V2h16M15 11h7v5h-7Z',map:'m2 5 6-3 8 3 6-3v17l-6 3-8-3-6 3V5Zm6-3v17m8-14v17',pet:'M7 20c-5-2-1-8 5-8s10 6 5 8c-2 1-3-1-5-1s-3 2-5 1ZM4 8h.1M9 4h.1M15 4h.1M20 8h.1',sliders:'M2 6h20M2 12h20M2 18h20M7 3v6m10 0v6m-7 0v6',boat:'m2 15 10-4 10 4-4 6H6l-4-6ZM12 11V2l7 8H12'};const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('fill','none');svg.setAttribute('stroke','currentColor');svg.setAttribute('stroke-width','1.7');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round');const p=document.createElementNS(svg.namespaceURI,'path');p.setAttribute('d',paths[kind]||paths.map);svg.append(p);return svg;}
  function renderSketch(i,review,selected){renderReferencePreview(i,review,selected);}
  function renderReferencePreview(i,review,selected){
+  let preferred=$('preferred-taxi-app');if(!preferred){preferred=make('input');preferred.type='hidden';preferred.id='preferred-taxi-app';preferred.name='preferredTaxiApp';$('trip-planner-form').append(preferred);}
   document.querySelector('.workspace-nav').hidden=true;const root=$('studio-dashboard-content');
   const titles=['Flight & Stay','Transportation','Itinerary','Packing List','Overview'],icons=['✈','▤','◫','▣','◕'];
   for(const [index,title] of titles.entries()){if(previewPanels.has(title))continue;const details=make('details',null,'reference-preview-card');details.open=true;const summary=make('summary');const icon=make('span',icons[index],'preview-icon');icon.setAttribute('aria-hidden','true');summary.append(icon,make('span',title));const content=make('div',null,'reference-preview-content');details.append(summary,content);root.append(details);previewPanels.set(title,content);}
@@ -104,6 +105,11 @@
   if(!advice.destination)transport.append(make('p','Choose a destination to see transport guidance.'));
   else{
    transport.append(make('small',`Suggested for ${advice.style}`,'transport-guide-tag'),make('h3',advice.title),make('p',advice.reason));
+   if(preferred.value&&!advice.apps.some(a=>a.id===preferred.value))preferred.value='';
+   const apps=make('section',null,'taxi-app-options');apps.append(make('h3','Taxi & ride apps'));
+   if(!advice.apps.length)apps.append(make('p','App coverage is not verified for this destination. Check local services before choosing.'));
+   for(const app of advice.apps){const row=make('div',null,'taxi-app-option');const choose=button(app.name,()=>{preferred.value=preferred.value===app.id?'':app.id;preferred.dispatchEvent(new Event('input',{bubbles:true}));});choose.setAttribute('aria-pressed',String(preferred.value===app.id));choose.setAttribute('aria-label','Prefer '+app.name);row.append(choose,searchLink('Open '+app.name+' ↗',app.url));apps.append(row);}
+   apps.append(make('small','Preference only—not a booking. Check pickup coverage, fare, vehicle size and pet rules in the app.'));transport.append(apps);
    const links=make('div',null,'transport-guide-links');
    if(advice.guide)links.append(searchLink('Official network guide ↗',advice.guide.url));
    links.append(searchLink('Explore local transport ↗','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(advice.destination+' public transport')));

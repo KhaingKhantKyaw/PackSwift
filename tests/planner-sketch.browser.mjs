@@ -59,7 +59,10 @@ try{
  assert.equal(JSON.parse(await page.locator('#itinerary-preferences-state').inputValue()).tripPace,'packed');
  assert.match(await page.locator('#studio-dashboard-content').innerText(),/Yangon → Bangkok/);
  assert.match(await page.locator('#studio-dashboard-content').innerText(),/2 adults/);
+ await page.getByRole('button',{name:'Prefer Grab',exact:true}).click();
+ assert.equal(await page.locator('#preferred-taxi-app').inputValue(),'grab');
  await page.reload();await page.waitForSelector('.sketch-fields');await page.waitForTimeout(800);
+ assert.equal(await page.getByRole('button',{name:'Prefer Grab',exact:true}).getAttribute('aria-pressed'),'true');
  assert.equal(await page.locator('#start-date-display').inputValue(),'16/12/2026');
  assert.equal(await page.locator('#passport-nationality').inputValue(),'Myanmar (Burma)');
  assert.equal(await page.locator('#entry-mode').inputValue(),'train');
@@ -78,6 +81,7 @@ try{
  assert.equal(payload.fields.find(f=>f.name==='startDate').value,'2026-12-16');
  assert.equal(payload.fields.find(f=>f.name==='passportCountry').value,'Myanmar (Burma)');
  assert.equal(payload.fields.find(f=>f.name==='budget').value,'30000');
+ assert.equal(payload.fields.find(f=>f.name==='preferredTaxiApp').value,'grab');
  await page.getByRole('button',{name:'Close sign-in prompt'}).click();
  // Restoring an authentication draft must not automatically save or navigate away.
  let automaticWrites=0;
