@@ -1,5 +1,19 @@
 /* Approved reference treatment, scoped exclusively to Plan Trip. */
 /* Full-width layout overrides are collected at the end of this file. */
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel{width:360px;max-width:100%;box-sizing:border-box;padding:12px;--ps-ink:#16343c;--ps-muted:#526870;--ps-border:#cededc}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-grid{grid-template-rows:20px;grid-auto-rows:34px;min-height:0;height:auto;gap:4px;margin:8px 0!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.low{background:#c4e1ff!important;color:#124e86!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.moderate{background:#ffe19a!important;color:#704a00!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.peak{background:#ffbcb6!important;color:#88251d!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.endpoint{background:#087c7c!important;color:#fff!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day>span{color:inherit!important;background:transparent!important;box-shadow:none!important;width:auto;height:auto;padding:0;font:600 12px Inter,Arial,sans-serif}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-day::before,html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-day::after{display:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-month button{width:28px;height:28px;min-height:0;color:#075f60!important;background:#ddf2e9!important;border:0;border-radius:7px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-month strong{color:#16343c!important;font:600 14px Inter,Arial,sans-serif}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar>p{min-height:0;margin:6px 0;color:#526870!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-selection{display:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel :is(.calendar-legend,.calendar-disclaimer){color:#526870!important;margin:6px 0;min-height:0}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-clear{color:#075f60!important;padding:4px 8px;min-height:0;font-size:11px}
 html body.planner-studio.planner-sketch[data-page="planner-studio"]{--ref-ink:#102e33;--ref-teal:#075f60;background:#f8f5ed!important;color:var(--ref-ink);font-family:Inter,Arial,sans-serif}
 html body.planner-studio.planner-sketch[data-page="planner-studio"]::before{display:block!important;content:"";position:fixed;inset:80px 0 0;pointer-events:none;z-index:-1;background:linear-gradient(180deg,#f8f5edee 0%,#f8f5ed38 28%,#f8f5ed00 70%,#f8f5edaa),url('/images/activities/chao-phraya.jpg') left center/52% 100% no-repeat,url('/images/activities/pattaya-beach.jpg') right center/52% 100% no-repeat;opacity:.8}
 html body.planner-studio.planner-sketch[data-page="planner-studio"]::after{display:block!important;content:"";position:fixed;bottom:-170px;left:-5%;width:110%;height:290px;background:#ddede3;border-radius:48% 60% 0 0;transform:rotate(4deg);z-index:-1;box-shadow:0 -28px 0 #f5ead5;pointer-events:none}
