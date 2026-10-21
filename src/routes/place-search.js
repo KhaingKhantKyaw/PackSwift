@@ -17,5 +17,6 @@ const handle=method=>async(req,res)=>{
  }
 };
 placeSearchRouter.get('/autocomplete',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('autocomplete'));
+placeSearchRouter.get('/transport-autocomplete',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('transportAutocomplete'));
 placeSearchRouter.get('/search',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('textSearch'));
 placeSearchRouter.get('/:id',[param('id').matches(/^[A-Za-z0-9_-]{10,255}$/),...context],validateRequest,handle('details'));

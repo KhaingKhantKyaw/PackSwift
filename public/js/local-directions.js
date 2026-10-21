@@ -1,10 +1,17 @@
 (() => {
  const node=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=text;return n;};
- let host,style='Balanced';
+ let host,style='Balanced',city='';
  window.PackSwiftDirections={mount(parent,input){
-  style=input.travelStyle||'Balanced';if(host){parent.append(host);return;}
+  style=input.travelStyle||'Balanced';city=input.destination||'';if(host){parent.append(host);return;}
   host=node('section');host.className='booking-live-results local-directions';host.append(node('h3','How to get there'));
   const fields={};for(const [key,label,type]of [['from','From','text'],['to','To','text'],['departure','Depart at (your device time zone)','datetime-local']]){const l=node('label',label),f=node('input');f.type=type;f.setAttribute('aria-label',label);if(type==='text'){f.placeholder='Place or full address, including city';f.maxLength=250;}l.append(f);host.append(l);fields[key]=f;}
+  for(const key of ['from','to']){
+   const field=fields[key],list=node('datalist'),status=node('small');list.id='route-places-'+key;field.setAttribute('list',list.id);field.autocomplete='off';status.setAttribute('role','status');field.parentElement.append(list,status);
+   let timer,controller,sequence=0;
+   field.addEventListener('input',()=>{clearTimeout(timer);controller?.abort();const version=++sequence;list.replaceChildren();status.textContent='';const q=field.value.trim(),destination=city;if(q.length<2)return;
+    timer=setTimeout(async()=>{controller=new AbortController();try{const params=new URLSearchParams({q,destination});const response=await fetch('/api/places/transport-autocomplete?'+params,{signal:controller.signal});if(!response.headers.get('content-type')?.includes('application/json'))throw Error();const data=await response.json();if(!response.ok)throw Error();if(version!==sequence||city!==destination)return;for(const place of data){const option=node('option');option.value=[place.name,place.address].filter(Boolean).join(', ');list.append(option);}status.textContent=data.length?'Suggestions by Google Maps':'No suggestions found. Try another spelling or add the city.';}catch(e){if(e.name!=='AbortError'&&version===sequence)status.textContent='Suggestions unavailable. Enter a full address instead.';}},350);
+   });
+  }
   host.append(node('small','Leave departure blank for now. Transit schedules are limited to the next 100 days. Driving times exclude live traffic; walking routes are estimates.'));
   const b=node('button','Compare routes');b.type='button';b.className='booking-search-link';const output=node('div');output.setAttribute('aria-live','polite');host.append(b,output);parent.append(host);
   let revision=0;Object.values(fields).forEach(f=>f.addEventListener('input',()=>{revision++;output.replaceChildren();}));
