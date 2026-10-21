@@ -1,4 +1,5 @@
 import { Router } from "express";
+import {localDirectionsRouter} from './local-directions.js';
 import {bookingSearchRouter} from './booking-search.js';
 import {placeSearchRouter} from './place-search.js';
 import {travelAdvisoryRouter} from './travel-advisory.js';
@@ -28,6 +29,7 @@ import { tripWorkspaceRouter } from './trip-workspace.js';
 import { tripPlanRouter } from "./trip-plan.js";
 
 export const apiRouter = Router();
+apiRouter.use('/local-directions',localDirectionsRouter);
 apiRouter.use('/booking-search',bookingSearchRouter);
 apiRouter.use('/places',placeSearchRouter);
 apiRouter.use(travelAdvisoryRouter);

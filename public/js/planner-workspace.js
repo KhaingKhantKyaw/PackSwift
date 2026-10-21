@@ -112,6 +112,7 @@
   if(i.entryMode==='air')routeBox.firstChild.replaceWith(photo('/images/planner-flight.jpg','Air travel illustration — no flight selected','flight-banner'));else routeBox.firstChild.replaceChildren(referenceIcon(i.entryMode==='train'?'train':'car'));
   transport.replaceChildren();transport.classList.remove('transport-visuals');transport.classList.add('transport-guide');
   const advice=window.PackSwiftTransportGuide.recommend(i);
+  window.PackSwiftDirections?.mount(transport,i);
   if(!advice.destination)transport.append(make('p','Choose a destination to see transport guidance.'));
   else{
    transport.append(make('small',`Suggested for ${advice.style}`,'transport-guide-tag'),make('h3',advice.title),make('p',advice.reason));
