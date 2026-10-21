@@ -8,7 +8,8 @@
  let month=new Date();month=new Date(Date.UTC(month.getFullYear(),month.getMonth(),1));let choosingEnd=false;
  const iso=date=>date.toISOString().slice(0,10);
  const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
- const notify=()=>form.dispatchEvent(new Event('input',{bubbles:true}));
+ const notify=()=>{start.dispatchEvent(new Event('input',{bubbles:true}));end.dispatchEvent(new Event('input',{bubbles:true}));};
+ window.PackSwiftDateCalendar={open(target){choosingEnd=target==='end-date'&&Boolean(start.value);const value=target==='end-date'?(end.value||start.value):start.value;if(value)month=new Date(value.slice(0,7)+'-01T00:00:00Z');draw();},element:calendar};
  function draw(){calendar.replaceChildren();const header=node('div');header.className='calendar-month';
  for(const [label,delta]of [['←',-1],['→',1]]){const b=node('button',label);b.type='button';b.setAttribute('aria-label',delta<0?'Previous month':'Next month');b.onclick=()=>{month=new Date(Date.UTC(month.getUTCFullYear(),month.getUTCMonth()+delta,1));draw();window.PackSwiftPlannerMotion?.animate(calendar.querySelector('.calendar-grid'),[{opacity:.4,transform:'translateX('+delta*8+'px)'},{opacity:1,transform:'none'}],240);calendar.querySelector('[aria-label="'+(delta<0?'Previous month':'Next month')+'"]').focus({preventScroll:true});};header.append(b);}
  header.insertBefore(node('strong',month.toLocaleDateString('en',{month:'long',year:'numeric',timeZone:'UTC'})),header.lastChild);calendar.append(header,node('p',choosingEnd?'Choose an end date after the start date.':'Choose a start date, then an end date.'));
