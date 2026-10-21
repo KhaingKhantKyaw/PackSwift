@@ -89,7 +89,16 @@
   routeInfo.append(make('small',guests));
   if(i.entryMode==='air'&&i.tripType!=='local'){
    routeInfo.prepend(make('strong','Round-trip flights'));
-   if(ready&&i.origin){const url=new URL('https://www.google.com/travel/flights');url.searchParams.set('q',`Round trip flights from ${i.origin} to ${i.destination} departing ${i.startDate} returning ${i.endDate} for ${i.adults} adults and ${Number(i.children)||0} children`);routeInfo.append(searchLink('Search Google Flights ↗',url.href));}
+   if(ready&&i.origin){
+    // Expedia's documented round-trip link uses catalog city/airport codes, not free text.
+    const origin=find(i.origin)?.code,destination=find(i.destination)?.code;
+    if(origin&&destination&&Number(i.adults)<=6){
+     const url=new URL(`https://www.expedia.com/go/flight/search/Roundtrip/${i.startDate}/${i.endDate}`);
+     for(const [key,value]of Object.entries({load:1,FromAirport:origin,ToAirport:destination,FromTime:362,ToTime:362,NumAdult:i.adults,currency:i.currency||'USD'}))url.searchParams.set(key,String(value));
+     routeInfo.append(searchLink('Search Expedia flights ↗',url.href));
+     if(Number(i.children)>0)routeInfo.append(make('small','Flight search starts with adults only. Add all children and their exact ages on Expedia before comparing fares.'));
+    }else routeInfo.append(make('small',!origin||!destination?'Choose cities from the destination suggestions to prefill flight search.':'For more than 6 adults, arrange a group flight search with the provider.'));
+   }
    else routeInfo.append(make('small','Choose your route, dates and travelers to search.'));
   }
   stay.className='stay-search-preview';stay.replaceChildren(make('strong','Find a stay'),make('span',i.destination||'Choose a destination'),make('small',i.startDate&&i.endDate?`Check-in ${date(i.startDate)} · Check-out ${date(i.endDate)}`:'Choose check-in and check-out dates'),make('small',guests));

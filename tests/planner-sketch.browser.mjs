@@ -43,11 +43,15 @@ try{
  await page.getByRole('button',{name:'Train',exact:true}).click();
  await page.locator('#budget').fill('30000');
  await page.getByRole('button',{name:'Air',exact:true}).click();
- const flightURL=new URL(await page.locator('a.booking-search-link').filter({hasText:'Google Flights'}).getAttribute('href'));
- assert.match(flightURL.searchParams.get('q'),/Yangon to Bangkok.*2026-12-16.*2027-01-03.*2 adults/);
+ const flightURL=new URL(await page.locator('a.booking-search-link').filter({hasText:'Expedia flights'}).getAttribute('href'));
+ assert.equal(flightURL.hostname,'www.expedia.com');
+ assert.equal(flightURL.pathname,'/go/flight/search/Roundtrip/2026-12-16/2027-01-03');
+ assert.equal(flightURL.searchParams.get('FromAirport'),'RGN');
+ assert.equal(flightURL.searchParams.get('ToAirport'),'BKK');
+ assert.equal(flightURL.searchParams.get('NumAdult'),'2');
  const stayURL=new URL(await page.locator('a.booking-search-link').filter({hasText:'Booking.com'}).getAttribute('href'));
  assert.equal(stayURL.searchParams.get('ss'),'Bangkok');assert.equal(stayURL.searchParams.get('checkin'),'2026-12-16');assert.equal(stayURL.searchParams.get('checkout'),'2027-01-03');assert.equal(stayURL.searchParams.get('group_adults'),'2');
- await page.getByRole('button',{name:'Train',exact:true}).click();assert.equal(await page.locator('a.booking-search-link').filter({hasText:'Google Flights'}).count(),0);
+ await page.getByRole('button',{name:'Train',exact:true}).click();assert.equal(await page.locator('a.booking-search-link').filter({hasText:'Expedia flights'}).count(),0);
  await page.locator('.purpose-multiselect summary').click();
  for(const checkbox of await page.locator('.purpose-options input:checked').all())await checkbox.uncheck();
  await page.getByRole('checkbox',{name:'Water & Marine Activities',exact:true}).check();
