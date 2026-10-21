@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const context={window:{}};vm.runInNewContext(fs.readFileSync(new URL('../public/js/transport-guide.js',import.meta.url),'utf8'),context);
+const recommend=context.window.PackSwiftTransportGuide.recommend;
+assert.match(recommend({destination:'Bangkok',travelStyle:'Pocket Friendly'}).reason,/public transport/);
+assert.match(recommend({destination:'Tokyo',travelStyle:'Ultimate Luxury'}).title,/Private/);
+assert.equal(recommend({destination:'Paris, Texas'}).guide,undefined);
+assert.equal(recommend({destination:'Tokyo, USA'}).guide,null);
+assert.equal(recommend({destination:'Unknown village'}).guide,undefined);
+assert.equal(recommend({destination:'Singapore',adults:4,children:1,travelingWithPets:true,accessibility:'step-free',entryMode:'air'}).cautions.length,5);
+console.log('PASS: transport style, coverage fallback, country mismatch and traveler needs');

@@ -1,4 +1,5 @@
 /* Approved reference treatment, scoped exclusively to Plan Trip. */
+.transport-guide h3{margin:8px 0;font-size:16px;color:#075f60}.transport-guide p,.transport-guide li{font-size:12px!important;line-height:1.6}.transport-guide ul{padding-left:18px;margin:10px 0}.transport-guide-tag{display:inline-block;background:#ddf2e9;color:#075f60;padding:5px 9px;border-radius:8px}.transport-guide-links{display:flex;flex-wrap:wrap;gap:8px}.transport-guide-source{display:block;margin-top:12px;color:#526870;line-height:1.5}.transport-guide details .booking-search-link{margin:6px 6px 0 0}
 .planner-sketch .stay-search-preview{display:flex;flex-direction:column;gap:8px;padding:14px;background:#eef4ef;border:1px solid #d7e0dd;border-radius:10px;min-width:0;overflow-wrap:anywhere}
 .planner-sketch .booking-search-link{display:inline-block;margin-top:auto;padding:10px 12px;border:1px solid #078c84;border-radius:8px;background:#ddf2e9;color:#075f60!important;font:600 12px/1.4 Inter,Arial,sans-serif;text-decoration:none}
 .planner-sketch .booking-search-link:hover{background:#c4e8dc}.planner-sketch .booking-search-link:focus-visible{outline:2px solid #078c84;outline-offset:3px}

@@ -99,8 +99,19 @@
   if(review?.itinerary?.length){const schedule=make('details',null,'preview-drilldown');schedule.append(make('summary','View itinerary'));for(const day of review.itinerary){const d=make('section');d.append(make('strong','Day '+day.day+' · '+day.date));for(const p of day.activities||[])d.append(make('p',(p.planningTime?p.planningTime+' · ':'')+(p.title||p.name)));schedule.append(d);}itinerary.append(schedule);}
   const pack=previewPanels.get('Packing List');pack.replaceChildren(photo('/images/packswift1.jpg','Travel packing essentials','packing-banner'));const list=make('details',null,'preview-drilldown');list.append(make('summary','Packing List'));const contents=packing(i);contents.querySelector('h3')?.remove();list.append(contents);pack.append(list);
   if(i.entryMode==='air')routeBox.firstChild.replaceWith(photo('/images/planner-flight.jpg','Air travel illustration — no flight selected','flight-banner'));else routeBox.firstChild.replaceChildren(referenceIcon(i.entryMode==='train'?'train':'car'));
-  [...transport.children].forEach((b,index)=>b.firstChild.replaceChildren(referenceIcon(['train','car','boat'][index])));
-  if(/bangkok/i.test(i.destination)){transport.firstChild.replaceChildren(photo('/images/planner-transit.jpg','Bangkok public transit'),make('small','Public transit'));}
+  transport.replaceChildren();transport.classList.remove('transport-visuals');transport.classList.add('transport-guide');
+  const advice=window.PackSwiftTransportGuide.recommend(i);
+  if(!advice.destination)transport.append(make('p','Choose a destination to see transport guidance.'));
+  else{
+   transport.append(make('small',`Suggested for ${advice.style}`,'transport-guide-tag'),make('h3',advice.title),make('p',advice.reason));
+   const links=make('div',null,'transport-guide-links');
+   if(advice.guide)links.append(searchLink('Official network guide ↗',advice.guide.url));
+   links.append(searchLink('Explore local transport ↗','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(advice.destination+' public transport')));
+   links.append(searchLink('Check licensed taxi / transfer options ↗','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(advice.destination+' licensed taxi private transfer')));transport.append(links);
+   if(advice.cautions.length){const list=make('ul');advice.cautions.forEach(t=>list.append(make('li',t)));transport.append(list);}
+   if(selected.length){const routes=make('details');routes.append(make('summary','Transport to your selected places'));for(const place of selected){const url=new URL('https://www.google.com/maps/dir/');url.searchParams.set('api','1');url.searchParams.set('destination',(place.title||place.name)+' '+advice.destination);routes.append(searchLink((place.title||place.name)+' ↗',url.href));}transport.append(routes);}
+   transport.append(make('small',advice.guide?'Network source checked 21 Oct 2026 · Check current routes, fares, payment and service conditions.':'Local coverage not verified · No live fares, schedules or service availability.','transport-guide-source'));
+  }
   [...root.querySelectorAll('.preview-icon')].forEach((n,index)=>n.replaceChildren(referenceIcon(['plane','train','map','bag','globe'][index])));
   const overview=previewPanels.get('Overview');overview.replaceChildren();const source=/bangkok/i.test(i.destination)?'/images/planner-wat-arun.jpg':find(i.destination)?.image||images[i.destination];if(source)overview.append(photo(source,i.destination,'overview-banner'));const duration=make('p',null,'overview-duration');duration.append(make('span','Trip Duration'),make('strong',nights(i)>0?`${nights(i)} night${nights(i)===1?'':'s'}`:'—'));overview.append(duration);const data=make('p',null,'overview-facts');data.textContent=[i.destination,`${i.adults} adults${i.children?' · '+i.children+' children':''}`,i.budget>0?money(i.budget,i.currency):''].filter(Boolean).join(' · ');overview.append(data);
  }
