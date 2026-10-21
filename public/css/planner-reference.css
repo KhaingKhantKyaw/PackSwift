@@ -1,4 +1,9 @@
 /* Approved reference treatment, scoped exclusively to Plan Trip. */
+.planner-sketch .stay-search-preview{display:flex;flex-direction:column;gap:8px;padding:14px;background:#eef4ef;border:1px solid #d7e0dd;border-radius:10px;min-width:0;overflow-wrap:anywhere}
+.planner-sketch .booking-search-link{display:inline-block;margin-top:auto;padding:10px 12px;border:1px solid #078c84;border-radius:8px;background:#ddf2e9;color:#075f60!important;font:600 12px/1.4 Inter,Arial,sans-serif;text-decoration:none}
+.planner-sketch .booking-search-link:hover{background:#c4e8dc}.planner-sketch .booking-search-link:focus-visible{outline:2px solid #078c84;outline-offset:3px}
+.planner-sketch .booking-search-notice{grid-column:1/-1;color:#526870;font-size:11px;line-height:1.5}
+@media(max-width:480px){.planner-sketch .reference-preview-card:first-child .reference-preview-content{grid-template-columns:minmax(0,1fr)}}
 .planner-sketch #travel-purpose-category[hidden]{display:none!important}
 .planner-sketch .purpose-multiselect{min-width:0;border:1px solid #cdd8d4;border-radius:10px;background:#fffcf7;font:13px/1.5 Inter,Arial,sans-serif;color:#102e33}
 .planner-sketch .purpose-multiselect>summary{padding:10px 12px;cursor:pointer;overflow-wrap:anywhere}
