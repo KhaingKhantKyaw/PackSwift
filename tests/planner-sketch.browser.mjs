@@ -68,6 +68,14 @@ try{
  assert.equal(payload.fields.find(f=>f.name==='passportCountry').value,'Myanmar (Burma)');
  assert.equal(payload.fields.find(f=>f.name==='budget').value,'30000');
  await page.getByRole('button',{name:'Close sign-in prompt'}).click();
+ // Restoring an authentication draft must not automatically save or navigate away.
+ let automaticWrites=0;
+ page.on('request',r=>{if(r.method()==='POST'&&(r.url().endsWith('/api/trip-drafts')||r.url().endsWith('/api/trips/analyze')))automaticWrites++;});
+ await page.evaluate(()=>window.dispatchEvent(new CustomEvent('packswift:draft-restored',{detail:{action:'board',preview:{places:[],skipped:[]}}})));
+ await page.waitForTimeout(900);
+ assert.equal(automaticWrites,0);assert.ok(new URL(page.url()).pathname==='/trip-planner');
+ assert.equal(await page.locator('#budget').inputValue(),'30000');
+ assert.equal(await page.locator('#start-date-display').inputValue(),'16/12/2026');
  assert.deepEqual(errors,[]);
  console.log('PASS: field order, 5 preview cards, calendar duration including DST, counters, pets, preferences, reload, save and responsive widths.');
 }finally{await browser.close();}
