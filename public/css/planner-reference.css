@@ -64,3 +64,16 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fiel
 html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields :is(input,select,button):focus-visible{outline:2px solid #078c84!important;outline-offset:3px;box-shadow:0 0 0 4px #ddf2e9!important}
 html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields input:invalid:not(:placeholder-shown){border-color:#b75242!important}
 @media(prefers-reduced-motion:reduce){.planner-sketch .pet-other-field{animation:none}}
+/* Compact form; the itinerary workspace receives the larger share. */
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,44fr) minmax(0,56fr)!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:is([data-field=Travelers],[data-field=Pets]){grid-column:1/-1}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6){grid-template-columns:140px minmax(0,1fr)}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Dates] .sketch-pair{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Dates] .sketch-control:last-child{grid-column:1/-1;display:flex;align-items:center;gap:14px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #trip-duration{width:145px!important;margin-left:auto}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields .sketch-date-picker{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper{height:40px!important;align-items:center;background:#fffcf7}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper button{background:transparent!important;color:#075f60!important;border:0!important;flex-basis:36px!important;height:36px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper input{background:transparent!important;border:0!important;box-shadow:none!important}
+.preview-interested-places{margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid #d7e0dd;min-width:0}.interested-places-label{display:block;font:500 13px Inter,Arial,sans-serif;color:#102e33;margin-bottom:8px}.preview-interested-places .place-search{margin:0;padding:0;min-width:0}.preview-interested-places input{width:100%;box-sizing:border-box;background:#fffcf7;border:1px solid #cdd8d4;border-radius:10px;padding:11px 12px;font:13px Inter,Arial,sans-serif}.preview-interested-places input:focus-visible{outline:2px solid #078c84;outline-offset:2px}
+@media(max-width:760px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)!important}}

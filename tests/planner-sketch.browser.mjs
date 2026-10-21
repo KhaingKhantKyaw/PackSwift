@@ -8,7 +8,10 @@ try{
  await page.goto((process.env.QA_TEST_URL||'http://127.0.0.1:3000')+'/trip-planner');
  await page.waitForSelector('.sketch-fields');
  await page.waitForTimeout(1000);
- assert.deepEqual(await page.locator('.sketch-field').evaluateAll(nodes=>nodes.map(n=>n.dataset.field)),['Trip Type','Location','Dates','Travelers','Pets','Nationality','Entry Mode','Expected Budget','Travel Purpose','Travel Style','Interested Places to Include in Trip','Itinerary Preferences']);
+ assert.deepEqual(await page.locator('.sketch-field').evaluateAll(nodes=>nodes.map(n=>n.dataset.field)),['Trip Type','Location','Dates','Travelers','Pets','Nationality','Entry Mode','Expected Budget','Travel Purpose','Travel Style','Itinerary Preferences']);
+ assert.equal(await page.locator('.reference-preview-card').filter({has:page.locator('#global-place-search')}).locator('summary').first().textContent(),'Itinerary');
+ assert.equal(await page.locator('#global-place-search').count(),1);
+ assert.equal(await page.evaluate(()=>document.querySelector('.studio-dashboard').getBoundingClientRect().width>document.querySelector('.studio-setup').getBoundingClientRect().width),true);
  for(const [start,end,nights] of [['03/12/2026','10/12/2026','7'],['01/11/2026','02/11/2026','1'],['28/02/2027','01/03/2027','1']]){await page.locator('#start-date-display').fill(start);await page.locator('#start-date-display').press('Tab');await page.locator('#end-date-display').fill(end);await page.locator('#end-date-display').press('Tab');assert.equal(await page.locator('#trip-duration').inputValue(),nights);}
  await page.locator('#end-date-display').fill('27/02/2027');await page.locator('#end-date-display').press('Tab');assert.equal(await page.locator('#end-date-display').evaluate(n=>n.checkValidity()),false);
  assert.equal(await page.locator('#travel-purpose-category option').count(),10);assert.equal(await page.locator('#travel-style option').count(),5);
