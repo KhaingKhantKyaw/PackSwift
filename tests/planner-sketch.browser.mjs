@@ -61,7 +61,7 @@ try{
   await page.screenshot({path:`/tmp/packswift-reference-${width}.png`,fullPage:true});
  }
  const draftResponse=page.waitForResponse(r=>r.url().endsWith('/api/trip-drafts')&&r.request().method()==='POST');
- await page.getByRole('button',{name:'Generate My Trip →',exact:true}).click();
+ await page.getByRole('button',{name:'Let’s see planning →',exact:true}).click();
  const draft=await draftResponse;assert.equal(draft.status(),201);
  const payload=draft.request().postDataJSON().payload;
  assert.equal(payload.fields.find(f=>f.name==='startDate').value,'2026-12-16');
