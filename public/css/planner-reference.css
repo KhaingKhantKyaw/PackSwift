@@ -1,7 +1,5 @@
 /* Approved reference treatment, scoped exclusively to Plan Trip. */
-html body.planner-studio.planner-sketch.planner-preview-mode .studio-columns{grid-template-columns:minmax(0,1fr)!important;max-width:1200px;margin:auto}
-html body.planner-preview-mode .studio-setup{display:none!important}
-.preview-edit-actions{display:flex;justify-content:flex-end;gap:10px;margin-bottom:16px}.preview-edit-actions[hidden]{display:none}.preview-edit-actions button{padding:9px 16px;border:1px solid #b6d4cc;background:#ddf2e9;color:#075f60;border-radius:10px;cursor:pointer}
+.planner-sketch .studio-dashboard{scroll-margin-top:calc(var(--header-height,88px) + 16px)}
 html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-control[hidden]{display:none!important}
 .planner-sketch .overview-duration{display:flex;justify-content:space-between;gap:12px;margin:10px 0 6px;color:#102e33;font:13px Inter,Arial,sans-serif}
 /* Full-width layout overrides are collected at the end of this file. */
