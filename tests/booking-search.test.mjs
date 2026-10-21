@@ -1,0 +1,9 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {parameters,normalize,searchBooking,safeLink} from '../src/services/booking-search.js';
+const input={origin:'Yangon',destination:'Bangkok',startDate:'2027-12-01',endDate:'2027-12-08',adults:2,children:0,currency:'THB'};
+test('maps dates, passengers and city codes',()=>{const p=parameters('flights',input);assert.equal(p.departure_id,'RGN');assert.equal(p.arrival_id,'BKK');assert.equal(p.return_date,input.endDate);assert.equal(p.adults,2);});
+test('validates dates and child ages before consuming quota',()=>{assert.throws(()=>parameters('hotels',{...input,startDate:'2027-02-30'}));assert.throws(()=>parameters('hotels',{...input,children:1}));assert.equal(parameters('hotels',{...input,children:1,childAges:[5]}).children_ages,'5');});
+test('safe normalized data excludes provider secrets and unsafe URLs',()=>{assert.equal(safeLink('javascript:alert(1)'),null);const result=normalize('hotels',{properties:[{name:'Hotel',total_rate:{lowest:'THB 1000'},link:'https://example.com'}],secret:'secret'},'THB');assert.equal(result.items[0].price,'THB 1000');assert.ok(!JSON.stringify(result).includes('secret'));});
+test('caches identical searches and sends key only to provider',async()=>{let calls=0;const fetcher=async url=>{calls++;assert.equal(url.searchParams.get('api_key'),'private-key');return {ok:true,json:async()=>({best_flights:[{price:123,flights:[{airline:'Example'}]}]})};};const options={key:'private-key',fetcher};await searchBooking('flights',input,options);const result=await searchBooking('flights',input,options);assert.equal(calls,1);assert.equal(result.cached,true);assert.ok(!JSON.stringify(result).includes('private-key'));});
+test('missing configuration fails safely',async()=>{await assert.rejects(searchBooking('hotels',input,{key:''}),/not configured/);});
