@@ -10,6 +10,7 @@ pageRouter.get(['/trips','/trips/:tripId','/trips/:tripId/requirements','/trips/
 
 const pages = new Map([
   ["/", "index.html"],
+  ["/explore", "explore.html"],
   ["/trip-planner", "trip-planner.html"],
   ["/packing-list", "packing-list.html"],
   ["/my-trips", "my-trips.html"],
