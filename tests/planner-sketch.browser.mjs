@@ -42,7 +42,12 @@ try{
  await page.locator('#passport-nationality').selectOption('Myanmar (Burma)');
  await page.getByRole('button',{name:'Train',exact:true}).click();
  await page.locator('#budget').fill('30000');
- await page.locator('#travel-purpose-category').selectOption('Water & Marine Activities');await page.locator('#travel-style').selectOption('Ultimate Luxury');assert.equal(await page.locator('#budget').inputValue(),'30000');assert.equal(await page.locator('#accommodation').inputValue(),'luxury');
+ await page.locator('.purpose-multiselect summary').click();
+ for(const checkbox of await page.locator('.purpose-options input:checked').all())await checkbox.uncheck();
+ await page.getByRole('checkbox',{name:'Water & Marine Activities',exact:true}).check();
+ await page.getByRole('checkbox',{name:'Food, Drink & Culinary',exact:true}).check();
+ await page.locator('.purpose-multiselect summary').click();
+ await page.locator('#travel-style').selectOption('Ultimate Luxury');assert.equal(await page.locator('#budget').inputValue(),'30000');assert.equal(await page.locator('#accommodation').inputValue(),'luxury');
  await page.locator('#pace').selectOption('packed');
  assert.equal(await page.locator('#studio-pets').isChecked(),true);
  assert.equal(JSON.parse(await page.locator('#itinerary-preferences-state').inputValue()).tripPace,'packed');
@@ -53,7 +58,7 @@ try{
  assert.equal(await page.locator('#passport-nationality').inputValue(),'Myanmar (Burma)');
  assert.equal(await page.locator('#entry-mode').inputValue(),'train');
  assert.equal(await page.locator('#budget').inputValue(),'30000');
- assert.equal(await page.locator('#travel-purpose-category').inputValue(),'Water & Marine Activities');assert.equal(await page.locator('#travel-style').inputValue(),'Ultimate Luxury');
+ assert.deepEqual(JSON.parse(await page.locator('#travel-purpose-values').inputValue()),['Food, Drink & Culinary','Water & Marine Activities']);assert.equal(await page.locator('#travel-style').inputValue(),'Ultimate Luxury');
  assert.equal(await page.locator('body').evaluate(n=>getComputedStyle(n).backgroundImage),'none');
  for(const width of [1536,1024,768,390,320]){
   await page.setViewportSize({width,height:1080});

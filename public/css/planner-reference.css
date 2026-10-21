@@ -1,4 +1,11 @@
 /* Approved reference treatment, scoped exclusively to Plan Trip. */
+.planner-sketch #travel-purpose-category[hidden]{display:none!important}
+.planner-sketch .purpose-multiselect{min-width:0;border:1px solid #cdd8d4;border-radius:10px;background:#fffcf7;font:13px/1.5 Inter,Arial,sans-serif;color:#102e33}
+.planner-sketch .purpose-multiselect>summary{padding:10px 12px;cursor:pointer;overflow-wrap:anywhere}
+.planner-sketch .purpose-options{max-height:260px;overflow:auto;border-top:1px solid #d7e0dd;padding:6px}
+.planner-sketch .purpose-options label{display:flex;gap:10px;align-items:center;padding:8px;border-radius:6px;cursor:pointer;font:13px/1.4 Inter,Arial,sans-serif!important}
+.planner-sketch .purpose-options label:has(:checked){background:#ddf2e9;color:#075f60}
+.planner-sketch .purpose-options input[type=checkbox]{width:16px;height:16px;flex:0 0 16px;accent-color:#078c84}
 .planner-sketch .studio-dashboard{scroll-margin-top:calc(var(--header-height,88px) + 16px)}
 html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-control[hidden]{display:none!important}
 .planner-sketch .overview-duration{display:flex;justify-content:space-between;gap:12px;margin:10px 0 6px;color:#102e33;font:13px Inter,Arial,sans-serif}
