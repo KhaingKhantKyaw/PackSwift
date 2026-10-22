@@ -37,5 +37,6 @@ window.PackSwiftItineraryPreferences={mount(form,getSelected){
    exactLabel.hidden=pf().preferredTimePeriod!=='specific';describe();row.append(controls);list.append(row);
   });
  }
- sync();return {get:read,sync,validate:()=>model.validate(read(),days())};
+ function edit(id){sync();const index=getSelected().findIndex(p=>model.activityKey(p)===id),row=list.children[index];if(!row)return;const trigger=document.activeElement,dialog=el('dialog',undefined,'workspace-dialog');dialog.setAttribute('aria-label','Choose day and priority');const close=el('button','Done');close.type='button';close.onclick=()=>dialog.close();row.open=true;dialog.append(row,close);document.body.append(dialog);dialog.addEventListener('close',()=>{dialog.remove();sync();if(trigger?.isConnected)trigger.focus();},{once:true});dialog.showModal();row.querySelector('select')?.focus();}
+ sync();return {get:read,sync,edit,validate:()=>model.validate(read(),days())};
 }};

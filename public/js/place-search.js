@@ -3,7 +3,7 @@ globalThis.PackSwiftPlaceSearch=(()=>{
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
  function mount({root,getInput,getSelected,add,remove,preferences}){
   const label=el('label','Search any place');label.htmlFor='global-place-search';const input=el('input');input.id='global-place-search';input.type='search';input.placeholder='Search a place you already have in mind…';input.autocomplete='off';input.setAttribute('role','combobox');input.setAttribute('aria-autocomplete','list');input.setAttribute('aria-controls','global-place-results');input.setAttribute('aria-expanded','false');
-  const status=el('p','Type at least 2 characters.','studio-note');status.setAttribute('role','status');const list=el('div',null,'place-search-results');list.id='global-place-results';list.setAttribute('role','listbox');const preview=el('div'),added=el('section');const attribution=el('small','Google Maps','place-search-attribution');root.append(label,input,status,list,preview,attribution,added);
+  const status=el('p','Type at least 2 characters.','studio-note');status.setAttribute('role','status');const list=el('div',null,'place-search-results');list.id='global-place-results';list.setAttribute('role','listbox');const preview=el('div');const attribution=el('small','Google Maps','place-search-attribution');root.append(label,input,status,list,preview,attribution);
   let token=crypto.randomUUID(),selectionSession=null,timer,controller,revision=0,current=null;
   let destination=getInput().destination;
   root.closest('form').addEventListener('input',e=>{if(!['destination','origin','tripType'].includes(e.target.name))return;if(destination===getInput().destination)return;destination=getInput().destination;clearTimeout(timer);controller?.abort();revision++;current=null;preview.replaceChildren();list.replaceChildren();input.value='';input.setAttribute('aria-expanded','false');token=crypto.randomUUID();status.textContent='Type at least 2 characters.';});
@@ -14,8 +14,7 @@ globalThis.PackSwiftPlaceSearch=(()=>{
    if(!r.ok)throw Error(data.message||(r.status===400?'Check your search and try again.':'Place search is temporarily unavailable.'));return data;
   }
   function link(text,href){if(!/^https:\/\//i.test(href||''))return el('span','');const a=el('a',text);a.href=href;a.target='_blank';a.rel='noopener noreferrer';return a;}
-  function refresh(){added.replaceChildren();const places=getSelected().filter(p=>p.source==='user_search');if(places.length)added.append(el('h4','Your Added Places'));
-   for(const p of places){const row=el('article',null,'searched-place-row');row.append(el('strong',p.title),el('small','ADDED BY YOU'));const details=el('button','View Details'),plan=el('button','Choose Day / Set Priority'),del=el('button','Remove');for(const b of [details,plan,del])b.type='button';details.onclick=()=>select({id:model.identity(p)});plan.onclick=preferences;del.onclick=()=>{remove(p);refresh();};row.append(details,plan,del);added.append(row);}if(current)drawPreview();
+  function refresh(){if(current)drawPreview();
   }
   function drawPreview(){preview.replaceChildren();const p=current;if(!p)return;const card=el('article',null,'place-search-preview');if(p.imageUrl){const img=el('img');img.src=p.imageUrl;img.alt=p.title;img.loading='lazy';img.onerror=()=>img.remove();card.append(img);}
    card.append(el('h4',p.title),el('p',p.address),el('small',(p.tripType||'unknown').replaceAll('_',' ').toUpperCase()));if(p.rating!==null)card.append(el('p',`★ ${p.rating} · ${p.ratingCount||0} ratings`));card.append(el('p',p.travelContext));const detail=el('details');detail.append(el('summary','View Details'),el('p',p.openingHours||'Opening hours unavailable'),el('p','Visit duration is a planning allowance, not provider-confirmed. Admission / meal cost needs checking.'),link('View on Google Maps ↗',p.googleMapsUri),link('Official website ↗',p.website));card.append(detail);
@@ -28,7 +27,7 @@ globalThis.PackSwiftPlaceSearch=(()=>{
   input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(timer);search(true);}if(e.key==='ArrowDown'){e.preventDefault();list.querySelector('button')?.focus();}if(e.key==='Escape'){list.replaceChildren();input.setAttribute('aria-expanded','false');}});
   list.addEventListener('keydown',e=>{const buttons=[...list.querySelectorAll('button')],i=buttons.indexOf(document.activeElement);if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();buttons[(i+(e.key==='ArrowDown'?1:buttons.length-1))%buttons.length]?.focus();}if(e.key==='Escape'){list.replaceChildren();input.focus();input.setAttribute('aria-expanded','false');}});
   async function hydrate(){const selected=getSelected();for(let i=0;i<selected.length;i++){const p=selected[i];if(p.source!=='user_search'||!p.needsRefresh)continue;try{selected[i]={...await request(encodeURIComponent(model.identity(p))),sideTripConfirmed:p.sideTripConfirmed};}catch{status.textContent='Some saved places could not be refreshed. Retry View Details before scheduling.';}}refresh();}
-  return {refresh,hydrate};
+  return {refresh,hydrate,showDetails:async id=>{await select({id});preview.scrollIntoView({block:'center',behavior:'smooth'});preview.tabIndex=-1;preview.focus({preventScroll:true});}};
  }
  return {mount};
 })();
