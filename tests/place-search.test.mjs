@@ -37,3 +37,11 @@ test('configuration, network, timeout and malformed responses have distinct diag
  ];
  for(const [options,code] of scenarios)await assert.rejects(()=>new PlaceSearchService(options).textSearch({query:'place'}),e=>e.diagnostic.code===code);
 });
+test('suggestions include proxied real photos and attribution, with no invented fallback',async()=>{
+ const service=new PlaceSearchService({apiKey:'test-only',fetchImpl:async()=>({ok:true,json:async()=>({places:[{id:'photo-place',displayName:{text:'Museum'},photos:[{authorAttributions:[{displayName:'Photographer',uri:'https://example.com/author'}]}]},{id:'no-photo',displayName:{text:'Park'}}]})})});
+ const places=await service.textSearch({query:'museum',destination:'Bangkok'});
+ assert.equal(places[0].imageUrl,'/api/activities/photo/photo-place');
+ assert.deepEqual(places[0].imageAuthors,[{name:'Photographer',url:'https://example.com/author'}]);
+ assert.equal(places[1].imageUrl,'');
+ assert.deepEqual(places[1].imageAuthors,[]);
+});
