@@ -349,3 +349,29 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-
 .planner-sketch .reference-preview-card{padding:18px}
 .planner-sketch .overview-input-details{gap:20px}
 }
+
+/* Compact, aligned preview content; form spacing stays unchanged. */
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-dashboard-content{gap:16px!important;align-content:start}
+.planner-sketch .studio-dashboard{container-type:inline-size}
+.planner-sketch .reference-preview-card{padding:18px 20px;min-width:0}
+.planner-sketch .reference-preview-card>summary{padding-bottom:14px;font-size:15px}
+.planner-sketch .reference-preview-card:not([open])>summary{padding-bottom:0}
+.planner-sketch .overview-input-details{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px 22px}
+.planner-sketch .overview-input-details dt{margin-bottom:4px}
+.planner-sketch .reference-preview-content h3{font-size:18px;margin:16px 0 10px}
+.planner-sketch .reference-preview-content p{margin:8px 0;line-height:1.5}
+.planner-sketch .taxi-app-options{display:flex;align-items:center;flex-wrap:wrap;gap:10px 20px;padding:14px;margin:0 0 16px}
+.planner-sketch .taxi-app-options>h3,.planner-sketch .taxi-app-options>small{flex-basis:100%;margin:0}
+.planner-sketch .taxi-app-option{margin:0;gap:8px}
+.planner-sketch .booking-live-results{min-width:0}
+.planner-sketch .itinerary-suggestion-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:12px;align-items:start}
+.planner-sketch .itinerary-suggestion-grid .booking-result{margin:0;padding:14px;min-width:0}
+.planner-sketch .itinerary-suggestion-grid .booking-result[hidden]{display:none}
+.planner-sketch .selected-thumbnails{gap:12px;padding:4px 0 10px}
+.planner-sketch .selected-thumbnails figure{flex-basis:130px}
+.planner-sketch .selected-thumbnails img{width:100%;height:95px;object-fit:cover}
+@container(min-width:650px){
+.planner-sketch .booking-live-results:not(.local-directions){display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.planner-sketch .booking-live-results:not(.local-directions)>small{grid-column:1/-1}
+}
+@media(max-width:760px){.planner-sketch .reference-preview-card{padding:16px}.planner-sketch .overview-input-details{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
