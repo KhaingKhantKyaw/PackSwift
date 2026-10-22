@@ -79,6 +79,8 @@
  function renderReferencePreview(i,review,selected){
   let preferred=$('preferred-taxi-app');if(!preferred){preferred=make('input');preferred.type='hidden';preferred.id='preferred-taxi-app';preferred.name='preferredTaxiApp';$('trip-planner-form').append(preferred);}
   document.querySelector('.workspace-nav').hidden=true;const root=$('studio-dashboard-content');
+  const city=String(i.destination||'').split(',')[0].trim(),destinationImage=find(city)?.image||images[city],dashboard=root.closest('.studio-dashboard');
+  if(dashboard){if(destinationImage&&(/^(https:\/\/|\/images\/)/.test(destinationImage)))dashboard.style.setProperty('--destination-backdrop','url('+JSON.stringify(destinationImage)+')');else dashboard.style.removeProperty('--destination-backdrop');}
   const titles=['Overview','Flight & Stay','Transportation','Itinerary','Packing List'],icons=['◕','✈','▤','◫','▣'];
   for(const [index,title] of titles.entries()){if(previewPanels.has(title))continue;const details=make('details',null,'reference-preview-card');details.open=true;details.dataset.previewSection=title;const summary=make('summary');const icon=make('span',icons[index],'preview-icon');icon.setAttribute('aria-hidden','true');summary.append(icon,make('span',title));const content=make('div',null,'reference-preview-content');details.append(summary,content);root.append(details);previewPanels.set(title,content);}
   let preparing=root.querySelector('.preview-preparing');if(!preparing){preparing=make('p','Preparing your trip…','preview-preparing');preparing.setAttribute('role','status');root.prepend(preparing);}

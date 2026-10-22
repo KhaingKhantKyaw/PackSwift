@@ -141,3 +141,170 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-cale
 .overview-input-details dt{font:12px Inter,Arial,sans-serif;color:#67817e;margin-bottom:5px}
 .overview-input-details dd{margin:0;font:500 14px Inter,Arial,sans-serif;color:#173b3b;overflow-wrap:anywhere}
 @media(max-width:480px){.overview-input-details{grid-template-columns:1fr}}
+@media(min-width:1001px){
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,30fr) minmax(0,70fr)!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup{padding:22px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6){display:block}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field>h2{white-space:normal!important;margin-bottom:10px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(-n+3)>:not(h2){margin-left:0!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1{font-size:30px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1::after{display:none}
+}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup{background-color:#fffcf7!important;background-image:url('/images/planning-sketch.svg')!important;background-size:360px 460px!important;background-repeat:repeat!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard{background-color:#fffcf7!important;background-image:linear-gradient(#fffcf7c9,#fffcf7e8),var(--destination-backdrop,none)!important;background-position:center top!important;background-size:cover!important;background-repeat:no-repeat!important}
+@media(max-width:1000px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)!important}}
+/* Approved reference treatment, scoped exclusively to Plan Trip. */
+.taxi-app-options{margin:14px 0;padding:12px;border:1px solid #d7e0dd;border-radius:12px}.taxi-app-option{display:flex;align-items:center;gap:10px;margin:8px 0}.taxi-app-option button{border:1px solid #b6d4cc;border-radius:8px;background:#fffcf7;color:#075f60;padding:9px 14px}.taxi-app-option button[aria-pressed=true]{background:#ddf2e9;border-color:#078c84}.taxi-app-option button[aria-pressed=true]::before{content:'✓ ';}.taxi-app-options small{display:block;color:#526870;line-height:1.5}
+.transport-guide h3{margin:8px 0;font-size:16px;color:#075f60}.transport-guide p,.transport-guide li{font-size:12px!important;line-height:1.6}.transport-guide ul{padding-left:18px;margin:10px 0}.transport-guide-tag{display:inline-block;background:#ddf2e9;color:#075f60;padding:5px 9px;border-radius:8px}.transport-guide-links{display:flex;flex-wrap:wrap;gap:8px}.transport-guide-source{display:block;margin-top:12px;color:#526870;line-height:1.5}.transport-guide details .booking-search-link{margin:6px 6px 0 0}
+.planner-sketch .stay-search-preview{display:flex;flex-direction:column;gap:8px;padding:14px;background:#eef4ef;border:1px solid #d7e0dd;border-radius:10px;min-width:0;overflow-wrap:anywhere}
+.planner-sketch .booking-search-link{display:inline-block;margin-top:auto;padding:10px 12px;border:1px solid #078c84;border-radius:8px;background:#ddf2e9;color:#075f60!important;font:600 12px/1.4 Inter,Arial,sans-serif;text-decoration:none}
+.planner-sketch .booking-search-link:hover{background:#c4e8dc}.planner-sketch .booking-search-link:focus-visible{outline:2px solid #078c84;outline-offset:3px}
+.planner-sketch .booking-search-notice{grid-column:1/-1;color:#526870;font-size:11px;line-height:1.5}
+@media(max-width:480px){.planner-sketch .reference-preview-card[data-preview-section="Flight & Stay"] .reference-preview-content{grid-template-columns:minmax(0,1fr)}}
+.planner-sketch #travel-purpose-category[hidden]{display:none!important}
+.planner-sketch .purpose-multiselect{min-width:0;border:1px solid #cdd8d4;border-radius:10px;background:#fffcf7;font:13px/1.5 Inter,Arial,sans-serif;color:#102e33}
+.planner-sketch .purpose-multiselect>summary{padding:10px 12px;cursor:pointer;overflow-wrap:anywhere}
+.planner-sketch .purpose-options{max-height:260px;overflow:auto;border-top:1px solid #d7e0dd;padding:6px}
+.planner-sketch .purpose-options label{display:flex;gap:10px;align-items:center;padding:8px;border-radius:6px;cursor:pointer;font:13px/1.4 Inter,Arial,sans-serif!important}
+.planner-sketch .purpose-options label:has(:checked){background:#ddf2e9;color:#075f60}
+.planner-sketch .purpose-options input[type=checkbox]{width:16px;height:16px;flex:0 0 16px;accent-color:#078c84}
+.planner-sketch .studio-dashboard{scroll-margin-top:calc(var(--header-height,88px) + 16px)}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-control[hidden]{display:none!important}
+.planner-sketch .overview-duration{display:flex;justify-content:space-between;gap:12px;margin:10px 0 6px;color:#102e33;font:13px Inter,Arial,sans-serif}
+/* Full-width layout overrides are collected at the end of this file. */
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel{width:360px;max-width:100%;box-sizing:border-box;padding:12px;--ps-ink:#16343c;--ps-muted:#526870;--ps-border:#cededc}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-grid{grid-template-rows:20px;grid-auto-rows:34px;min-height:0;height:auto;gap:4px;margin:8px 0!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.low{background:#c4e1ff!important;color:#124e86!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.moderate{background:#ffe19a!important;color:#704a00!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.peak{background:#ffbcb6!important;color:#88251d!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day.endpoint{background:#087c7c!important;color:#fff!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar .calendar-day>span{color:inherit!important;background:transparent!important;box-shadow:none!important;width:auto;height:auto;padding:0;font:600 12px Inter,Arial,sans-serif}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-day::before,html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-day::after{display:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-month button{width:28px;height:28px;min-height:0;color:#075f60!important;background:#ddf2e9!important;border:0;border-radius:7px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-month strong{color:#16343c!important;font:600 14px Inter,Arial,sans-serif}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar>p{min-height:0;margin:6px 0;color:#526870!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-selection{display:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel :is(.calendar-legend,.calendar-disclaimer){color:#526870!important;margin:6px 0;min-height:0}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-clear{color:#075f60!important;padding:4px 8px;min-height:0;font-size:11px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"]{--ref-ink:#102e33;--ref-teal:#075f60;background:#f8f5ed!important;color:var(--ref-ink);font-family:Inter,Arial,sans-serif}
+html body.planner-studio.planner-sketch[data-page="planner-studio"]::before{display:block!important;content:"";position:fixed;inset:80px 0 0;pointer-events:none;z-index:-1;background:linear-gradient(180deg,#f8f5edee 0%,#f8f5ed38 28%,#f8f5ed00 70%,#f8f5edaa),url('/images/activities/chao-phraya.jpg') left center/52% 100% no-repeat,url('/images/activities/pattaya-beach.jpg') right center/52% 100% no-repeat;opacity:.8}
+html body.planner-studio.planner-sketch[data-page="planner-studio"]::after{display:block!important;content:"";position:fixed;bottom:-170px;left:-5%;width:110%;height:290px;background:#ddede3;border-radius:48% 60% 0 0;transform:rotate(4deg);z-index:-1;box-shadow:0 -28px 0 #f5ead5;pointer-events:none}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-shell{max-width:1200px!important;padding:18px 18px 24px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,56fr) minmax(0,44fr)!important;gap:16px!important;align-items:start!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup,.studio-dashboard){background:rgba(255,252,247,.95)!important;border:1px solid #d7e0dd!important;border-radius:24px!important;padding:22px 26px!important;box-shadow:0 8px 28px #254b4320!important;backdrop-filter:blur(12px)!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup>h1,.studio-dashboard>h2){font-family:Georgia,'Times New Roman',serif!important;font-size:36px!important;font-weight:600!important;letter-spacing:-.8px;line-height:1.1;margin:0 0 24px!important;color:#073b3d!important;position:relative}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1::after{content:'➤';display:inline-block;color:#078c84;font:30px Georgia;margin-left:30px;transform:rotate(-25deg);opacity:.7}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard>h2::after{content:'◇';position:absolute;right:5px;top:-10px;font-size:60px;color:#70c6bb;text-shadow:-28px 10px #b5dfd5,24px 8px #a6d8cc;opacity:.7}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields{display:grid;grid-template-columns:1fr 1.25fr;gap:18px 12px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field{grid-column:1/-1}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field>h2{display:flex;align-items:center;gap:10px;font-family:Inter,Arial,sans-serif!important;font-size:14px!important;font-weight:600!important;text-transform:none!important;letter-spacing:0!important;color:#102e33!important;margin:0 0 9px!important}
+.field-icon{color:#075f60;width:20px;flex-shrink:0;font-size:18px;text-align:center}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(-n+3)>:not(h2){margin-left:30px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Travelers]{grid-column:1}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Pets]{grid-column:2}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6){display:grid;grid-template-columns:175px minmax(0,1fr);align-items:center;gap:10px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6)>h2{margin:0!important;white-space:nowrap}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields :is(input:not([type=radio]):not([type=checkbox]):not([type=hidden]),select){background:#fffcf7!important;border-color:#cdd8d4!important;border-radius:10px!important;font-family:Inter,Arial,sans-serif!important;font-size:13px!important;height:40px!important;color:#102e33!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-control>label{font-family:Inter,Arial,sans-serif!important;font-size:11px!important;color:#304e50!important;margin-bottom:4px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Location] .sketch-pair{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr);gap:12px;align-items:end}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .route-swap{border:0;border-radius:50%;width:32px;height:32px;min-height:0;background:#ddf2e9;color:#075f60;align-self:end;margin-bottom:4px;padding:0;font-size:20px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Dates] .sketch-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 106px;gap:10px;align-items:end}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .trip-type-control label{font-family:Inter,Arial,sans-serif!important;font-size:13px!important;font-weight:500!important;border-radius:10px!important;padding:12px!important;min-height:44px;background:#fffcf7!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .trip-type-control label:has(input:checked){background:#e6f4ec!important;border-color:#078c84!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-pet-options{gap:6px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-pet-options button{padding:8px!important;font-family:Inter,Arial,sans-serif!important;font-size:11px!important;border-radius:9px!important;flex:1;background:#fffcf7!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-pet-options button[aria-pressed=true],html body.planner-studio.planner-sketch[data-page="planner-studio"] .entry-segments button[aria-pressed=true]{background:#e4f3eb!important;border-color:#078c84!important;color:#073b3d!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper{height:34px;min-height:34px!important;border-radius:8px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper button{width:25px!important;height:32px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields .traveller-stepper input{height:32px!important;min-height:32px!important;font-size:12px!important}
+.entry-segments{display:flex;gap:10px}.entry-segments button{flex:1;border:1px solid #d7e0dd;background:#fffcf7;border-radius:10px;color:#102e33;font:13px Inter,Arial,sans-serif;height:40px;padding:6px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-save{display:block;width:100%!important;background:#075f60!important;color:white!important;font:600 17px Inter,Arial,sans-serif!important;border:0!important;border-radius:16px!important;height:50px!important;margin-top:20px!important;transition:background .15s}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-save:hover{background:#073b3d!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .workspace-nav,html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-save-row{display:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-dashboard-content{padding:0!important;display:grid!important;gap:14px;min-height:0}
+.reference-preview-card{background:#fffcf7;border:1px solid #efeee7;border-radius:17px;box-shadow:0 3px 14px #234c4310;padding:12px}
+.reference-preview-card>summary{display:flex;align-items:center;gap:9px;font:600 16px Inter,Arial,sans-serif;color:#102e33;cursor:pointer;list-style:none;padding:0 0 12px}
+.reference-preview-card>summary::-webkit-details-marker{display:none}.reference-preview-card>summary::after{content:'⌃';margin-left:auto;font-size:20px}.reference-preview-card:not([open])>summary{padding-bottom:0}.reference-preview-card:not([open])>summary::after{content:'⌄'}
+.preview-icon{background:#075f60;border-radius:50%;color:white;width:30px;height:30px;display:grid;place-items:center;font-size:18px}
+.reference-preview-content{min-width:0;font:13px Inter,Arial,sans-serif;color:#102e33}.reference-preview-content img{display:block;width:100%;object-fit:cover;border-radius:10px}
+.reference-preview-card[data-preview-section="Flight & Stay"] .reference-preview-content{display:grid;grid-template-columns:1.7fr 1fr;gap:8px}.reference-route{border-radius:10px;overflow:hidden;background:#e4f2e9}.route-illustration{height:76px;display:grid;place-items:center;font-size:42px;color:#075f60;background:linear-gradient(#c2e0eb,#f2e6d2)}.reference-route>div:last-child{display:grid;gap:5px;padding:9px;font-size:12px}.reference-route strong{font-weight:500}
+.neutral-preview{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;border:1px dashed #cfdcd5;border-radius:10px;background:#f0f3ed;color:#667d77;min-height:78px;font-size:12px}.neutral-preview>span{font-size:30px}
+.transport-visuals{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.transport-visuals button{background:#e2eee7;border:0;border-radius:10px;min-height:76px;display:grid;place-items:center;padding:8px!important}.transport-visuals button>span{font-size:28px}.transport-visuals button>small{font:11px Inter,Arial,sans-serif}
+.selected-thumbnails{display:flex;gap:7px;overflow:auto}.selected-thumbnails figure{margin:0;flex:0 0 92px}.selected-thumbnails img{height:76px}.selected-thumbnails figcaption{font-size:10px;line-height:1.3;margin-top:4px}.selected-thumbnails :is(small,a){font-size:9px}
+.packing-banner{height:62px;object-position:50% 35%}.overview-banner{height:90px}.overview-facts{font-size:11px!important;margin:8px 0 0!important}.preview-drilldown{margin-top:8px;font-size:12px}.preview-drilldown summary{cursor:pointer}.preview-drilldown section{padding:8px 0}.preview-drilldown p{font-size:12px}.reference-preview-content .workspace-pack-row{font-size:12px}
+@media(max-width:1050px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6){grid-template-columns:145px minmax(0,1fr)}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field>h2{font-size:12px!important}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Pets]{grid-column:1/-1}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Travelers]{grid-column:1/-1}}
+@media(max-width:760px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)!important}html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup,.studio-dashboard){padding:20px!important}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6){display:block}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6)>h2{margin-bottom:8px!important}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(-n+3)>:not(h2){margin-left:0!important}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Dates] .sketch-pair{grid-template-columns:1fr 1fr}html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Location] .sketch-pair{gap:6px;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr)}html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup>h1,.studio-dashboard>h2){font-size:29px!important}}
+html body.planner-studio.planner-sketch[data-page="planner-studio"]::before{filter:none!important;background-image:linear-gradient(180deg,#f8f5edee 0%,#f8f5ed38 28%,#f8f5ed00 70%,#f8f5edaa),url('/images/planner-wat-arun.jpg'),url('/images/planner-railay.jpg');background-position:center,left center,right center;background-size:100% 100%,auto 100%,auto 100%;background-repeat:no-repeat}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-dashboard-content :is(summary,small,p,button,span,strong,figcaption){font-family:Inter,Arial,sans-serif!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper input{flex:1 1 0!important;width:0!important;min-width:20px!important;padding:0!important;text-align:center!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper button{flex:0 0 24px!important}
+.reference-preview-content .flight-banner{height:76px;border-radius:0}.transport-visuals img{height:62px}.transport-visuals button:has(img){padding:0!important;overflow:hidden}.transport-visuals button:has(img) small{padding:4px}
+.planner-sketch .field-icon svg{width:18px;height:18px;display:block}.planner-sketch .preview-icon svg{width:19px;height:19px}.planner-sketch .entry-segments button,.planner-sketch .sketch-pet-options button{display:flex;align-items:center;justify-content:center;gap:7px}.planner-sketch .entry-segments svg,.planner-sketch .sketch-pet-options svg{width:16px;height:16px;flex-shrink:0}.planner-sketch .transport-visuals svg,.planner-sketch .route-illustration svg{width:30px;height:30px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1::after{content:'';width:145px;height:50px;position:absolute;top:-3px;margin-left:8px;transform:none;background:url('/images/planner-plane.svg') center/contain no-repeat}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard>h2::after{content:'';width:175px;height:65px;right:-14px;top:-14px;background:url('/images/planner-mountains.svg') center/contain no-repeat}
+html body.planner-studio.planner-sketch[data-page="planner-studio"]::before{background-position:center,left center,calc(100% + 28vw) center}
+@media(max-width:760px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1::after{display:none}html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard>h2::after{width:110px;right:0}.reference-preview-content{overflow-wrap:anywhere}}
+@media(prefers-reduced-motion:reduce){body.planner-sketch *{scroll-behavior:auto!important;transition:none!important}}
+.planner-sketch .pet-other-field{margin-top:10px;animation:pet-reveal .18s ease-out}.planner-sketch .pet-other-field[hidden]{display:none!important}
+@keyframes pet-reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field="Interested Places to Include in Trip"]>h2{white-space:normal;line-height:1.45}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields :is(input,select,button):focus-visible{outline:2px solid #078c84!important;outline-offset:3px;box-shadow:0 0 0 4px #ddf2e9!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields input:invalid:not(:placeholder-shown){border-color:#b75242!important}
+@media(prefers-reduced-motion:reduce){.planner-sketch .pet-other-field{animation:none}}
+/* Compact form; the itinerary workspace receives the larger share. */
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,44fr) minmax(0,56fr)!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:is([data-field=Travelers],[data-field=Pets]){grid-column:1/-1}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6){grid-template-columns:140px minmax(0,1fr)}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Dates] .sketch-pair{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field=Dates] .sketch-control:last-child{grid-column:1/-1;display:flex;align-items:center;gap:14px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #trip-duration{width:145px!important;margin-left:auto}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields .sketch-date-picker{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper{height:40px!important;align-items:center;background:#fffcf7}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper button{background:transparent!important;color:#075f60!important;border:0!important;flex-basis:36px!important;height:36px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .traveller-stepper input{background:transparent!important;border:0!important;box-shadow:none!important}
+.preview-interested-places{margin:0 0 14px;padding-bottom:14px;border-bottom:1px solid #d7e0dd;min-width:0}.interested-places-label{display:block;font:500 13px Inter,Arial,sans-serif;color:#102e33;margin-bottom:8px}.preview-interested-places .place-search{margin:0;padding:0;min-width:0}.preview-interested-places input{width:100%;box-sizing:border-box;background:#fffcf7;border:1px solid #cdd8d4;border-radius:10px;padding:11px 12px;font:13px Inter,Arial,sans-serif}.preview-interested-places input:focus-visible{outline:2px solid #078c84;outline-offset:2px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-shell{max-width:none!important;width:100%!important;box-sizing:border-box;padding:16px!important}
+.planner-sketch .sketch-field:nth-child(3n+1) .field-icon{color:#2876bb}.planner-sketch .sketch-field:nth-child(3n+2) .field-icon{color:#9362ba}.planner-sketch .sketch-field:nth-child(3n) .field-icon{color:#d18428}
+.planner-sketch .reference-preview-card:nth-child(1) .preview-icon{background:#2876bb}.planner-sketch .reference-preview-card:nth-child(2) .preview-icon{background:#9362ba}.planner-sketch .reference-preview-card:nth-child(4) .preview-icon{background:#b67525}
+.planner-sketch .sketch-calendar-trigger{position:absolute;right:4px;top:4px;width:32px;height:32px;border:0;background:transparent;color:#2876bb;padding:6px;cursor:pointer}.sketch-calendar-trigger svg{width:20px;height:20px}
+.planner-sketch .sketch-calendar-panel[hidden]{display:none!important}.planner-sketch .sketch-calendar-panel{margin-top:12px;max-width:420px;background:#fffcf7;border:1px solid #d7e0dd;border-radius:14px;padding:12px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .compact-trip-calendar{display:block!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-calendar-panel .calendar-day{min-height:34px!important;height:34px!important;padding:4px!important;border:0!important;border-radius:7px!important;font:12px Inter,Arial,sans-serif!important}
+.planner-sketch .sketch-calendar-panel .calendar-day.low{background:#e8f2ff!important;color:#24629a!important}.planner-sketch .sketch-calendar-panel .calendar-day.peak{background:#ffebe8!important;color:#ad4038!important}.planner-sketch .sketch-calendar-panel .calendar-day.moderate{background:#fff4db!important;color:#8b6523!important}.planner-sketch .sketch-calendar-panel .calendar-day.endpoint{background:#075f60!important;color:white!important}.planner-sketch .sketch-calendar-panel .calendar-day.in-range{box-shadow:inset 0 0 0 1px #078c84!important}.planner-sketch .sketch-calendar-panel .calendar-day:disabled{opacity:.35}
+.planner-sketch .sketch-calendar-panel :is(p,small,.calendar-legend){font:11px/1.5 Inter,Arial,sans-serif!important}.planner-sketch .sketch-calendar-panel .calendar-selection{display:none}.planner-sketch .calendar-done{display:block;margin:8px 0 0 auto;border:1px solid #d7e0dd;border-radius:8px;padding:7px 16px;background:#ddf2e9;color:#075f60}
+@media(max-width:760px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)!important}}
+.booking-live-results{grid-column:1/-1;min-width:0;width:100%}.booking-live-results>section{border-top:1px solid #d7e0dd;padding:14px 0}.booking-live-results small{display:block;line-height:1.5;color:#526870}.booking-result{border:1px solid #d7e0dd;border-radius:12px;padding:14px;margin:10px 0;overflow-wrap:anywhere}.booking-result a{display:inline-block;margin-top:8px}.booking-live-results label{display:inline-flex;align-items:center;gap:8px;margin:6px}.booking-live-results input{max-width:80px}
+.local-directions label{display:flex;flex-direction:column;align-items:stretch;margin:10px 0}.local-directions input{max-width:none;width:100%;box-sizing:border-box}.local-directions{margin-bottom:18px}.local-directions li{margin:8px 0}
+.local-directions .directions-location-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.local-directions .directions-location-row label{min-width:0}.local-directions .directions-location-row input{min-width:0;border:1px solid #cbd8d5;border-radius:10px;padding:12px;background:#fffcf7;color:#173b3d;font:inherit}
+.itinerary-discovery label{display:flex;flex-direction:column;gap:6px;margin:10px 0}.itinerary-discovery input{box-sizing:border-box;width:100%;padding:10px;border:1px solid #cbd8d5;border-radius:10px;background:#fffcf7;color:#173b3d;font:inherit}.itinerary-discovery small{display:block;color:#526870}.itinerary-discovery button{padding:9px 14px;border:1px solid #88bcb3;border-radius:9px;background:#ddf2e9;color:#075f60}.itinerary-discovery{margin-bottom:16px}
+.arrival-time-picker{display:flex;gap:8px;max-width:320px}.arrival-time-picker select{min-width:0;flex:1;padding:12px 10px;border:1px solid #cbd8d5;border-radius:10px;background:#fffcf7;color:#173b3d;font:inherit}
+.itinerary-selected-place{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;margin:6px 0;background:#edf5f1;border-radius:10px}.itinerary-selected-place button{flex-shrink:0}.itinerary-discovery .booking-result{transition:opacity .22s,transform .22s}.itinerary-discovery .itinerary-selecting{opacity:0;transform:translateY(-6px)}@media(prefers-reduced-motion:reduce){.itinerary-discovery .booking-result{transition:none}}
+.selected-thumbnails figure{position:relative}
+.selected-thumbnails .selected-place-remove{position:absolute;top:4px;right:4px;display:grid;place-items:center;width:28px;height:28px;min-height:0;padding:0;border:1px solid #cadbd7;border-radius:50%;background:#fff;color:#174846;font:20px/1 sans-serif;box-shadow:0 1px 4px #0002;cursor:pointer}
+.selected-thumbnails .selected-place-remove:hover{background:#fee8e5;color:#a22f29}
+.selected-thumbnails .selected-place-remove:focus-visible{outline:3px solid #087e80;outline-offset:2px}
+.itinerary-place-photo{width:100%;height:150px;overflow:hidden;border-radius:10px;background:#edf3ef;display:grid;place-items:center;color:#526a66;margin-bottom:8px}
+.itinerary-place-photo img{width:100%;height:100%;object-fit:cover}
+.itinerary-photo-credit{display:block;font-size:11px;margin-bottom:8px;color:#526a66}
+.selected-place-actions{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.selected-place-actions button{font-size:11px;padding:5px 6px;min-height:28px;border-radius:7px}
+.reference-preview-card[hidden],.preview-preparing[hidden]{display:none!important}
+.preview-preparing{min-height:320px;display:grid;place-items:center;color:#67817e;font-size:15px}
+.overview-input-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px;margin:0}
+.overview-input-details div{min-width:0}
+.overview-input-details dt{font:12px Inter,Arial,sans-serif;color:#67817e;margin-bottom:5px}
+.overview-input-details dd{margin:0;font:500 14px Inter,Arial,sans-serif;color:#173b3b;overflow-wrap:anywhere}
+@media(max-width:480px){.overview-input-details{grid-template-columns:1fr}}
+@media(min-width:1001px){
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,30fr) minmax(0,70fr)!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup{padding:22px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(n+6){display:block}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field>h2{white-space:normal!important;margin-bottom:10px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field:nth-child(-n+3)>:not(h2){margin-left:0!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1{font-size:30px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup>h1::after{display:none}
+}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup{background-color:#fffcf7!important;background-image:url('/images/planning-sketch.svg')!important;background-size:360px 460px!important;background-repeat:repeat!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard{background-color:#fffcf7!important;background-image:linear-gradient(#fffcf7c9,#fffcf7e8),var(--destination-backdrop,none)!important;background-position:center top!important;background-size:cover!important;background-repeat:no-repeat!important}
+@media(max-width:1000px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)!important}
