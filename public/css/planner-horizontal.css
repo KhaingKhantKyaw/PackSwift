@@ -49,7 +49,7 @@ html body.planner-horizontal.planner-sketch .sketch-field[data-field="Travel Pur
 html body.planner-horizontal.planner-sketch .sketch-field[data-field="Travel Style"]>select{margin-top:0!important}
 }
 @media(min-width:1101px){
-html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-field:is([data-field="Travelers"],[data-field="Travel Purpose"],[data-field="Travel Style"]){display:grid!important;grid-template-rows:22px 24px 40px!important;row-gap:0!important;align-content:start!important}
+html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-field:is([data-field="Travelers"],[data-field="Travel Purpose"],[data-field="Travel Style"]){display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:22px 24px 40px!important;row-gap:0!important;align-content:start!important}
 html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-field:is([data-field="Travelers"],[data-field="Travel Purpose"],[data-field="Travel Style"])>h2{grid-row:1;margin:0!important;min-height:0!important;line-height:22px!important}
 html body.planner-horizontal.planner-sketch .sketch-field[data-field="Travelers"]>.sketch-pair{grid-row:2/4;margin:0!important;align-items:start!important}
 html body.planner-horizontal.planner-sketch .sketch-field[data-field="Travelers"] .sketch-control{display:grid!important;grid-template-rows:24px 40px!important;gap:0!important;margin:0!important}
@@ -58,3 +58,13 @@ html body.planner-horizontal.planner-sketch .sketch-field[data-field="Travel Pur
 html body.planner-horizontal.planner-sketch .sketch-field[data-field="Travel Style"]>select{grid-row:3;margin:0!important;height:40px!important;align-self:start}
 html body.planner-horizontal.planner-sketch .purpose-multiselect summary{height:38px!important;min-height:38px!important;padding:7px 10px!important;line-height:22px!important;box-sizing:border-box}
 }
+html body.planner-horizontal.planner-sketch .studio-setup{z-index:2}
+html body.planner-horizontal.planner-sketch .studio-dashboard{z-index:1}
+html body.planner-horizontal.planner-sketch .purpose-multiselect{position:relative;width:100%;box-sizing:border-box;overflow:visible}
+html body.planner-horizontal.planner-sketch #travel-style{width:100%!important;min-width:0}
+html body.planner-horizontal.planner-sketch .purpose-multiselect>summary{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block!important;padding-right:30px!important;font:14px/22px Inter,Arial,sans-serif!important;list-style:none}
+html body.planner-horizontal.planner-sketch .purpose-multiselect>summary::after{content:'⌄';position:absolute;right:12px;top:8px}
+html body.planner-horizontal.planner-sketch .purpose-multiselect>summary::-webkit-details-marker{display:none}
+html body.planner-horizontal.planner-sketch .purpose-options{position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:20;background:#fffcf7;border:1px solid #cdd8d4;border-radius:10px;box-shadow:0 8px 24px #123b3b20;max-height:280px;overflow-y:auto;overscroll-behavior:contain;padding:6px}
+html body.planner-horizontal.planner-sketch .purpose-options label{min-height:40px;box-sizing:border-box;white-space:normal}
+html body.planner-horizontal.planner-sketch .purpose-multiselect:not([open])>.purpose-options{display:none!important}
