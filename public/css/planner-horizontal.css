@@ -82,3 +82,14 @@ html body.planner-horizontal .sketch-field:has(.purpose-multiselect[open]){z-ind
 html body.planner-horizontal .sketch-field:has(.sketch-calendar-panel:not([hidden])){min-height:120px}
 @media(max-width:1100px){html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-fields{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:650px){html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-fields{grid-template-columns:minmax(0,1fr)!important}}
+
+/* Consistent preview panel dimensions, with content determining row height. */
+html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] #studio-dashboard-content{align-items:stretch!important;grid-auto-flow:row;gap:16px!important}
+html body.planner-horizontal .reference-preview-card[data-preview-section]{grid-column:span 6;align-self:stretch;box-sizing:border-box;min-width:0;padding:20px;border-radius:16px}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Overview"]{grid-column:1/-1}
+html body.planner-horizontal .reference-preview-card>summary{min-height:32px;box-sizing:content-box;margin:0;padding-bottom:16px}
+html body.planner-horizontal .reference-preview-card:not([open]){align-self:start}
+html body.planner-horizontal .reference-preview-card:not([open])>summary{padding-bottom:0}
+@media(max-width:1100px){
+html body.planner-horizontal .reference-preview-card[data-preview-section]{grid-column:1/-1}
+}
