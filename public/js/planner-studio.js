@@ -14,6 +14,7 @@
  const searchRoot=node('section',undefined,'place-search');form.querySelector('[data-step="4"]').prepend(searchRoot);
  const placeSearch=PackSwiftPlaceSearch.mount({root:searchRoot,getInput:input,getSelected:()=>state.selected,add:p=>{if(!state.selected.some(s=>PackSwiftPlaceSearchModel.identity(s)===PackSwiftPlaceSearchModel.identity(p)))state.selected.push(p);renderPlaces();refresh();},remove:p=>{state.selected=state.selected.filter(s=>key(s)!==key(p));renderPlaces();refresh();},preferences:()=>show(5)});
  window.addEventListener('packswift:add-itinerary-place',e=>{const p=e.detail;if(!p||!p.placeId)return;if(!state.selected.some(s=>PackSwiftPlaceSearchModel.identity(s)===PackSwiftPlaceSearchModel.identity(p)))state.selected.push(p);renderPlaces();refresh();});
+ window.addEventListener('packswift:remove-itinerary-place',e=>{state.selected=state.selected.filter(p=>PackSwiftPlaceSearchModel.identity(p)!==String(e.detail));renderPlaces();refresh();});
  function valid(step){const i=input();let message='';
   if(step===0&&(!i.origin.trim()||!i.destination.trim()||!i.startDate||!i.endDate||!(days(i)>0)||days(i)>90))message='Choose your route and dates for a trip of 1–90 nights.';
   if(step===1&&(!Number.isInteger(i.adults)||i.adults<1||!Number.isInteger(i.children)||i.children<0||i.travelers>20||(i.isInternational!==false&&!i.passportCountry.trim())))message='Choose 1–20 travellers, including an adult, and add passport nationality.';
