@@ -375,3 +375,16 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-dash
 .planner-sketch .booking-live-results:not(.local-directions)>small{grid-column:1/-1}
 }
 @media(max-width:760px){.planner-sketch .reference-preview-card{padding:16px}.planner-sketch .overview-input-details{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+.itinerary-preferences-dialog{width:min(520px,calc(100vw - 32px));max-height:85vh;overflow:auto;padding:24px;box-sizing:border-box}
+.itinerary-preferences-dialog .preference-controls{display:grid;gap:16px;margin-top:18px}
+.itinerary-preferences-dialog .preference-controls label{display:grid;gap:7px;font:14px/1.4 Inter,Arial,sans-serif}
+.itinerary-preferences-dialog :is(select,input){width:100%;box-sizing:border-box;min-height:42px;padding:9px 12px;border:1px solid #cdd8d4;border-radius:9px;background:#fffcf7;color:#173b3b;font:14px Inter,Arial,sans-serif}
+.itinerary-preferences-dialog [hidden]{display:none!important}
+.itinerary-preferences-dialog .preference-place>summary{list-style:none;pointer-events:none}
+.itinerary-preferences-dialog .preference-place>summary .workspace-link{display:none}
+.itinerary-preferences-dialog>button{margin-top:18px}
+#preview-itinerary-settings .preference-modes{display:grid;gap:12px;border:0;padding:12px 0}
+#preview-itinerary-settings .preference-mode{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px;border:1px solid #d7e0dd;border-radius:10px}
+#preview-itinerary-settings .preference-mode span{flex-basis:100%;font-size:13px}
+#preview-itinerary-settings input[type=radio]{width:18px;min-height:18px}
+#preview-itinerary-settings .studio-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
