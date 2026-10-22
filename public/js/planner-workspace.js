@@ -112,15 +112,15 @@
   if(i.entryMode==='air')routeBox.firstChild.replaceWith(photo('/images/planner-flight.jpg','Air travel illustration — no flight selected','flight-banner'));else routeBox.firstChild.replaceChildren(referenceIcon(i.entryMode==='train'?'train':'car'));
   transport.replaceChildren();transport.classList.remove('transport-visuals');transport.classList.add('transport-guide');
   const advice=window.PackSwiftTransportGuide.recommend(i);
-  window.PackSwiftDirections?.mount(transport,i);
   if(!advice.destination)transport.append(make('p','Choose a destination to see transport guidance.'));
   else{
    transport.append(make('small',`Suggested for ${advice.style}`,'transport-guide-tag'),make('h3',advice.title),make('p',advice.reason));
    if(preferred.value&&!advice.apps.some(a=>a.id===preferred.value))preferred.value='';
-   const apps=make('section',null,'taxi-app-options');apps.append(make('h3','Taxi & ride apps'));
+   const apps=make('section',null,'taxi-app-options');apps.append(make('h3','Taxi & ride apps in '+advice.destination));
    if(!advice.apps.length)apps.append(make('p','App coverage is not verified for this destination. Check local services before choosing.'));
    for(const app of advice.apps){const row=make('div',null,'taxi-app-option');const choose=button(app.name,()=>{preferred.value=preferred.value===app.id?'':app.id;preferred.dispatchEvent(new Event('input',{bubbles:true}));});choose.setAttribute('aria-pressed',String(preferred.value===app.id));choose.setAttribute('aria-label','Prefer '+app.name);row.append(choose,searchLink('Open '+app.name+' ↗',app.url));apps.append(row);}
-   apps.append(make('small','Preference only—not a booking. Check pickup coverage, fare, vehicle size and pet rules in the app.'));transport.append(apps);
+   apps.append(make('small','Preference only—not a booking. Check pickup coverage, fare, vehicle size and pet rules in the app.'));transport.prepend(apps);
+   window.PackSwiftDirections?.mount(transport,i);
    const links=make('div',null,'transport-guide-links');
    if(advice.guide)links.append(searchLink('Official network guide ↗',advice.guide.url));
    links.append(searchLink('Explore local transport ↗','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(advice.destination+' public transport')));
