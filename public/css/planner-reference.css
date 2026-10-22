@@ -321,3 +321,31 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-save
 .planner-sketch .reference-preview-content input:not([type=hidden]),.planner-sketch .reference-preview-content select{font-size:14px;min-height:40px;padding:8px 10px}
 .planner-sketch .reference-preview-content p{margin:8px 0}
 @media(max-width:760px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field :is(input,select){font-size:16px!important}}
+
+/* Airier planner spacing, without changing the 30/70 desktop split. */
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{gap:24px!important;align-items:start}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup,.studio-dashboard){padding:clamp(24px,2.2vw,40px)!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup{background-image:linear-gradient(#fffcf7bb,#fffcf7bb),url('/images/planning-sketch.svg')!important;background-repeat:repeat!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard{background-image:linear-gradient(#fffcf7eb,#fffcf7f5),var(--destination-backdrop,none)!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup>h1,.studio-dashboard>h2){margin-bottom:32px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-fields{row-gap:26px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field{margin-bottom:8px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field>h2{margin-bottom:14px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field label{margin-bottom:7px}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-dashboard-content{gap:24px!important}
+.planner-sketch .reference-preview-card{padding:24px;border-radius:18px;box-shadow:0 2px 10px #234c4308}
+.planner-sketch .reference-preview-card>summary{padding-bottom:22px}
+.planner-sketch .overview-input-details{gap:24px 32px}
+.planner-sketch .overview-input-details dt{margin-bottom:8px}
+.planner-sketch .taxi-app-options{padding:20px;margin:4px 0 24px}
+.planner-sketch .taxi-app-option{gap:12px;margin:12px 0}
+.planner-sketch .reference-preview-content h3{margin:24px 0 16px}
+.planner-sketch .reference-preview-content p{margin:12px 0;line-height:1.65}
+@media(min-width:1001px) and (max-width:1400px){
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field[data-field="Dates"] .sketch-pair{grid-template-columns:1fr;gap:14px}
+}
+@media(max-width:760px){
+html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup,.studio-dashboard){padding:22px!important}
+.planner-sketch .reference-preview-card{padding:18px}
+.planner-sketch .overview-input-details{gap:20px}
+}
