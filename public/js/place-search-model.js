@@ -7,7 +7,9 @@ globalThis.PackSwiftPlaceSearchModel=(()=>{
  function schedule(selected,days,preferences={}){
   const result=Array.from({length:days},(_,i)=>({day:i+1,title:`Day ${i+1}`,activities:[],load:0})),unscheduled=[];
   const prefs=new Map((preferences.activityPreferences||[]).map(p=>[p.activityId,p]));
-  const cap={relaxed:2,balanced:3,packed:4}[preferences.tripPace]||3;
+  const cap={'Pocket Friendly':3,'Balanced':3,'Comfort & Value':2,'Full Experience':4,'Ultimate Luxury':1}[preferences.travelStyle]||{relaxed:2,balanced:3,packed:4}[preferences.tripPace]||3;
+  const arrival=/^\d{2}:\d{2}$/.test(preferences.arrivalTime||'')?Number(preferences.arrivalTime.slice(0,2))*60+Number(preferences.arrivalTime.slice(3)):null;
+  if(arrival!==null)result[0].load=Math.max(0,1-Math.min(cap,Math.max(0,Math.floor((1200-arrival-210)/150)))/cap);
   const sorted=[...selected].sort((a,b)=>{const score=p=>{const f=prefs.get(identity(p))||{};return (f.preferredDay?10:0)+({must_visit:3,would_like:2,optional:1}[f.priority]||2);};return score(b)-score(a);});
   for(const p of sorted){const f=prefs.get(identity(p))||{},long=['day_trip','overnight_option','long_distance'].includes(p.tripType),weight=long?1:1/cap;
    if(p.needsRefresh||p.tripType==='unknown'){unscheduled.push({...p,reason:'Refresh place details and verify travel before scheduling.'});continue;}

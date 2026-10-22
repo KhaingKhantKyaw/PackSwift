@@ -20,7 +20,7 @@ export function buildLiveReview(input) {
   const domestic=input.routeType==='domestic';
   const places = Array.isArray(input.selectedPlaces) ? input.selectedPlaces.slice(0, 150).filter(p => p && typeof (p.title || p.name) === 'string' && !p.isSample) : [];
   const plan = globalThis.PackSwiftTripEngine.generateDynamicTrip(input.destination, Math.max(1, days - 2), input.notes, input.pace, {places, level:style, travelers:adults+children, currency:estimate.currency, accessibility:input.accessibility});
-  const selectionPlan=globalThis.PackSwiftPlaceSearchModel.schedule(places,days,{tripPace:input.pace,...input.itineraryPreferences});
+  const selectionPlan=globalThis.PackSwiftPlaceSearchModel.schedule(places,days,{tripPace:input.pace,...input.itineraryPreferences,travelStyle:input.travelStyle,arrivalTime:input.arrivalTime});
   const range = amount => ({minimum:Math.round(amount * .85), maximum:Math.round(amount * 1.2)});
   const stayFactor = {hostel:.6,budget:.8,comfortable:1,luxury:1.8}[input.accommodationStyle] || 1;
   const categories = [['Accommodation', .45], ['Food', .25], ['Local transport', .15], ['Activities allowance', .10], ['Daily essentials', .05]].map(([label, share]) => ({label, ...range(estimate.totalEstimate * share * (label === 'Accommodation' ? stayFactor : days / estimate.totalNights))}));
@@ -29,7 +29,7 @@ export function buildLiveReview(input) {
   const itinerary = Array.from({length:days}, (_, index) => {
     const arrival=index===0, departure=index===days-1;
     const activities = places.length?selectionPlan.days[index].activities:arrival || departure ? [] : plan.days[index-1]?.activities || [];
-    return {day:index+1,date:dateAt(index),title:arrival?(local?'Start your local trip':'Arrival & settle in'):departure?(local?'Wrap up your local trip':'Departure & return transfer'):activities.length?plan.days[index-1].label:'Flexible local day',activities,
+    return {day:index+1,date:dateAt(index),title:arrival?(local?'Start your local trip':'Arrival & settle in'):departure?(local?'Wrap up your local trip':'Departure & return transfer'):activities.length?(plan.days[index-1]?.label||'Explore your selected places'):'Flexible local day',activities,
       guidance:arrival?(local?'Explore near your stay and leave time to settle in.':(domestic?'Allow time for transport and check-in.':'Verify entry requirements; allow time for border checks and transfer.')):departure?(local?'Keep time to pack and check out if staying overnight.':'Keep sightseeing optional. Confirm check-out and your return transport requirements.'):activities.length?'Check venue hours and actual transit before setting departure times.':'No verified activities assigned. Add places or use this day for rest, laundry and nearby exploration.',
       transport:style==='budget'?'Compare public transit and walking routes':'Compare public transit and ride-hailing',
       estimatedDailyGroundCost:range((estimate.totalEstimate / estimate.totalNights)*.55)};
