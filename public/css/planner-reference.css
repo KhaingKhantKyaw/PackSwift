@@ -5,7 +5,7 @@
 .planner-sketch .booking-search-link{display:inline-block;margin-top:auto;padding:10px 12px;border:1px solid #078c84;border-radius:8px;background:#ddf2e9;color:#075f60!important;font:600 12px/1.4 Inter,Arial,sans-serif;text-decoration:none}
 .planner-sketch .booking-search-link:hover{background:#c4e8dc}.planner-sketch .booking-search-link:focus-visible{outline:2px solid #078c84;outline-offset:3px}
 .planner-sketch .booking-search-notice{grid-column:1/-1;color:#526870;font-size:11px;line-height:1.5}
-@media(max-width:480px){.planner-sketch .reference-preview-card:first-child .reference-preview-content{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.planner-sketch .reference-preview-card[data-preview-section="Flight & Stay"] .reference-preview-content{grid-template-columns:minmax(0,1fr)}}
 .planner-sketch #travel-purpose-category[hidden]{display:none!important}
 .planner-sketch .purpose-multiselect{min-width:0;border:1px solid #cdd8d4;border-radius:10px;background:#fffcf7;font:13px/1.5 Inter,Arial,sans-serif;color:#102e33}
 .planner-sketch .purpose-multiselect>summary{padding:10px 12px;cursor:pointer;overflow-wrap:anywhere}
@@ -72,7 +72,7 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-dash
 .reference-preview-card>summary::-webkit-details-marker{display:none}.reference-preview-card>summary::after{content:'⌃';margin-left:auto;font-size:20px}.reference-preview-card:not([open])>summary{padding-bottom:0}.reference-preview-card:not([open])>summary::after{content:'⌄'}
 .preview-icon{background:#075f60;border-radius:50%;color:white;width:30px;height:30px;display:grid;place-items:center;font-size:18px}
 .reference-preview-content{min-width:0;font:13px Inter,Arial,sans-serif;color:#102e33}.reference-preview-content img{display:block;width:100%;object-fit:cover;border-radius:10px}
-.reference-preview-card:first-child .reference-preview-content{display:grid;grid-template-columns:1.7fr 1fr;gap:8px}.reference-route{border-radius:10px;overflow:hidden;background:#e4f2e9}.route-illustration{height:76px;display:grid;place-items:center;font-size:42px;color:#075f60;background:linear-gradient(#c2e0eb,#f2e6d2)}.reference-route>div:last-child{display:grid;gap:5px;padding:9px;font-size:12px}.reference-route strong{font-weight:500}
+.reference-preview-card[data-preview-section="Flight & Stay"] .reference-preview-content{display:grid;grid-template-columns:1.7fr 1fr;gap:8px}.reference-route{border-radius:10px;overflow:hidden;background:#e4f2e9}.route-illustration{height:76px;display:grid;place-items:center;font-size:42px;color:#075f60;background:linear-gradient(#c2e0eb,#f2e6d2)}.reference-route>div:last-child{display:grid;gap:5px;padding:9px;font-size:12px}.reference-route strong{font-weight:500}
 .neutral-preview{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;border:1px dashed #cfdcd5;border-radius:10px;background:#f0f3ed;color:#667d77;min-height:78px;font-size:12px}.neutral-preview>span{font-size:30px}
 .transport-visuals{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.transport-visuals button{background:#e2eee7;border:0;border-radius:10px;min-height:76px;display:grid;place-items:center;padding:8px!important}.transport-visuals button>span{font-size:28px}.transport-visuals button>small{font:11px Inter,Arial,sans-serif}
 .selected-thumbnails{display:flex;gap:7px;overflow:auto}.selected-thumbnails figure{margin:0;flex:0 0 92px}.selected-thumbnails img{height:76px}.selected-thumbnails figcaption{font-size:10px;line-height:1.3;margin-top:4px}.selected-thumbnails :is(small,a){font-size:9px}
@@ -134,3 +134,10 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-cale
 .itinerary-photo-credit{display:block;font-size:11px;margin-bottom:8px;color:#526a66}
 .selected-place-actions{display:flex;flex-direction:column;gap:4px;margin-top:6px}
 .selected-place-actions button{font-size:11px;padding:5px 6px;min-height:28px;border-radius:7px}
+.reference-preview-card[hidden],.preview-preparing[hidden]{display:none!important}
+.preview-preparing{min-height:320px;display:grid;place-items:center;color:#67817e;font-size:15px}
+.overview-input-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px;margin:0}
+.overview-input-details div{min-width:0}
+.overview-input-details dt{font:12px Inter,Arial,sans-serif;color:#67817e;margin-bottom:5px}
+.overview-input-details dd{margin:0;font:500 14px Inter,Arial,sans-serif;color:#173b3b;overflow-wrap:anywhere}
+@media(max-width:480px){.overview-input-details{grid-template-columns:1fr}}

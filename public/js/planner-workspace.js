@@ -79,8 +79,14 @@
  function renderReferencePreview(i,review,selected){
   let preferred=$('preferred-taxi-app');if(!preferred){preferred=make('input');preferred.type='hidden';preferred.id='preferred-taxi-app';preferred.name='preferredTaxiApp';$('trip-planner-form').append(preferred);}
   document.querySelector('.workspace-nav').hidden=true;const root=$('studio-dashboard-content');
-  const titles=['Flight & Stay','Transportation','Itinerary','Packing List','Overview'],icons=['✈','▤','◫','▣','◕'];
-  for(const [index,title] of titles.entries()){if(previewPanels.has(title))continue;const details=make('details',null,'reference-preview-card');details.open=true;const summary=make('summary');const icon=make('span',icons[index],'preview-icon');icon.setAttribute('aria-hidden','true');summary.append(icon,make('span',title));const content=make('div',null,'reference-preview-content');details.append(summary,content);root.append(details);previewPanels.set(title,content);}
+  const titles=['Overview','Flight & Stay','Transportation','Itinerary','Packing List'],icons=['◕','✈','▤','◫','▣'];
+  for(const [index,title] of titles.entries()){if(previewPanels.has(title))continue;const details=make('details',null,'reference-preview-card');details.open=true;details.dataset.previewSection=title;const summary=make('summary');const icon=make('span',icons[index],'preview-icon');icon.setAttribute('aria-hidden','true');summary.append(icon,make('span',title));const content=make('div',null,'reference-preview-content');details.append(summary,content);root.append(details);previewPanels.set(title,content);}
+  let preparing=root.querySelector('.preview-preparing');if(!preparing){preparing=make('p','Preparing your trip…','preview-preparing');preparing.setAttribute('role','status');root.prepend(preparing);}
+  const hasInput=Boolean(i.origin?.trim()||i.destination?.trim()||i.startDate||i.endDate||Number(i.budget)>0||selected.length);
+  preparing.hidden=hasInput;
+  const visibility={'Overview':hasInput,'Flight & Stay':Boolean(i.origin&&i.destination&&i.startDate&&i.endDate&&nights(i)>0),'Transportation':Boolean(i.destination),'Itinerary':Boolean(i.destination),'Packing List':Boolean(i.destination&&i.startDate&&i.endDate&&nights(i)>0)};
+  for(const title of titles){const card=previewPanels.get(title).parentElement;card.hidden=!visibility[title];root.append(card);}
+  if(!hasInput)return;
   const photo=(src,alt,cls='')=>{const image=make('img',null,cls);image.src=src;image.alt=alt;image.loading='lazy';image.onerror=()=>{image.replaceWith(make('span','Image unavailable','neutral-preview'));};return image;};
   const flight=previewPanels.get('Flight & Stay');flight.replaceChildren();const routeBox=make('div',null,'reference-route'),routeInfo=make('div');routeInfo.append(make('strong',[i.origin,i.destination].filter(Boolean).join(' → ')||'—'),make('small',i.startDate&&i.endDate?date(i.startDate)+' – '+date(i.endDate):'—'),make('small',nights(i)?nights(i)+' nights':'—'));routeBox.append(make('div','✈','route-illustration'),routeInfo);const stay=make('div',null,'neutral-preview');stay.append(make('span','▥'),make('small','Stay not selected'));flight.append(routeBox,stay);
   const ready=Boolean(i.destination&&i.startDate&&i.endDate&&nights(i)>0&&Number(i.adults)>0);
@@ -130,8 +136,18 @@
    if(selected.length){const routes=make('details');routes.append(make('summary','Transport to your selected places'));for(const place of selected){const url=new URL('https://www.google.com/maps/dir/');url.searchParams.set('api','1');url.searchParams.set('destination',(place.title||place.name)+' '+advice.destination);routes.append(searchLink((place.title||place.name)+' ↗',url.href));}transport.append(routes);}
    transport.append(make('small',advice.guide?'Network source checked 21 Oct 2026 · Check current routes, fares, payment and service conditions.':'Local coverage not verified · No live fares, schedules or service availability.','transport-guide-source'));
   }
-  [...root.querySelectorAll('.preview-icon')].forEach((n,index)=>n.replaceChildren(referenceIcon(['plane','train','map','bag','globe'][index])));
-  const overview=previewPanels.get('Overview');overview.replaceChildren();const source=/bangkok/i.test(i.destination)?'/images/planner-wat-arun.jpg':find(i.destination)?.image||images[i.destination];if(source)overview.append(photo(source,i.destination,'overview-banner'));const duration=make('p',null,'overview-duration');duration.append(make('span','Trip Duration'),make('strong',nights(i)>0?`${nights(i)} night${nights(i)===1?'':'s'}`:'—'));overview.append(duration);const data=make('p',null,'overview-facts');data.textContent=[i.destination,`${i.adults} adults${i.children?' · '+i.children+' children':''}`,i.budget>0?money(i.budget,i.currency):''].filter(Boolean).join(' · ');overview.append(data);
+  [...root.querySelectorAll('.preview-icon')].forEach((n,index)=>n.replaceChildren(referenceIcon(['globe','plane','train','map','bag'][index])));
+  const overview=previewPanels.get('Overview');overview.replaceChildren();const facts=make('dl',null,'overview-input-details');
+  const fact=(label,value)=>{if(value===undefined||value===null||value==='')return;const row=make('div');row.append(make('dt',label),make('dd',String(value)));facts.append(row);};
+  fact('Origin',i.origin);fact('Destination',i.destination);fact('Start Date',i.startDate?date(i.startDate):'');fact('End Date',i.endDate?date(i.endDate):'');
+  if(nights(i)>0)fact('Trip Duration',nights(i)+' nights');
+  fact('Travelers',i.adults+' adults'+(Number(i.children)>0?' · '+i.children+' children':''));
+  fact('Nationality',i.passportCountry);fact('Entry Mode',i.entryMode);
+  if(i.budget>0)fact('Expected Budget',money(i.budget,i.currency));
+  let purposes=[];try{purposes=JSON.parse(i.travelPurposes||'[]');}catch{}
+  fact('Travel Purpose',purposes.length?purposes.join(' · '):i.travelPurposeCategory);
+  fact('Travel Style',i.travelStyle);if(i.travelingWithPets)fact('Pets',i.petType);
+  overview.append(facts);
  }
  document.addEventListener('click',e=>{const nav=e.target.closest('[data-workspace-target]');if(nav){document.querySelectorAll('[data-workspace-target]').forEach(b=>b.removeAttribute('aria-current'));nav.setAttribute('aria-current','page');jump(nav.dataset.workspaceTarget);}if(e.target.closest('#workspace-review'))jump('studio-summary');});
  fetch('/data/destinations.json').then(r=>r.ok?r.json():[]).then(data=>{catalog=data;if(current)render(current.i,current.review,current.selected);}).catch(()=>{});
