@@ -307,4 +307,17 @@ html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setu
 }
 html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-setup{background-color:#fffcf7!important;background-image:url('/images/planning-sketch.svg')!important;background-size:360px 460px!important;background-repeat:repeat!important}
 html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-dashboard{background-color:#fffcf7!important;background-image:linear-gradient(#fffcf7c9,#fffcf7e8),var(--destination-backdrop,none)!important;background-position:center top!important;background-size:cover!important;background-repeat:no-repeat!important}
-@media(max-width:1000px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)!important}
+@media(max-width:1000px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .studio-columns{grid-template-columns:minmax(0,1fr)!important}}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] :is(.studio-setup>h1,.studio-dashboard>h2){font-size:30px!important;line-height:1.2!important;margin-bottom:22px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field>h2{font-size:14px!important;line-height:1.4!important;margin-bottom:8px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field label{font-size:12px!important;line-height:1.4}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select){font-size:14px!important;min-height:40px!important;height:40px!important;padding:8px 10px!important;border-radius:9px!important;min-width:0;box-sizing:border-box}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field button:not(.calendar-day):not(.sketch-calendar-trigger){font-size:13px!important;min-height:36px;padding:7px 9px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field{margin-bottom:16px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field input[id*="date"]{padding-right:36px!important}
+html body.planner-studio.planner-sketch[data-page="planner-studio"] #studio-save{font-size:15px!important;padding:12px!important;min-height:44px!important}
+.planner-sketch .reference-preview-content{font-size:14px;line-height:1.5}
+.planner-sketch .reference-preview-content h3{font-size:20px;margin:16px 0 12px}
+.planner-sketch .reference-preview-content input:not([type=hidden]),.planner-sketch .reference-preview-content select{font-size:14px;min-height:40px;padding:8px 10px}
+.planner-sketch .reference-preview-content p{margin:8px 0}
+@media(max-width:760px){html body.planner-studio.planner-sketch[data-page="planner-studio"] .sketch-field :is(input,select){font-size:16px!important}}
