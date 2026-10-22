@@ -146,11 +146,11 @@
   fact('Origin',i.origin);fact('Destination',i.destination);fact('Start Date',i.startDate?date(i.startDate):'');fact('End Date',i.endDate?date(i.endDate):'');
   if(nights(i)>0)fact('Trip Duration',nights(i)+' nights');
   fact('Travelers',i.adults+' adults'+(Number(i.children)>0?' · '+i.children+' children':''));
-  fact('Nationality',i.passportCountry);fact('Entry Mode',i.entryMode);
-  if(i.budget>0)fact('Expected Budget',money(i.budget,i.currency));
+  if(!document.body.classList.contains('planner-horizontal')){fact('Nationality',i.passportCountry);fact('Entry Mode',i.entryMode);}
+  if(!document.body.classList.contains('planner-horizontal')&&i.budget>0)fact('Expected Budget',money(i.budget,i.currency));
   let purposes=[];try{purposes=JSON.parse(i.travelPurposes||'[]');}catch{}
   fact('Travel Purpose',purposes.length?purposes.join(' · '):i.travelPurposeCategory);
-  fact('Travel Style',i.travelStyle);if(i.travelingWithPets)fact('Pets',i.petType);
+  fact('Travel Style',i.travelStyle);if(!document.body.classList.contains('planner-horizontal')&&i.travelingWithPets)fact('Pets',i.petType);
   overview.append(facts);
  }
  document.addEventListener('click',e=>{const nav=e.target.closest('[data-workspace-target]');if(nav){document.querySelectorAll('[data-workspace-target]').forEach(b=>b.removeAttribute('aria-current'));nav.setAttribute('aria-current','page');jump(nav.dataset.workspaceTarget);}if(e.target.closest('#workspace-review'))jump('studio-summary');});

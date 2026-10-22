@@ -1,0 +1,33 @@
+/* Horizontal layout reuses the existing form and preview controllers. */
+html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .studio-columns{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+html body.planner-horizontal.planner-sketch .studio-setup,
+html body.planner-horizontal.planner-sketch .studio-dashboard{position:relative!important;top:auto!important;width:100%!important;max-width:none!important;max-height:none!important;overflow:visible!important;box-sizing:border-box;padding:20px!important}
+html body.planner-horizontal.planner-sketch .studio-setup>h1,
+html body.planner-horizontal.planner-sketch #studio-save,
+html body.planner-horizontal.planner-sketch .sketch-field[hidden]{display:none!important}
+html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-fields{display:grid!important;grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:16px 20px!important}
+html body.planner-horizontal.planner-sketch .sketch-field{display:block!important;grid-column:span 4!important;margin:0!important;min-width:0}
+html body.planner-horizontal.planner-sketch .sketch-field[data-field="Trip Type"]{grid-column:span 3!important}
+html body.planner-horizontal.planner-sketch .sketch-field[data-field="Location"]{grid-column:span 5!important}
+html body.planner-horizontal.planner-sketch .sketch-field[data-field="Dates"]{grid-column:span 4!important}
+html body.planner-horizontal.planner-sketch .sketch-field>h2{font-size:13px!important;margin:0 0 8px!important;line-height:1.4}
+html body.planner-horizontal.planner-sketch .sketch-field:nth-child(-n+3)>:not(h2){margin-left:0!important}
+html body.planner-horizontal.planner-sketch .sketch-field[data-field="Dates"] .sketch-pair{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+html body.planner-horizontal.planner-sketch .studio-dashboard>h2{font-size:26px!important;margin:0 0 16px!important}
+html body.planner-horizontal.planner-sketch #studio-dashboard-content{grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:14px!important;align-items:start}
+html body.planner-horizontal .reference-preview-card{grid-column:span 6;min-width:0;margin:0}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Overview"],
+html body.planner-horizontal .preview-preparing{grid-column:1/-1}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{grid-column:span 8}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{grid-column:span 4}
+html body.planner-horizontal .overview-input-details{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px 20px}
+html body.planner-horizontal .purpose-multiselect{min-width:0}
+html body.planner-horizontal .purpose-multiselect summary{min-height:40px;box-sizing:border-box}
+@media(max-width:1100px){
+html body.planner-horizontal.planner-sketch .sketch-field[data-field]{grid-column:span 6!important}
+html body.planner-horizontal .reference-preview-card[data-preview-section]{grid-column:1/-1}
+}
+@media(max-width:600px){
+html body.planner-horizontal.planner-sketch .sketch-field[data-field]{grid-column:1/-1!important}
+html body.planner-horizontal.planner-sketch .studio-setup,html body.planner-horizontal.planner-sketch .studio-dashboard{padding:16px!important}
+}

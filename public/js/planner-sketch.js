@@ -5,7 +5,7 @@
  if(!document.body.classList.contains('planner-sketch'))return;
  const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;};
  const fields=el('div',null,'sketch-fields');
- const title=el('h1','Plan Your Trip');form.prepend(title,fields);
+ const title=el('h1','Plan Your Trip');title.hidden=true;document.body.classList.add('planner-horizontal');form.prepend(title,fields);
  function group(label){const n=el('section',null,'sketch-field');n.dataset.field=label;n.append(el('h2',label));fields.append(n);return n;}
  function control(id,label){const n=el('div',null,'sketch-control'),l=el('label',label);l.htmlFor=id;const input=$(id);n.append(l,input.closest('.traveller-stepper')||input);return n;}
  const type=group('Trip Type');type.append(form.querySelector('.trip-type-control'));type.querySelector('legend')?.remove();
@@ -63,6 +63,8 @@
  const dashboard=document.querySelector('.studio-dashboard'),heading=el('h2','Live Preview');dashboard.prepend(heading);$('studio-save').textContent='Let’s see planning →';form.append($('studio-save'),$('studio-save-status'));$('global-place-search').placeholder='Search or enter places you want to visit';
  const symbols={'Trip Type':'⌖',Location:'⌖',Dates:'▣',Travelers:'♟',Pets:'♧',Nationality:'◎','Entry Mode':'▤','Expected Budget':'▰','Travel Purpose':'▣','Must-have Places':'★','Itinerary Preferences':'☷'};fields.querySelectorAll('.sketch-field').forEach(n=>{const icon=el('span',symbols[n.dataset.field],'field-icon');icon.setAttribute('aria-hidden','true');n.querySelector('h2').prepend(icon);});
  const icon=window.PackSwiftWorkspace.icon;fields.querySelectorAll('.field-icon').forEach((n,index)=>n.replaceChildren(icon(['pin','pin','calendar','people','pet','globe','car','wallet','bag','wallet','pin','sliders'][index])));entryButtons.querySelectorAll('button').forEach(b=>b.prepend(icon({air:'plane',land:'car',train:'train'}[b.dataset.mode])));petOptions.querySelectorAll('button').forEach(b=>{if(b.dataset.pet)b.prepend(icon('pet'));});
+ for(const section of [pets,nationality,entry,budget,prefs]){section.hidden=true;section.querySelectorAll('[required]').forEach(control=>control.required=false);}
+ $('studio-save').hidden=true;
  const calendarAPI=window.PackSwiftDateCalendar;
  if(calendarAPI){const calendarPanel=el('div',null,'sketch-calendar-panel');calendarPanel.hidden=true;calendarPanel.append(calendarAPI.element);dates.append(calendarPanel);let trigger;
  const close=el('button','Done','calendar-done');close.type='button';close.onclick=()=>{calendarPanel.hidden=true;trigger?.focus();};calendarPanel.append(close);
