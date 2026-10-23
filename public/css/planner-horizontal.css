@@ -84,6 +84,15 @@ html body.planner-horizontal .sketch-field:has(.sketch-calendar-panel:not([hidde
 @media(max-width:650px){html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-fields{grid-template-columns:minmax(0,1fr)!important}}
 
 /* Consistent preview panel dimensions, with content determining row height. */
+.planner-horizontal .booking-live-results:not(.local-directions){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
+.planner-horizontal .booking-live-results:not(.local-directions)>small{grid-column:1/-1}
+html body.planner-horizontal .booking-live-results>.booking-option-panel{align-self:stretch!important;display:flex;flex-direction:column;padding:16px}
+.planner-horizontal .booking-option-controls{display:flex;flex-direction:column;gap:10px;flex:1}
+.planner-horizontal .booking-option-controls>.booking-search-link{margin-top:auto;align-self:stretch;min-height:40px}
+.planner-horizontal .booking-option-controls select{width:135px;max-width:50%;min-height:40px;border:1px solid #cdd8d4;border-radius:8px;background:#fffcf7;font:14px Inter,Arial,sans-serif;padding:8px}
+.planner-horizontal .booking-option-panel>[role=status]:empty{display:none}
+.planner-horizontal .booking-option-panel h3{margin:0 0 14px}
+@media(max-width:600px){.planner-horizontal .booking-live-results:not(.local-directions){grid-template-columns:minmax(0,1fr)!important}}
 html body.planner-horizontal .itinerary-suggestion-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px;align-items:stretch}
 html body.planner-horizontal .itinerary-suggestion-grid .booking-result{position:relative;display:flex;flex-direction:column;gap:7px;padding:12px;margin:0;min-width:0;border-radius:12px}
 html body.planner-horizontal .itinerary-suggestion-grid .booking-result[hidden]{display:none!important}
