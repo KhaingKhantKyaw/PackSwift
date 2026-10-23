@@ -34,7 +34,9 @@
   for(const category of categories){
    if(category==='Children & Family'&&!Number(input.children)&&!items.some(x=>x.category===category))continue;
    const section=el('details');section.dataset.category=category;section.open=open.has(category)||(first&&['Documents & Money','Clothing'].includes(category));
-   const entries=items.filter(x=>x.category===category);section.append(el('summary',category+' · '+entries.filter(x=>x.packed).length+'/'+entries.length));
+   const entries=items.filter(x=>x.category===category),summary=el('summary'),icon=el('span');icon.className='packing-category-icon';icon.setAttribute('aria-hidden','true');
+   const symbols={'Documents & Money':'wallet','Daily Essentials':'bag','Clothing':'bag','Footwear':'map','Toiletries':'bag','Beauty & Personal Care':'pet','Health & Medication':'people','Electronics':'sliders','Weather Protection':'globe','Activity Gear':'map','Travel Comfort':'plane','Children & Family':'people','My Items':'bag'};
+   icon.append(window.PackSwiftWorkspace.icon(symbols[category]||'bag'));summary.append(icon,el('span',category),el('small',entries.filter(x=>x.packed).length+'/'+entries.length));section.append(summary);
    for(const item of entries){
     const row=el('div');row.className='packing-item';const check=el('input');check.type='checkbox';check.checked=!!item.packed;check.setAttribute('aria-label','Packed '+item.name);
     const name=el('input');name.type='text';name.value=item.name;name.maxLength=100;name.setAttribute('aria-label','Item name: '+item.name);

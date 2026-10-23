@@ -1,4 +1,38 @@
 /* Horizontal layout reuses the existing form and preview controllers. */
+/* Page-scoped color and type system; layout and interaction rules stay intact. */
+body.planner-horizontal{--plan-teal:#087c78;--plan-blue:#2868aa;--plan-purple:#7750a2;--plan-amber:#996013}
+html body.planner-horizontal .sketch-field[data-field]{border-top:3px solid var(--field-accent,#087c78)!important}
+html body.planner-horizontal .sketch-field[data-field="Trip Type"]{--field-accent:#087c78}
+html body.planner-horizontal .sketch-field[data-field="Location"]{--field-accent:#7750a2}
+html body.planner-horizontal .sketch-field[data-field="Dates"]{--field-accent:#b07120}
+html body.planner-horizontal .sketch-field[data-field="Travelers"]{--field-accent:#2868aa}
+html body.planner-horizontal .sketch-field[data-field="Travel Purpose"]{--field-accent:#a54f64}
+html body.planner-horizontal .sketch-field[data-field="Travel Style"]{--field-accent:#087c78}
+html body.planner-horizontal .sketch-field .field-icon{color:var(--field-accent)!important}
+html body.planner-horizontal .reference-preview-card[data-preview-section]{--section-accent:#087c78;border-top:3px solid var(--section-accent)}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"]{--section-accent:#2868aa}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Transportation"]{--section-accent:#7750a2}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{--section-accent:#087c78}
+html body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{--section-accent:#996013}
+html body.planner-horizontal .reference-preview-card .preview-icon{background:var(--section-accent)!important;color:#fff}
+html body.planner-horizontal #studio-dashboard-content .reference-preview-card>summary{font-size:16px!important;font-weight:700!important;letter-spacing:.1px}
+html body.planner-horizontal .overview-input-details dd{font-weight:650;color:#164d4c;line-height:1.5}
+html body.planner-horizontal .overview-input-details dt{font-size:11px;letter-spacing:.035em;color:#536d6a}
+html body.planner-horizontal .reference-preview-content h3{color:#173f46;font-size:18px;line-height:1.4}
+html body.planner-horizontal .reference-preview-content :is(input,select){font-family:Inter,Arial,sans-serif!important;color:#183e43}
+html body.planner-horizontal .reference-preview-content button{font-family:Inter,Arial,sans-serif!important;font-weight:600}
+html body.planner-horizontal .booking-search-link,html body.planner-horizontal .add-itinerary-place{background:#e2f3ee;color:#066b66;border-color:#76b9aa}
+html body.planner-horizontal .booking-search-link:hover,html body.planner-horizontal .add-itinerary-place:hover{background:#ccebe1}
+html body.planner-horizontal :is(button,a,input,select,summary):focus-visible{outline:3px solid #2c8dba;outline-offset:3px}
+.planner-horizontal .packing-checklist>details{background:#fffdf9}
+.planner-horizontal .packing-checklist>details[open]{border-color:#d6b980;background:#fffaf0}
+.planner-horizontal .packing-checklist>details>summary{display:flex;align-items:center;gap:9px;list-style:none;color:#544326}
+.planner-horizontal .packing-checklist>details>summary small{margin-left:auto;font:600 12px Inter,Arial,sans-serif!important;padding:3px 8px;border-radius:20px;background:#f2e6cb;color:#70501c}
+.packing-category-icon{display:inline-flex;width:27px;height:27px;padding:5px;box-sizing:border-box;flex:none;border-radius:7px;background:#f3e8d0;color:#8a5d1e}
+.packing-category-icon svg{width:100%;height:100%}
+.planner-horizontal .packing-item:has(input[type=checkbox]:checked){opacity:.65}
+.planner-horizontal .packing-item:has(input[type=checkbox]:checked) input[type=text]{text-decoration:line-through}
+.planner-horizontal .preview-drilldown>section{padding:10px 12px;margin:8px 0;border-left:3px solid #67b7a7;background:#f0f7f3;border-radius:0 8px 8px 0}
 html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .studio-columns{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
 html body.planner-horizontal.planner-sketch .studio-setup,
 html body.planner-horizontal.planner-sketch .studio-dashboard{position:relative!important;top:auto!important;width:100%!important;max-width:none!important;max-height:none!important;overflow:visible!important;box-sizing:border-box;padding:20px!important}
