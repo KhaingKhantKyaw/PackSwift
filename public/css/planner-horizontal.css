@@ -84,6 +84,17 @@ html body.planner-horizontal .sketch-field:has(.sketch-calendar-panel:not([hidde
 @media(max-width:650px){html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-fields{grid-template-columns:minmax(0,1fr)!important}}
 
 /* Consistent preview panel dimensions, with content determining row height. */
+html body.planner-horizontal .reference-preview-card:is([data-preview-section="Itinerary"],[data-preview-section="Packing List"])[open]{height:640px;overflow:hidden}
+html body.planner-horizontal .reference-preview-card:is([data-preview-section="Itinerary"],[data-preview-section="Packing List"])>.reference-preview-content{height:calc(100% - 52px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:8px;box-sizing:border-box}
+.packing-checklist>details{border:1px solid #dce5e0;border-radius:10px;margin:10px 0;padding:12px}
+.packing-checklist>details>summary{font:600 14px Inter,Arial,sans-serif;cursor:pointer}
+.packing-item{display:grid;grid-template-columns:20px minmax(0,1fr) 55px 30px;gap:6px;align-items:center;margin-top:9px}
+html body.planner-horizontal .packing-item input{width:100%;min-width:0;box-sizing:border-box;font:13px Inter,Arial,sans-serif;padding:7px;border:1px solid #dce5e0;border-radius:7px;background:#fffcf7}
+html body.planner-horizontal .packing-item input[type=checkbox]{min-height:18px;height:18px;width:18px;accent-color:#087d79}
+.packing-item button{padding:4px;min-height:32px;border:0;background:transparent;color:#8c4940}
+.packing-add{display:flex;gap:6px;margin-top:10px}
+.packing-add input{min-width:0;flex:1;width:100%}
+.packing-add button{padding:6px 12px}
 .planner-horizontal .booking-live-results:not(.local-directions){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
 .planner-horizontal .booking-live-results:not(.local-directions)>small{grid-column:1/-1}
 html body.planner-horizontal .booking-live-results>.booking-option-panel{align-self:stretch!important;display:flex;flex-direction:column;padding:16px}
