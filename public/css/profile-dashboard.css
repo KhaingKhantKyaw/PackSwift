@@ -34,3 +34,8 @@ html body[data-page="profile"] .profile-shell{font-family:Arial,sans-serif}
 .profile-edit-dialog .save-primary{background:#075e60;color:white}.profile-edit-dialog button:disabled{opacity:.6;cursor:wait}
 .profile-edit-dialog :focus-visible{outline:3px solid #138e91;outline-offset:2px}
 .profile-edit-dialog .profile-expand[open] label{margin-top:12px}
+.identity-actions{margin-left:auto;display:flex;align-items:center;gap:12px}
+html body[data-page="profile"] .profile-trips-button{display:inline-flex;align-items:center;justify-content:center;gap:18px;min-height:44px;box-sizing:border-box;padding:11px 22px;border-radius:10px;background:#075e60!important;color:#fff!important;text-decoration:none!important;font-weight:700;box-shadow:0 4px 12px #075e6020}
+html body[data-page="profile"] .profile-trips-button:hover{background:#084b4c!important}
+.profile-save-bar{justify-content:flex-end}
+@media(max-width:520px){.identity-actions{width:100%;margin-left:0}.identity-actions>*{flex:1}.identity-actions #edit-profile{margin-left:0}}
