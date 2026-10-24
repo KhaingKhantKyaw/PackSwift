@@ -72,8 +72,7 @@ const mainNavigation = `
   <a class="nav-link" data-nav="home" href="/">Home</a>
   <a class="nav-link" data-nav="explore" href="/explore">Explore</a>
   <a class="nav-link" data-nav="planner" href="/trip-planner">Plan Trip</a>
-  <a class="nav-link" data-nav="help" href="/help">Help</a>
-  <a class="nav-link" data-nav="trips" data-auth="user" hidden href="/trips">My Trips</a>`;
+  <a class="nav-link" data-nav="help" href="/help">Help</a>`;
 
 // One runtime component replaces legacy page shells. Unique classes isolate its
 // geometry from the retired .site-header/.slider-header page overrides.
@@ -135,9 +134,11 @@ for (const footer of document.querySelectorAll(".footer-inner")) {
   if (footer.querySelector('a[href="/packing-list"]')) continue;
   const links = document.createElement("span");
   links.className = "footer-quick-links";
-  links.innerHTML = '<a href="/packing-list">Packing List</a> · <a href="/my-trips">My Trips</a>';
+  links.innerHTML = '<a href="/packing-list">Packing List</a>';
   footer.append(links);
 }
+// Saved trips are reached through the account profile, not global navigation.
+document.querySelectorAll('.footer-inner a[href="/trips"], .footer-inner a[href="/my-trips"]').forEach(link=>link.remove());
 
 async function api(path, options = {}) {
   const headers = new Headers(options.headers || {});

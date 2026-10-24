@@ -9,6 +9,7 @@ import { apiRouter } from "./src/routes/api.js";
 import { pageRouter } from "./src/routes/pages.js";
 import { requireSameOrigin } from "./src/middleware/same-origin.js";
 import { preserveRequestIp } from "./src/middleware/request-ip.js";
+import { optionalAuth } from "./src/middleware/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDirectory = path.join(__dirname, "public");
@@ -44,6 +45,15 @@ app.use(cookieParser());
 app.use(express.json({ limit: "128kb", type: "application/json" }));
 app.use(express.urlencoded({ extended: false, limit: "128kb" }));
 app.use(requireSameOrigin);
+// Run before static serving so .html URLs cannot bypass the account gate.
+app.use((request, response, next) => {
+  if (!/^\/(?:trips(?:\/|$)|my-trips(?:\.html)?\/?$|saved-trip-workspace(?:\.html)?\/?$|profile(?:\.html)?\/?$)/i.test(request.path)) return next();
+  response.set("Cache-Control", "no-store");
+  optionalAuth(request, response, () => {
+    if (!request.auth) return response.redirect(302, "/login?redirect=" + encodeURIComponent(request.originalUrl));
+    next();
+  });
+});
 app.use(
   express.static(publicDirectory, {
     extensions: ["html"],
