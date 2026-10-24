@@ -150,6 +150,26 @@ html body.planner-horizontal .booking-live-results>.booking-option-panel{align-s
 .planner-horizontal .booking-results-scroll .booking-result>small{display:block;font-size:12px;line-height:1.5;color:var(--planning-muted)}
 html body.planner-horizontal .booking-result .booking-result-action{display:block;box-sizing:border-box;width:100%;margin-top:8px;padding:12px;border:1px solid var(--planning-line);border-radius:9px;background:var(--planning-action);color:var(--planning-action-text)!important;text-decoration:none;font:600 14px/1.5 Arial,sans-serif;text-align:center;overflow-wrap:anywhere}
 .planner-horizontal .booking-result-action:hover{filter:brightness(.95)}
+/* One balanced booking workspace, with compact summaries and independent lists. */
+html body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"] .reference-preview-content{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+html body.planner-horizontal .reference-preview-content .reference-route{background:var(--planning-inset);border:1px solid var(--planning-line);border-radius:14px;min-width:0}
+html body.planner-horizontal .reference-route>.flight-banner,html body.planner-horizontal .reference-route>.route-illustration{display:none}
+html body.planner-horizontal .reference-route>div:last-child,html body.planner-horizontal .stay-search-preview{display:flex;flex-direction:column;gap:0;padding:16px;background:var(--planning-inset);color:var(--planning-text);border-radius:14px;min-width:0}
+html body.planner-horizontal .booking-card-summary{display:flex;flex-direction:column;gap:6px;min-height:190px;font-size:14px;line-height:1.5}
+html body.planner-horizontal .booking-card-summary>strong:first-child{font-size:18px;font-weight:700}
+html body.planner-horizontal .booking-card-summary>small{display:block;font-size:13px;line-height:1.5;color:var(--planning-muted)}
+html body.planner-horizontal .booking-card-summary>.booking-search-link{margin:8px 0 0;padding:6px 0;background:transparent;border:0;border-radius:0;font-size:13px;text-align:left;color:var(--planning-action-text)!important;text-decoration:underline;text-underline-offset:3px}
+html body.planner-horizontal .booking-embedded{margin-top:8px}
+html body.planner-horizontal .booking-embedded .booking-option-header{display:flex!important;min-height:64px;height:64px;margin:0 0 10px}
+html body.planner-horizontal .booking-stay-filter label{white-space:normal}
+html body.planner-horizontal .booking-embedded .booking-option-controls>.booking-search-link{font-size:14px;min-height:44px;padding:10px 12px}
+html body.planner-horizontal .booking-results-scroll{height:420px;padding-right:6px;margin-top:14px}
+html body.planner-horizontal .booking-results-scroll>.booking-result{padding:14px;margin:10px 0;border-radius:12px;gap:8px;font-size:14px;line-height:1.5}
+html body.planner-horizontal .booking-results-scroll>.booking-result>strong{font-size:16px;font-weight:700}
+html body.planner-horizontal .booking-results-scroll>.booking-result>p{font-size:13px;line-height:1.6}
+html body.planner-horizontal .booking-results-scroll>small{display:block;font-size:11px;color:var(--planning-muted);line-height:1.5}
+html body.planner-horizontal .booking-result .booking-result-action{font-size:13px;min-height:44px;padding:10px}
+@media(max-width:700px){html body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"] .reference-preview-content{grid-template-columns:1fr}html body.planner-horizontal .booking-card-summary{min-height:0}html body.planner-horizontal .booking-embedded .booking-option-header:empty{display:none!important}html body.planner-horizontal .booking-results-scroll{height:340px}}
 .planner-horizontal .booking-option-controls label{display:grid!important;gap:6px!important}
 .planner-horizontal .booking-option-header{display:flex;align-items:center;gap:12px;height:64px;min-height:64px;margin-bottom:12px}
 html body.planner-horizontal .booking-option-header h3{flex-shrink:0;margin:0!important}
