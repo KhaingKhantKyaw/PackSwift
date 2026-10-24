@@ -1,8 +1,8 @@
 (() => {
- const states=new Map();
+ const states=new Map();let stayNear='';
  const el=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=text;return n;};
  window.PackSwiftBookingPreview={mount(root,input){
-  const payload=Object.fromEntries(['origin','destination','startDate','endDate','adults','children','currency'].map(k=>[k,input[k]]));
+  const payload=Object.fromEntries(['origin','destination','startDate','endDate','adults','children','currency','travelStyle'].map(k=>[k,input[k]]));
   const key=JSON.stringify(payload);if(!states.has(key)){if(states.size>20)states.delete(states.keys().next().value);states.set(key,{ages:[]});}const state=states.get(key);
   const area=el('section');area.className='booking-live-results';root.append(area);
   const draw=()=>{area.replaceChildren();area.append(el('small','Search on demand · cached up to 10 minutes. Confirm final prices and availability with the provider.'));
@@ -10,8 +10,14 @@
     if(kind==='flights'&&(input.entryMode!=='air'||input.tripType==='local'))continue;
     const group=el('section');group.className='booking-option-panel';const controls=el('div');controls.className='booking-option-controls';group.append(el('h3',kind==='flights'?'Flight options':'Stay options'));area.append(group);group.append(controls);
     try{state.ages=JSON.parse(document.getElementById('traveler-child-ages')?.value||'[]');}catch{state.ages=[];}
+    const budget=/pocket|budget/i.test(input.travelStyle||''),comfort=/comfort|luxury|full/i.test(input.travelStyle||'');
+    controls.append(el('small',budget?'Lowest prices first':kind==='flights'?(/comfort|luxury/i.test(input.travelStyle||'')?'Shorter journeys first · compare fares':'Recommended flights · compare price and journey time'):(comfort?'Highest-rated stays first':'Recommended stays')));
+    if(kind==='hotels'){
+     const label=el('label','I would like to stay near (optional)'),field=el('input'),list=el('datalist'),hint=el('small');field.type='text';field.maxLength=250;field.placeholder='Search a landmark, beach or area';field.value=stayNear;list.id='stay-near-suggestions';field.setAttribute('list',list.id);label.append(field,list);controls.append(label,hint);let timer,sequence=0;
+     field.oninput=()=>{stayNear=field.value;delete state.hotels;const version=++sequence;clearTimeout(timer);list.replaceChildren();hint.textContent='';if(stayNear.trim().length<2)return;timer=setTimeout(async()=>{try{const r=await fetch('/api/places/transport-autocomplete?'+new URLSearchParams({q:stayNear,destination:input.destination}));if(!r.ok)throw Error();const places=await r.json();if(version!==sequence||!field.isConnected)return;for(const p of places)list.append(new Option(p.name,[p.name,p.address].filter(Boolean).join(', ')));hint.textContent='Suggestions by Google Maps. Confirm property location before booking.';}catch{if(version===sequence)hint.textContent='Enter a place or address to search nearby stays.';}},350);};
+    }
     const record=state[kind],b=el('button',record?.loading?'Searching…':`Search ${kind==='flights'?'flights':'stays'}`);b.type='button';b.className='booking-search-link';b.disabled=Boolean(record?.loading)||!input.destination||!input.startDate||!input.endDate;
-    b.onclick=async()=>{state[kind]={loading:true};draw();try{const response=await fetch('/api/booking-search/'+kind,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,childAges:state.ages})});if(!(response.headers.get('content-type')||'').includes('application/json'))throw new Error('Booking search is not available on this server yet. Restart PackSwift and refresh this page.');const data=await response.json();if(!response.ok)throw new Error(data.error||'Search unavailable.');state[kind]={data};}catch(e){state[kind]={error:e.message||'Search unavailable. Please try again.'};}state.draw();};controls.append(b);
+    b.onclick=async()=>{state[kind]={loading:true};draw();try{const response=await fetch('/api/booking-search/'+kind,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,stayNear:kind==='hotels'?stayNear:undefined,childAges:state.ages})});if(!(response.headers.get('content-type')||'').includes('application/json'))throw new Error('Booking search is not available on this server yet. Restart PackSwift and refresh this page.');const data=await response.json();if(!response.ok)throw new Error(data.error||'Search unavailable.');state[kind]={data};}catch(e){state[kind]={error:e.message||'Search unavailable. Please try again.'};}state.draw();};controls.append(b);
     const results=el('div');results.className='booking-results-scroll';results.tabIndex=0;results.setAttribute('role','region');results.setAttribute('aria-label',kind==='flights'?'Flight search results':'Stay search results');group.append(results);
     const status=el('p',record?.loading?'Looking for options…':record?.error||'');status.setAttribute('role','status');results.append(status);
     if(record?.data){const data=record.data;group.append(el('small',`${data.source} · ${new Date(data.searchedAt).toLocaleTimeString()}${data.cached?' · cached':''}`));if(!data.items.length)group.append(el('p','No options found. Try other dates or the external search.'));

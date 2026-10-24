@@ -13,12 +13,16 @@ export function parameters(kind,input){
  const currency=String(input.currency||'USD');if(!/^[A-Z]{3}$/.test(currency))throw fail('Choose a valid currency.');
  const p={engine:kind==='flights'?'google_flights':'google_hotels',hl:'en',currency,adults,children};
  if(kind==='flights'){
-  const code=name=>cities.find(c=>c.name.toLowerCase()===String(name||'').trim().toLowerCase())?.code;
+  const code=name=>{const value=String(name||'').trim().toLowerCase();return cities.find(c=>[c.name,`${c.name}, ${c.country}`,c.code].some(v=>v.toLowerCase()===value))?.code;};
   const from=code(input.origin),to=code(input.destination);
   if(!from||!to||from===to)throw fail('Choose two different cities from the suggestions for flight search.');
   Object.assign(p,{departure_id:from,arrival_id:to,outbound_date:startDate,return_date:endDate,type:1});
+  p.sort_by=/pocket|budget/i.test(input.travelStyle||'')?2:/comfort|luxury/i.test(input.travelStyle||'')?5:1;
  }else{
   Object.assign(p,{q:input.destination.trim()+' hotels',check_in_date:startDate,check_out_date:endDate});
+  if(input.stayNear){if(typeof input.stayNear!=='string'||input.stayNear.length>250)throw fail('Enter a place of up to 250 characters.');p.q=`Hotels near ${input.stayNear.trim()} in ${input.destination.trim()}`;}
+  if(/pocket|budget/i.test(input.travelStyle||''))p.sort_by=3;
+  else if(/comfort|luxury|full/i.test(input.travelStyle||''))p.sort_by=8;
   if(children){const ages=input.childAges;if(!Array.isArray(ages)||ages.length!==children||ages.some(a=>!Number.isInteger(a)||a<1||a>17))throw fail('Enter each child’s age (use 1 for under one year) to search stays.');p.children_ages=ages.join(',');}
  }
  return p;
@@ -36,6 +40,7 @@ export async function searchBooking(kind,input,{fetcher=fetch,key=process.env.SE
  const task=(async()=>{const url=new URL('https://serpapi.com/search.json');Object.entries({...p,api_key:key}).forEach(([k,v])=>url.searchParams.set(k,v));
   let r,data;try{r=await fetcher(url,{signal:AbortSignal.timeout(25000)});data=await r.json();}catch{throw fail('Search timed out or is unavailable. Please try again.',502);}
   if(!r.ok||data.error)throw fail(r.status===429?'Search quota reached. Please use the external links.':'Provider search is unavailable. Please check configuration or try again later.',r.status===429?429:502);
+  if(kind==='flights'&&[2,5].includes(p.sort_by)){const field=p.sort_by===2?'price':'total_duration';data.best_flights=[...(data.best_flights||[]),...(data.other_flights||[])].sort((a,b)=>(Number.isFinite(a[field])?a[field]:Infinity)-(Number.isFinite(b[field])?b[field]:Infinity));data.other_flights=[];}
   const value=normalize(kind,data,p.currency);if(cache.size>=100)cache.delete(cache.keys().next().value);cache.set(id,{value,expires:Date.now()+600000});return value;
  })();pending.set(id,task);try{return await task;}finally{pending.delete(id);}
 }
