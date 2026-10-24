@@ -136,8 +136,13 @@ html body.planner-horizontal .packing-item input[type=checkbox]{min-height:18px;
 .planner-horizontal .booking-live-results:not(.local-directions){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch}
 .planner-horizontal .booking-live-results:not(.local-directions)>small{grid-column:1/-1}
 html body.planner-horizontal .booking-live-results>.booking-option-panel{align-self:stretch!important;display:flex;flex-direction:column;padding:16px}
-.planner-horizontal .booking-option-controls{display:flex;flex-direction:column;gap:10px;flex:1}
-.planner-horizontal .booking-option-controls>.booking-search-link{margin-top:auto;align-self:stretch;min-height:40px}
+.planner-horizontal .booking-option-controls{display:flex;flex-direction:column;gap:10px;flex:0 0 auto}
+.planner-horizontal .booking-option-controls>.booking-search-link{margin-top:0!important;align-self:stretch;min-height:40px}
+.planner-horizontal .booking-results-scroll{height:360px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;margin-top:12px;min-width:0;padding-right:6px}
+.planner-horizontal .traveler-child-ages{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+.planner-horizontal .traveler-child-ages[hidden]{display:none!important}
+.planner-horizontal .traveler-child-ages label{display:grid;gap:6px;font-size:12px}
+.planner-horizontal .traveler-child-ages select{width:100%;min-width:0}
 .planner-horizontal .booking-option-controls select{width:135px;max-width:50%;min-height:40px;border:1px solid #cdd8d4;border-radius:8px;background:#fffcf7;font:14px Inter,Arial,sans-serif;padding:8px}
 .planner-horizontal .booking-option-panel>[role=status]:empty{display:none}
 .planner-horizontal .booking-option-panel h3{margin:0 0 14px}
