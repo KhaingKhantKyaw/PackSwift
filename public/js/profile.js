@@ -15,7 +15,7 @@ accountEditor.querySelector('summary').textContent='Edit email & user ID';
 for(const input of accountEditor.querySelectorAll('input'))input.setAttribute('form','profile-form');
 $('.identity-bar').append(accountEditor);
 const usernameInput=form.elements.username;
-usernameInput.parentElement.firstChild.textContent='User ID';
+usernameInput.parentElement.firstChild.textContent='Username';
 const handleControl=document.createElement('span');handleControl.className='handle-control';
 const prefix=document.createElement('span');prefix.textContent='@';prefix.setAttribute('aria-hidden','true');
 usernameInput.before(handleControl);handleControl.append(prefix,usernameInput);
@@ -76,9 +76,37 @@ $('#add-packing-item').onclick=addItem;$('#new-packing-item').onkeydown=e=>{if(e
 function updateCount(){$('#interest-count').textContent='· '+form.querySelectorAll('[name=interests]:checked').length+' selected';}
 form.addEventListener('change',updateCount);
 function identity(user){$('#profile-name').textContent=user.fullName;$('#profile-user-id').textContent='@'+user.username;renderPhoto(saved.picture);}
-$('#edit-profile').onclick=()=>{accountEditor.open=!accountEditor.open;if(accountEditor.open)form.elements.username.focus();};
+accountEditor.hidden=true;
+$('#password-form').closest('details').remove();
+const editDialog=document.createElement('dialog');editDialog.className='profile-edit-dialog';editDialog.setAttribute('aria-labelledby','edit-dialog-title');
+editDialog.innerHTML='<div class="dialog-heading"><h2 id="edit-dialog-title">Edit profile</h2><button type="button" data-close aria-label="Close edit profile">×</button></div><form id="account-dialog-form"><label>Username<span class="handle-control"><span aria-hidden="true">@</span><input name="username" required minlength="3" maxlength="50" pattern="[A-Za-z0-9]+" autocomplete="username"></span></label><small>3–50 letters and numbers only.</small><label>Email<input name="email" type="email" required maxlength="255" autocomplete="email"></label><details class="profile-expand"><summary>Change password (optional)</summary><label>Current password<input name="currentPassword" type="password" maxlength="128" autocomplete="current-password"></label><label>New password<input name="newPassword" type="password" minlength="10" maxlength="128" autocomplete="new-password"></label><label>Confirm new password<input name="confirmPassword" type="password" autocomplete="new-password"></label><small>Use uppercase, lowercase, a number and a symbol.</small></details><p id="dialog-feedback" role="status"></p><div class="dialog-actions"><button type="button" data-close>Cancel</button><button type="submit" class="save-primary">Save changes</button></div></form>';
+document.body.append(editDialog);
+const dialogForm=editDialog.querySelector('form');
+let accountBusy=false;
+const closeEditor=()=>{if(!accountBusy){editDialog.close();dialogForm.reset();$('#edit-profile').focus();}};
+editDialog.querySelectorAll('[data-close]').forEach(b=>b.onclick=closeEditor);
+editDialog.addEventListener('cancel',e=>{if(accountBusy)e.preventDefault();});
+editDialog.addEventListener('close',()=>dialogForm.reset());
+$('#edit-profile').onclick=()=>{dialogForm.reset();dialogForm.elements.username.value=form.elements.username.value;dialogForm.elements.email.value=form.elements.email.value;$('#dialog-feedback').textContent='';editDialog.showModal();dialogForm.elements.username.focus();};
+dialogForm.onsubmit=async e=>{
+  e.preventDefault();if(accountBusy)return;
+  const feedback=$('#dialog-feedback'),values=Object.fromEntries(new FormData(dialogForm));
+  if(values.newPassword!==values.confirmPassword){feedback.textContent='New passwords do not match.';return;}
+  if(values.newPassword&&!values.currentPassword){feedback.textContent='Enter your current password.';return;}
+  if(values.currentPassword&&!values.newPassword){feedback.textContent='Enter a new password, or clear the current password field.';return;}
+  const payload={fullName:$('#profile-name').textContent,username:values.username.trim(),email:values.email.trim()};
+  if(values.newPassword){payload.currentPassword=values.currentPassword;payload.newPassword=values.newPassword;}
+  accountBusy=true;dialogForm.querySelectorAll('button').forEach(b=>b.disabled=true);feedback.textContent='Saving…';
+  try{
+    const result=await window.PackSwift.api('/api/auth/settings',{method:'PUT',body:JSON.stringify(payload)});
+    window.PackSwift.setCurrentUser(result.user);identity(result.user);
+    for(const n of ['username','email'])form.elements[n].value=result.user[n];
+    feedback.textContent='Changes saved.';$('#save-feedback').textContent='Account changes saved.';
+    accountBusy=false;closeEditor();
+  }catch(error){feedback.textContent=error.message;}
+  finally{accountBusy=false;dialogForm.querySelectorAll('button').forEach(b=>b.disabled=false);}
+};
 async function load(){try{const user=await window.PackSwift.authReady;if(!user){$('#profile-status').hidden=true;$('#profile-guest').hidden=false;return;}const result=await window.PackSwift.api('/api/profile/preferences');saved=result.preferences||{};identity(user);for(const n of ['fullName','username','email'])form.elements[n].value=user[n]||'';for(const n of fields)form.elements[n].value=saved[n]||'';for(const input of form.querySelectorAll('[name=interests]'))input.checked=(saved.interests||[]).includes(input.value);items=[...(saved.packingItems||[])];renderItems();updateCount();$('#profile-content').hidden=false;$('#profile-status').hidden=true;}catch(e){$('#profile-status').textContent='Unable to load profile: '+e.message;}}
 form.onsubmit=async e=>{e.preventDefault();const feedback=$('#save-feedback'),button=form.querySelector('[type=submit]');button.disabled=true;feedback.textContent='Saving…';try{const account=Object.fromEntries(['fullName','username','email'].map(n=>[n,form.elements[n].value.trim()]));const result=await window.PackSwift.api('/api/auth/settings',{method:'PUT',body:JSON.stringify(account)});window.PackSwift.setCurrentUser(result.user);identity(result.user);const preferences=Object.fromEntries(fields.map(n=>[n,form.elements[n].value.trim()]));preferences.interests=[...form.querySelectorAll('[name=interests]:checked')].map(x=>x.value);preferences.packingItems=items;await window.PackSwift.api('/api/profile/preferences',{method:'PUT',body:JSON.stringify(preferences)});saved={...saved,...preferences};feedback.textContent='Profile and preferences saved.';}catch(error){feedback.textContent='Some changes may not be saved. '+error.message;}finally{button.disabled=false;}};
-$('#password-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,b=f.querySelector('button');b.disabled=true;try{await window.PackSwift.api('/api/auth/password',{method:'PUT',body:JSON.stringify(Object.fromEntries(new FormData(f)))});f.reset();$('#password-feedback').textContent='Password updated.';}catch(error){$('#password-feedback').textContent=error.message;}finally{b.disabled=false;}};
 $('#export-profile').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(saved,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='packswift-preferences.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 load();

@@ -159,10 +159,22 @@ authRouter.put(
   requireAuth,
   requireDatabase,
   accountValidators,
+  body("newPassword").optional().isLength({min:10,max:128}).matches(/[a-z]/).matches(/[A-Z]/).matches(/[0-9]/).matches(/[^A-Za-z0-9]/).withMessage("Use 10+ characters with uppercase, lowercase, a number and a symbol."),
+  body("currentPassword").optional().isString().isLength({min:1,max:128}),
   validateRequest,
   async (request, response, next) => {
     try {
+      let passwordHash = null;
+      if (request.body.newPassword) {
+        const current = await findUserById(request.auth.userId);
+        const credentials = current && await findUserForLogin(current.username);
+        if (!credentials || typeof request.body.currentPassword !== "string" || !(await bcrypt.compare(request.body.currentPassword, credentials.password_hash))) {
+          return response.status(401).json({error:"Current password is incorrect. No changes were saved."});
+        }
+        passwordHash = await bcrypt.hash(request.body.newPassword, 12);
+      }
       const user = await updateUser(request.auth.userId, {
+        passwordHash,
         fullName: cleanText(request.body.fullName, 100),
         username: cleanText(request.body.username, 50).toLowerCase(),
         email: request.body.email.toLowerCase(),

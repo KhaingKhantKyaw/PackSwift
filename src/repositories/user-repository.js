@@ -34,13 +34,13 @@ export async function findUserById(userId) {
   return rows[0] ?? null;
 }
 
-export async function updateUser(userId, { fullName, username, email }) {
+export async function updateUser(userId, { fullName, username, email, passwordHash = null }) {
   const pool = getDatabasePool();
   await pool.execute(
     `UPDATE users
-     SET full_name = ?, username = ?, email = ?
+     SET full_name = ?, username = ?, email = ?, password_hash = COALESCE(?, password_hash)
      WHERE id = ?`,
-    [fullName, username, email, userId],
+    [fullName, username, email, passwordHash, userId],
   );
   return findUserById(userId);
 }

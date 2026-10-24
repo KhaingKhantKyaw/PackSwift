@@ -22,3 +22,15 @@ html body[data-page="profile"] .profile-shell{font-family:Arial,sans-serif}
 .handle-control{display:flex;align-items:center;gap:0;border:1px solid #cbdad5;border-radius:9px;background:#fffefa}
 .handle-control>span{padding-left:12px;color:#087e80;font-weight:bold}
 .profile-shell .handle-control input{border:0;background:transparent}
+.profile-edit-dialog{width:min(460px,calc(100vw - 32px));max-height:85vh;overflow:auto;box-sizing:border-box;border:1px solid #cbdad5;border-radius:20px;padding:26px;background:#fffdf8;color:#123b3d;box-shadow:0 20px 80px #062d3340}
+.profile-edit-dialog::backdrop{background:#062d3380;backdrop-filter:blur(4px)}
+.dialog-heading,.dialog-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dialog-heading h2{margin:0;font-size:26px!important}.dialog-heading{margin-bottom:20px}
+.profile-edit-dialog form,.profile-edit-dialog label{display:flex;flex-direction:column;gap:10px}
+.profile-edit-dialog form{gap:16px}.profile-edit-dialog label{font-size:14px}
+.profile-edit-dialog input{width:100%;height:44px;box-sizing:border-box;border:1px solid #cbdad5;border-radius:9px;padding:0 12px;background:#fffefa;color:#123b3d;font-size:15px}
+.profile-edit-dialog .handle-control input{border:0}.profile-edit-dialog small{color:#627475;font-size:12px}
+.profile-edit-dialog button{cursor:pointer;min-height:42px;padding:10px 18px;border:1px solid #88bcb5;border-radius:10px;background:#e1f3ec;color:#075c5d}
+.profile-edit-dialog .save-primary{background:#075e60;color:white}.profile-edit-dialog button:disabled{opacity:.6;cursor:wait}
+.profile-edit-dialog :focus-visible{outline:3px solid #138e91;outline-offset:2px}
+.profile-edit-dialog .profile-expand[open] label{margin-top:12px}
