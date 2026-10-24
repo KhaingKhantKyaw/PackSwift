@@ -28,8 +28,21 @@ profileRouter.put("/preferences", requireAuth, requireDatabase, async (request, 
       if (!Array.isArray(values) || values.length > 50 || values.some(v=>typeof v !== "string" || v.length > 100)) return response.status(400).json({error:"Invalid " + key});
       preferences[key] = [...new Set(values.map(v=>v.trim()).filter(Boolean))];
     }
-    await getDatabasePool().execute("INSERT INTO user_profile_preferences (user_id, preferences) VALUES (?, ?) ON DUPLICATE KEY UPDATE preferences = VALUES(preferences)", [request.auth.userId, JSON.stringify(preferences)]);
+    await getDatabasePool().execute("INSERT INTO user_profile_preferences (user_id, preferences) VALUES (?, ?) ON DUPLICATE KEY UPDATE preferences = JSON_MERGE_PATCH(preferences, VALUES(preferences))", [request.auth.userId, JSON.stringify(preferences)]);
     response.json({preferences});
+  } catch (error) { next(error); }
+});
+
+profileRouter.put("/picture", requireAuth, requireDatabase, async (request, response, next) => {
+  try {
+    const picture = request.body?.picture;
+    if (picture !== null) {
+      if (typeof picture !== "string" || picture.length > 100000 || !/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(picture)) return response.status(422).json({error:"Choose a JPG, PNG or WebP photo under 5 MB."});
+      const bytes = Buffer.from(picture.split(",")[1], "base64");
+      if (bytes.length < 4 || bytes[0] !== 255 || bytes[1] !== 216 || bytes.at(-2) !== 255 || bytes.at(-1) !== 217) return response.status(422).json({error:"Invalid profile photo."});
+    }
+    await getDatabasePool().execute("INSERT INTO user_profile_preferences (user_id, preferences) VALUES (?, ?) ON DUPLICATE KEY UPDATE preferences = JSON_SET(preferences, '$.picture', ?)", [request.auth.userId, JSON.stringify({picture}), picture]);
+    response.json({picture});
   } catch (error) { next(error); }
 });
 

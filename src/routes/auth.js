@@ -9,6 +9,7 @@ import { requireDatabase } from "../middleware/database.js";
 import { validateRequest } from "../middleware/validate.js";
 import {
   createUser,
+  accountConflict,
   findUserById,
   findUserForLogin,
   updatePassword,
@@ -94,7 +95,7 @@ authRouter.post(
       response.status(201).json({ user: publicUser(user) });
     } catch (error) {
       if (error?.code === "ER_DUP_ENTRY") {
-        response.status(409).json({ error: "That email address or username is already in use." });
+        response.status(409).json({ error: await accountConflict(request.body.username, request.body.email) });
         return;
       }
       next(error);
@@ -170,7 +171,7 @@ authRouter.put(
       response.json({ user: publicUser(user) });
     } catch (error) {
       if (error?.code === "ER_DUP_ENTRY") {
-        response.status(409).json({ error: "That email address or username is already in use." });
+        response.status(409).json({ error: await accountConflict(request.body.username, request.body.email, request.auth.userId) });
         return;
       }
       next(error);

@@ -49,3 +49,13 @@ export async function updatePassword(userId, passwordHash) {
   const pool = getDatabasePool();
   await pool.execute("UPDATE users SET password_hash = ? WHERE id = ?", [passwordHash, userId]);
 }
+
+export async function accountConflict(username, email, excludeId = 0) {
+  const [rows] = await getDatabasePool().execute(
+    "SELECT username, email FROM users WHERE (username = ? OR email = ?) AND id <> ?",
+    [username.trim().toLowerCase(), email.trim().toLowerCase(), excludeId],
+  );
+  return rows.some(row => row.username.toLowerCase() === username.trim().toLowerCase())
+    ? "Username is already taken."
+    : "That email address is already in use.";
+}

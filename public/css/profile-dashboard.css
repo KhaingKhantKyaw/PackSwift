@@ -8,3 +8,8 @@ html body[data-page="profile"] .profile-shell{font-family:Arial,sans-serif}
 .profile-panels{grid-auto-rows:1fr}
 .packing-chips:empty{display:none}
 @media(max-width:760px){.profile-panels{grid-auto-rows:auto}html body[data-page="profile"] .profile-heading h1{font-size:32px!important}}
+.profile-avatar{overflow:hidden}.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.photo-controls{display:flex;align-items:center;flex-wrap:wrap;gap:12px;margin:-6px 0 20px;padding:0 4px}
+.profile-shell .photo-upload{display:inline-flex;position:relative;cursor:pointer;background:#e1f3ec;border:1px solid #88bcb5;border-radius:10px;padding:11px 18px;font-weight:600;color:#075c5d}
+.photo-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}.photo-upload:focus-within{outline:3px solid #138e91;outline-offset:3px}
+#photo-feedback,#profile-user-id{font-size:13px;color:#526b67}
