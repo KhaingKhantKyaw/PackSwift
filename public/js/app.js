@@ -78,6 +78,8 @@ const mainNavigation = `
 // geometry from the retired .site-header/.slider-header page overrides.
 const headerStyles=document.createElement('link');
 headerStyles.rel='stylesheet';headerStyles.href='/css/global-header.css';document.head.append(headerStyles);
+const planningThemeStyles=document.createElement('link');
+planningThemeStyles.rel='stylesheet';planningThemeStyles.href='/css/planning-theme.css';document.head.append(planningThemeStyles);
 const globalHeader=document.createElement('header');
 globalHeader.className='ps-global-header';
 globalHeader.dataset.variant=page==='planner-studio'?'solid':'overlay';

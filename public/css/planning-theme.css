@@ -1,0 +1,24 @@
+/* Loaded after the shared theme: surfaces and foregrounds must change together. */
+html{--planning-paper:#fffdf8;--planning-inset:#f2f7f4;--planning-text:#163b40;--planning-muted:#4c666b;--planning-line:#b4ccc8;--planning-action:#dcf3eb;--planning-action-text:#075b56;--planning-focus:#007c88}
+html[data-theme="dark"]{color-scheme:dark;--planning-paper:#152f36;--planning-inset:#203f47;--planning-text:#edf7f5;--planning-muted:#bacfce;--planning-line:#52747a;--planning-action:#285b57;--planning-action-text:#d2fff0;--planning-focus:#77e0d2}
+html[data-theme="light"]{color-scheme:light}
+html body:is(.planner-horizontal,[data-page="profile"]) :is(.planning-card,.studio-setup,.studio-dashboard,.reference-preview-card,.profile-card,.account-bar,.profile-save-bar),
+html body :is(.guide-dialog,.profile-edit-dialog){background-color:var(--planning-paper)!important;color:var(--planning-text)!important;border-color:var(--planning-line)!important}
+html body:is(.planner-horizontal,[data-page="profile"]) :is(.planning-card,.studio-setup,.studio-dashboard,.profile-card,.profile-heading,.account-bar),
+html body :is(.guide-dialog,.profile-edit-dialog){--ps-ink:var(--planning-text);--ps-muted:var(--planning-muted)}
+html body:is(.planner-horizontal,[data-page="profile"]) :is(.planning-card,.studio-setup,.studio-dashboard,.profile-card,.profile-heading,.account-bar) :is(h1,h2,h3,h4,p,label,legend,summary,dt,dd),
+html body :is(.guide-dialog,.profile-edit-dialog) :is(h1,h2,h3,p,label,legend){color:var(--planning-text)!important}
+html body:is(.planner-horizontal,[data-page="profile"]) :is(input,select,textarea,.purpose-multiselect>summary),
+html body :is(.guide-dialog,.profile-edit-dialog) :is(input,select,textarea){background:var(--planning-paper)!important;color:var(--planning-text)!important;border-color:var(--planning-line)!important;accent-color:var(--planning-focus)}
+html body:is(.planner-horizontal,[data-page="profile"]) ::placeholder{color:var(--planning-muted)!important;opacity:1}
+html body:is(.planner-horizontal,[data-page="profile"]) :is(.planning-card,.studio-setup,.studio-dashboard,.profile-card) :is(small,.muted,.help-text,.itinerary-photo-credit){color:var(--planning-muted)!important}
+html body:is(.planner-horizontal,[data-page="profile"]) :is(.planning-card,.studio-setup,.studio-dashboard,.profile-card) :is(button,.booking-search-link),
+html body :is(.guide-dialog,.profile-edit-dialog) button{background:var(--planning-action)!important;color:var(--planning-action-text)!important;border-color:var(--planning-line)!important}
+html body:is(.planner-horizontal,[data-page="profile"]) :is(button,input,select,textarea,summary,a):focus-visible{outline:3px solid var(--planning-focus)!important;outline-offset:3px}
+html[data-theme="dark"] body:is(.planner-horizontal,[data-page="profile"]){background:#0b2027!important;color:var(--planning-text)!important}
+html[data-theme="dark"] body.planner-horizontal :is(.studio-setup,.studio-dashboard){background-image:none!important}
+html[data-theme="dark"] body:is(.planner-horizontal,[data-page="profile"]) :is(.sketch-field,.traveller-stepper,.purpose-options,.sketch-calendar-panel,.budget-result,.personality-chips span,.profile-expand,.interest-options,.packing-chips,.flight-search-preview,.stay-search-preview,.booking-search-panel,.itinerary-selected-place,.preference-place,.packing-checklist>details,.transport-guide,.taxi-app-option){background:var(--planning-inset)!important;color:var(--planning-text)!important;border-color:var(--planning-line)!important}
+html[data-theme="dark"] body.planner-horizontal :is(.reference-preview-content,.studio-setup) :is(article,fieldset){background-color:var(--planning-inset)!important;color:var(--planning-text)!important;border-color:var(--planning-line)!important}
+html[data-theme="dark"] body.planner-horizontal :is(.overview-input-details dd,.overview-input-details dt,.packing-checklist summary,.transport-guide-source,.preview-preparing,.reference-route,.transport-guide-tag){color:var(--planning-text)!important}
+html[data-theme="dark"] body.planner-horizontal :is(button[aria-pressed="true"],button.is-active,.trip-type-control .active){background:#94e3cd!important;color:#092f30!important;border-color:#94e3cd!important}
+@media print{html{--planning-paper:#fff;--planning-inset:#f3f3f3;--planning-text:#163b40;--planning-muted:#4c666b;--planning-line:#b4ccc8}}
