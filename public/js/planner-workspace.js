@@ -99,7 +99,7 @@
    routeInfo.prepend(make('strong','Round-trip flights'));
    if(ready&&i.origin){
     // Expedia's documented round-trip link uses catalog city/airport codes, not free text.
-    const origin=find(i.origin)?.code,destination=find(i.destination)?.code;
+    const origin=find(String(i.origin).split(',')[0].trim())?.code,destination=find(String(i.destination).split(',')[0].trim())?.code;
     if(origin&&destination&&Number(i.adults)<=6){
      const url=new URL(`https://www.expedia.com/go/flight/search/Roundtrip/${i.startDate}/${i.endDate}`);
      for(const [key,value]of Object.entries({load:1,FromAirport:origin,ToAirport:destination,FromTime:362,ToTime:362,NumAdult:i.adults,currency:i.currency||'USD'}))url.searchParams.set(key,String(value));

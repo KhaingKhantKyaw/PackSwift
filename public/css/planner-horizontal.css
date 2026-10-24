@@ -140,6 +140,10 @@ html body.planner-horizontal .booking-live-results>.booking-option-panel{align-s
 .planner-horizontal .booking-option-controls>.booking-search-link{margin-top:0!important;align-self:stretch;min-height:40px}
 .planner-horizontal .booking-results-scroll{height:360px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;margin-top:12px;min-width:0;padding-right:6px}
 .planner-horizontal .booking-option-controls label{display:grid!important;gap:6px!important}
+.planner-horizontal .booking-stay-filter{grid-column:1/-1;padding:12px;border:1px solid var(--planning-line);border-radius:10px;background:var(--planning-inset)}
+.planner-horizontal .booking-stay-filter label{display:grid!important;grid-template-columns:minmax(180px,1fr) minmax(200px,2fr);gap:12px}
+.planner-horizontal .booking-stay-filter input{max-width:none!important;width:100%;min-width:0;box-sizing:border-box;padding:10px;border:1px solid var(--planning-line);border-radius:8px}
+@media(max-width:600px){.planner-horizontal .booking-stay-filter label{grid-template-columns:1fr}}
 .planner-horizontal .booking-option-controls input[type=text]{width:100%!important;max-width:none!important;box-sizing:border-box;min-height:42px;padding:10px;border:1px solid var(--planning-line);border-radius:8px}
 .planner-horizontal .traveler-child-ages{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
 .planner-horizontal .traveler-child-ages[hidden]{display:none!important}
