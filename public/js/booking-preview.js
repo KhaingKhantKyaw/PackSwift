@@ -19,7 +19,20 @@
     const results=el('div');results.className='booking-results-scroll';results.tabIndex=0;results.setAttribute('role','region');results.setAttribute('aria-label',kind==='flights'?'Flight search results':'Stay search results');group.append(results);
     const status=el('p',record?.loading?'Looking for options…':record?.error||'');status.setAttribute('role','status');results.append(status);
     if(record?.data){const data=record.data;group.append(el('small',`${data.source} · ${new Date(data.searchedAt).toLocaleTimeString()}${data.cached?' · cached':''}`));if(!data.items.length)group.append(el('p','No options found. Try other dates or the external search.'));
-     for(const item of data.items){const card=el('article');card.className='booking-result';card.append(el('strong',item.title||'Travel option'),el('p',item.detail),el('strong',item.price),el('small',item.priceLabel));if(item.url){try{const url=new URL(item.url);if(url.protocol==='https:'){const a=el('a',item.linkLabel||(kind==='flights'?'Compare this route on Google Flights ↗':'View stay & booking options ↗'));a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';card.append(a);}}catch{}}const use=el('button','Use in budget');use.type='button';use.onclick=()=>window.dispatchEvent(new CustomEvent('packswift:budget-quote',{detail:{kind,title:item.title,price:item.price,basis:item.priceLabel,currency:input.currency,searchedAt:data.searchedAt,context:payload}}));card.append(use);group.append(card);}
+     for(const item of data.items){
+      const card=el('article');card.className='booking-result';card.append(el('strong',item.title||'Travel option'),el('p',item.detail),el('strong',item.price),el('small',item.priceLabel));
+      let url;try{const candidate=new URL(item.url);if(candidate.protocol==='https:'&&!candidate.username&&!candidate.password)url=candidate;}catch{}
+      let label=kind==='flights'?'Compare route on Google Flights ↗':'View stay & booking options ↗';
+      if(kind==='flights'&&item.linkLabel?.startsWith('View booking'))label='View flight booking options ↗';
+      if(!url&&kind==='hotels'){
+       url=new URL('https://www.booking.com/searchresults.html');
+       Object.entries({ss:[item.title,input.destination].filter(Boolean).join(', '),checkin:input.startDate,checkout:input.endDate,group_adults:input.adults,group_children:Number(input.children)||0,selected_currency:input.currency||'USD'}).forEach(([k,v])=>{if(v!=null)url.searchParams.set(k,String(v));});
+       for(const age of state.ages||[])if(Number.isInteger(age))url.searchParams.append('age',String(age));
+       label='Find this stay on Booking.com ↗';
+      }
+      if(url){const a=el('a',label);a.className='booking-result-action';a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label',label+' (opens in a new tab)');card.append(a);}
+      group.append(card);
+     }
     }
     for(const child of [...group.children])if(child!==controls&&child!==results&&child!==header)results.append(child);
    }

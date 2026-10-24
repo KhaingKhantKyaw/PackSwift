@@ -145,6 +145,11 @@ html body.planner-horizontal .booking-live-results>.booking-option-panel{align-s
 .planner-horizontal .booking-embedded .booking-results-scroll:has(>p:only-child:empty){display:none}
 .planner-horizontal .booking-embedded .booking-option-controls>.booking-search-link{width:100%;box-sizing:border-box}
 .planner-horizontal .booking-embedded .booking-result{background:var(--planning-paper);color:var(--planning-text)}
+.planner-horizontal .booking-results-scroll .booking-result{display:flex;flex-direction:column;gap:8px;text-align:left}
+.planner-horizontal .booking-results-scroll .booking-result>p{margin:0}
+.planner-horizontal .booking-results-scroll .booking-result>small{display:block;font-size:12px;line-height:1.5;color:var(--planning-muted)}
+html body.planner-horizontal .booking-result .booking-result-action{display:block;box-sizing:border-box;width:100%;margin-top:8px;padding:12px;border:1px solid var(--planning-line);border-radius:9px;background:var(--planning-action);color:var(--planning-action-text)!important;text-decoration:none;font:600 14px/1.5 Arial,sans-serif;text-align:center;overflow-wrap:anywhere}
+.planner-horizontal .booking-result-action:hover{filter:brightness(.95)}
 .planner-horizontal .booking-option-controls label{display:grid!important;gap:6px!important}
 .planner-horizontal .booking-option-header{display:flex;align-items:center;gap:12px;height:64px;min-height:64px;margin-bottom:12px}
 html body.planner-horizontal .booking-option-header h3{flex-shrink:0;margin:0!important}
