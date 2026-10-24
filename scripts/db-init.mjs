@@ -27,6 +27,7 @@ const connection = await mysql.createConnection({
 
 try {
   await connection.query(portableSchema);
+  await connection.query(await readFile(new URL("../database/migrations/021_user_profile_preferences.sql", import.meta.url), "utf8"));
   const [readinessColumns] = await connection.execute(
     `SELECT COLUMN_NAME
      FROM INFORMATION_SCHEMA.COLUMNS

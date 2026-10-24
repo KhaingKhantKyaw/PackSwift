@@ -2,8 +2,36 @@ import { Router } from "express";
 import { requireAuth } from "../middleware/auth.js";
 import { requireDatabase } from "../middleware/database.js";
 import { getProfile } from "../repositories/profile-repository.js";
+import { getDatabasePool } from "../config/database.js";
 
 export const profileRouter = Router();
+
+profileRouter.get("/preferences", requireAuth, requireDatabase, async (request, response, next) => {
+  try {
+    const [rows] = await getDatabasePool().execute("SELECT preferences FROM user_profile_preferences WHERE user_id = ?", [request.auth.userId]);
+    const value = rows[0]?.preferences;
+    response.set("Cache-Control", "no-store").json({preferences: typeof value === "string" ? JSON.parse(value) : value || {}});
+  } catch (error) { next(error); }
+});
+
+profileRouter.put("/preferences", requireAuth, requireDatabase, async (request, response, next) => {
+  try {
+    const data = request.body;
+    if (!data || typeof data !== "object" || Array.isArray(data)) return response.status(400).json({error:"Invalid preferences."});
+    const preferences = {};
+    for (const key of ["homeCity","currency","language","travelStyle","transportation","luggage","laundry","packingExclusions","nationality","companions","accessibility","pets"]) {
+      if (data[key] !== undefined && (typeof data[key] !== "string" || data[key].length > 500)) return response.status(400).json({error:"Invalid " + key});
+      preferences[key] = (data[key] || "").trim();
+    }
+    for (const key of ["interests","packingItems"]) {
+      const values = data[key] || [];
+      if (!Array.isArray(values) || values.length > 50 || values.some(v=>typeof v !== "string" || v.length > 100)) return response.status(400).json({error:"Invalid " + key});
+      preferences[key] = [...new Set(values.map(v=>v.trim()).filter(Boolean))];
+    }
+    await getDatabasePool().execute("INSERT INTO user_profile_preferences (user_id, preferences) VALUES (?, ?) ON DUPLICATE KEY UPDATE preferences = VALUES(preferences)", [request.auth.userId, JSON.stringify(preferences)]);
+    response.json({preferences});
+  } catch (error) { next(error); }
+});
 
 profileRouter.get("/", requireAuth, requireDatabase, async (request, response, next) => {
   try {
