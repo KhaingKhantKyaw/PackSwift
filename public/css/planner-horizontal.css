@@ -140,10 +140,14 @@ html body.planner-horizontal .booking-live-results>.booking-option-panel{align-s
 .planner-horizontal .booking-option-controls>.booking-search-link{margin-top:0!important;align-self:stretch;min-height:40px}
 .planner-horizontal .booking-results-scroll{height:360px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;margin-top:12px;min-width:0;padding-right:6px}
 .planner-horizontal .booking-option-controls label{display:grid!important;gap:6px!important}
-.planner-horizontal .booking-stay-filter{grid-column:1/-1;padding:12px;border:1px solid var(--planning-line);border-radius:10px;background:var(--planning-inset)}
-.planner-horizontal .booking-stay-filter label{display:grid!important;grid-template-columns:minmax(180px,1fr) minmax(200px,2fr);gap:12px}
+.planner-horizontal .booking-option-header{display:flex;align-items:center;gap:12px;height:64px;min-height:64px;margin-bottom:12px}
+html body.planner-horizontal .booking-option-header h3{flex-shrink:0;margin:0!important}
+.planner-horizontal .booking-stay-filter{flex:1;min-width:0;padding:0;border:0;background:transparent}
+html body.planner-horizontal .booking-stay-filter label{display:flex!important;align-items:center;white-space:nowrap;gap:8px;margin:0;font-size:12px}
+.planner-horizontal .booking-option-controls>small{order:2}
+.planner-horizontal .booking-option-controls>small:empty{display:none}
 .planner-horizontal .booking-stay-filter input{max-width:none!important;width:100%;min-width:0;box-sizing:border-box;padding:10px;border:1px solid var(--planning-line);border-radius:8px}
-@media(max-width:600px){.planner-horizontal .booking-stay-filter label{grid-template-columns:1fr}}
+@media(max-width:600px){.planner-horizontal .booking-option-header{gap:8px}.planner-horizontal .booking-stay-filter label{gap:4px!important}}
 .planner-horizontal .booking-option-controls input[type=text]{width:100%!important;max-width:none!important;box-sizing:border-box;min-height:42px;padding:10px;border:1px solid var(--planning-line);border-radius:8px}
 .planner-horizontal .traveler-child-ages{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
 .planner-horizontal .traveler-child-ages[hidden]{display:none!important}
