@@ -1,14 +1,14 @@
 (() => {
  const states=new Map();let stayNear='';
  const el=(tag,text)=>{const n=document.createElement(tag);if(text)n.textContent=text;return n;};
- window.PackSwiftBookingPreview={mount(root,input){
+ window.PackSwiftBookingPreview={mount(root,input,targets){
   const payload=Object.fromEntries(['origin','destination','startDate','endDate','adults','children','currency','travelStyle'].map(k=>[k,input[k]]));
   const key=JSON.stringify(payload);if(!states.has(key)){if(states.size>20)states.delete(states.keys().next().value);states.set(key,{ages:[]});}const state=states.get(key);
-  const area=el('section');area.className='booking-live-results';root.append(area);
-  const draw=()=>{area.replaceChildren();area.append(el('small','Search on demand · cached up to 10 minutes. Confirm final prices and availability with the provider.'));
+  const area=el('section');area.className='booking-live-results';if(!targets)root.append(area);
+  const draw=()=>{area.replaceChildren();if(targets)for(const target of Object.values(targets))target.querySelector('.booking-embedded')?.remove();
    for(const kind of ['flights','hotels']){
     if(kind==='flights'&&(input.entryMode!=='air'||input.tripType==='local'))continue;
-    const group=el('section');group.className='booking-option-panel';const controls=el('div');controls.className='booking-option-controls';const header=el('header');header.className='booking-option-header';header.append(el('h3',kind==='flights'?'Flight options':'Stay options'));group.append(header);area.append(group);group.append(controls);
+    const group=el('section');group.className=targets?'booking-embedded':'booking-option-panel';const controls=el('div');controls.className='booking-option-controls';const header=el('header');header.className='booking-option-header';if(!targets)header.append(el('h3',kind==='flights'?'Flight options':'Stay options'));group.append(header);(targets?.[kind]||area).append(group);group.append(controls);
     try{state.ages=JSON.parse(document.getElementById('traveler-child-ages')?.value||'[]');}catch{state.ages=[];}
     if(kind==='hotels'){
      const label=el('label','Stay near'),field=el('input'),list=el('datalist'),hint=el('small');field.type='text';field.maxLength=250;field.placeholder='Search place…';field.value=stayNear;list.id='stay-near-suggestions';field.setAttribute('list',list.id);label.append(field,list);const filter=el('div');filter.className='booking-stay-filter';filter.append(label);header.append(filter);controls.append(hint);let timer,sequence=0;
