@@ -19,14 +19,22 @@ profileRouter.put("/preferences", requireAuth, requireDatabase, async (request, 
     const data = request.body;
     if (!data || typeof data !== "object" || Array.isArray(data)) return response.status(400).json({error:"Invalid preferences."});
     const preferences = {};
-    for (const key of ["homeCity","currency","language","travelStyle","transportation","luggage","laundry","packingExclusions","nationality","companions","accessibility","pets"]) {
+    for (const key of ["homeCity","currency","language","travelStyle","transportation","luggage","laundry","packingExclusions","nationality","companions","accessibility","pets","dailyPace","dayStart","dayEnd","walking","crowds","spendingPriority","stayPreference","diet","avoid","travelMinutes","restBreaks","weatherFlexibility","guidance"]) {
+      if (data[key] === undefined) continue;
       if (data[key] !== undefined && (typeof data[key] !== "string" || data[key].length > 500)) return response.status(400).json({error:"Invalid " + key});
       preferences[key] = (data[key] || "").trim();
     }
     for (const key of ["interests","packingItems"]) {
+      if (data[key] === undefined) continue;
       const values = data[key] || [];
       if (!Array.isArray(values) || values.length > 50 || values.some(v=>typeof v !== "string" || v.length > 100)) return response.status(400).json({error:"Invalid " + key});
       preferences[key] = [...new Set(values.map(v=>v.trim()).filter(Boolean))];
+    }
+    for (const key of ["wishlist","packingPresets"]) {
+      if(data[key] === undefined) continue;
+      const values=data[key];
+      if(!Array.isArray(values)||values.length>50||values.some(v=>!v||typeof v!=="object"||typeof v.name!=="string"||v.name.length>120||typeof v.detail!=="string"||v.detail.length>1000)) return response.status(400).json({error:"Invalid "+key});
+      preferences[key]=values.map(v=>({name:v.name.trim(),detail:v.detail.trim()})).filter(v=>v.name);
     }
     await getDatabasePool().execute("INSERT INTO user_profile_preferences (user_id, preferences) VALUES (?, ?) ON DUPLICATE KEY UPDATE preferences = JSON_MERGE_PATCH(preferences, VALUES(preferences))", [request.auth.userId, JSON.stringify(preferences)]);
     response.json({preferences});

@@ -7,7 +7,11 @@ globalThis.PackSwiftPlaceSearchModel=(()=>{
  function schedule(selected,days,preferences={}){
   const result=Array.from({length:days},(_,i)=>({day:i+1,title:`Day ${i+1}`,activities:[],load:0})),unscheduled=[];
   const prefs=new Map((preferences.activityPreferences||[]).map(p=>[p.activityId,p]));
-  const cap={'Pocket Friendly':3,'Balanced':3,'Comfort & Value':2,'Full Experience':4,'Ultimate Luxury':1}[preferences.travelStyle]||{relaxed:2,balanced:3,packed:4}[preferences.tripPace]||3;
+  const requestedCap={relaxed:2,balanced:3,packed:4}[preferences.dailyPace]||{'Pocket Friendly':3,'Balanced':3,'Comfort & Value':2,'Full Experience':4,'Ultimate Luxury':1}[preferences.travelStyle]||{relaxed:2,balanced:3,packed:4}[preferences.tripPace]||3;
+  const minutes=t=>/^([01]\d|2[0-3]):[0-5]\d$/.test(t||'')?Number(t.slice(0,2))*60+Number(t.slice(3)):null;
+  const start=minutes(preferences.preferredDayStart),end=minutes(preferences.preferredDayEnd);
+  const timeCap=start!==null&&end!==null&&end>start?Math.max(1,Math.floor((end-start)/150)):requestedCap;
+  const cap=Math.min(requestedCap,timeCap,preferences.walking==='short'||preferences.restBreaks==='Frequent'?2:4);
   const arrival=/^\d{2}:\d{2}$/.test(preferences.arrivalTime||'')?Number(preferences.arrivalTime.slice(0,2))*60+Number(preferences.arrivalTime.slice(3)):null;
   if(arrival!==null)result[0].load=Math.max(0,1-Math.min(cap,Math.max(0,Math.floor((1200-arrival-210)/150)))/cap);
   const score=p=>{const f=prefs.get(identity(p))||{};return (f.preferredDay?10:0)+({must_visit:3,would_like:2,optional:1}[f.priority]||2);};

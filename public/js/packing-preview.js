@@ -5,7 +5,8 @@
  function read(){try{return JSON.parse(field.value)||{};}catch{return {};}}
  function save(s){field.value=JSON.stringify(s);field.dispatchEvent(new Event('input',{bubbles:true}));}
  function suggestions(i,selected){
-  const days=Math.max(1,Math.round((Date.parse(i.endDate)-Date.parse(i.startDate))/86400000)+1||1),qty=Math.min(days,7),items=[];
+  let personal={};try{personal=JSON.parse(i.planningSupport||'{}').preferences||{};}catch{}
+  const days=Math.max(1,Math.round((Date.parse(i.endDate)-Date.parse(i.startDate))/86400000)+1||1),qty=Math.min(days,personal.laundry==='Every few days'?3:personal.laundry==='No laundry planned'?days:7),items=[];
   const add=(category,name,quantity=1,reason='Essential')=>items.push({id:category+':'+name,category,name,quantity,reason});
   add('Documents & Money',i.isInternational===false?'Personal identification':'Passport');add('Documents & Money','Tickets and booking details');add('Documents & Money','Payment cards / cash');
   add('Daily Essentials','Reusable water bottle');add('Daily Essentials','Day bag');
@@ -22,7 +23,9 @@
   if(/temple|pagoda|mosque/i.test(places))add('Clothing','Shoulder and knee covering',1,'Religious visits · confirm venue dress rules');
   if(Number(i.children)>0)add('Children & Family','Child travel essentials',Number(i.children));
   add('Travel Comfort','Eye mask / earplugs',1,'Optional');
-  return items;
+  for(const name of personal.packingItems||[])if(!items.some(x=>x.name===name))add('My Items',name,1,'Your saved essential');
+  const excluded=String(personal.packingExclusions||'').split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
+  return items.filter(x=>!excluded.includes(x.name.toLowerCase()));
  }
  function draw(){
   if(!context)return;const {input,selected}=context,s=read();s.edits||={};s.dismissed||=[];s.custom||=[];
