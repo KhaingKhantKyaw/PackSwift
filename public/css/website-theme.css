@@ -1,0 +1,25 @@
+/* Shared palette for every route; photography retains its own overlay contrast. */
+html[data-theme]{--ps-canvas:#f6f4ec;--ps-surface:#fffdf8;--ps-ink:#163b40;--ps-muted:#4c666b;--ps-border:#b4ccc8;--ps-accent:#08766e;--ps-scene:none}
+html[data-theme="dark"]{--ps-canvas:#0d1524;--ps-surface:#172335;--ps-ink:#f0f4fa;--ps-muted:#c0cbdb;--ps-border:#4d607b;--ps-accent:#96e4ce;--ps-scene:none}
+html[data-theme] body:not(.slider-home),html[data-theme] body[data-page="profile"]:not(.slider-home){background:var(--ps-canvas)!important;color:var(--ps-ink)!important}
+html[data-theme] body .ps-global-header{background:#073e43!important}
+html[data-theme="dark"] body .ps-global-header{background:#101c2f!important;border-bottom:1px solid var(--ps-border)!important}
+html[data-theme] body :is(.panel,.trip-card,.auth-card,.profile-card,.account-bar,.profile-save-bar,.saved-trip-card,.saved-trip-hero,.saved-trip-editor,.ps-help-panel,.concierge-plan,.concierge-faq,.atlas-panel,.explore-city-copy,dialog){background-color:var(--ps-surface)!important;color:var(--ps-ink)!important;border-color:var(--ps-border)!important}
+html[data-theme] body :is(.panel,.trip-card,.auth-card,.profile-card,.account-bar,.saved-trip-card,.saved-trip-hero,.saved-trip-editor,.ps-help-panel,.concierge-plan,.concierge-faq,.atlas-panel,.explore-city-copy,dialog) :is(h1,h2,h3,h4,p,label,summary,legend,li){color:var(--ps-ink)!important}
+html[data-theme] body :is(.panel,.trip-card,.profile-card,.saved-trip-card,.ps-help-panel,dialog) :is(small,.muted,.form-help){color:var(--ps-muted)!important}
+html[data-theme] body input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),html[data-theme] body :is(select,textarea,.field-control){background-color:var(--ps-surface)!important;color:var(--ps-ink)!important;border-color:var(--ps-border)!important;accent-color:var(--ps-accent)}
+html[data-theme] body ::placeholder{color:var(--ps-muted)!important;opacity:1}
+html[data-theme] body .button-primary{background:#08766e!important;color:#fff!important;border-color:#08766e!important}
+html[data-theme="dark"] body .button-primary{background:#96e4ce!important;color:#102f35!important;border-color:#96e4ce!important}
+html[data-theme] body .button-secondary{background:var(--planning-action)!important;color:var(--planning-action-text)!important;border-color:var(--ps-border)!important}
+html[data-theme] body :is(button,a,input,select,textarea,summary):focus-visible{outline:3px solid var(--planning-focus)!important;outline-offset:3px}
+html[data-theme] body :is(.site-footer,.home-explore-footer,.mobile-nav){background:var(--ps-surface)!important;color:var(--ps-ink)!important;border-color:var(--ps-border)!important}
+html[data-theme] body :is(.site-footer,.home-explore-footer,.mobile-nav) :is(a,p,span){color:var(--ps-ink)!important}
+html[data-theme] body.combined-home .home-world-explorer{background:var(--ps-canvas)!important;color:var(--ps-ink)!important}
+html[data-theme] body.combined-home .home-world-explorer::before{background:linear-gradient(110deg,var(--ps-canvas),color-mix(in srgb,var(--ps-canvas) 92%,transparent)),url('/images/destination-bali.jpg') center/cover!important}
+html[data-theme] body .home-world-explorer :is(h2,.atlas-intro,.atlas-hint,.atlas-eyebrow){color:var(--ps-ink)!important}
+html[data-theme] body :is(.atlas-continent,.region-options button){background:var(--planning-inset)!important;color:var(--ps-ink)!important;border-color:var(--ps-border)!important}
+html[data-theme] body :is(.atlas-continent,.region-options button)[aria-pressed="true"]{background:var(--planning-action)!important;color:var(--planning-action-text)!important;border:2px solid var(--ps-accent)!important}
+html[data-theme="dark"] body[data-page="profile"] .profile-heading h1{color:var(--ps-ink)!important}
+html[data-theme] body dialog::backdrop{background:#071322aa}
+@media print{html[data-theme]{--ps-canvas:#fff;--ps-surface:#fff;--ps-ink:#163b40;--ps-muted:#4c666b;--ps-border:#b4ccc8}}
