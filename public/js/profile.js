@@ -9,16 +9,34 @@ card('Travel preferences','◇','<div class="fields">'+select('travelStyle','Tra
 card('Packing preferences','▣','<div class="fields">'+select('luggage','Luggage',['Carry-on only','Checked luggage','Backpack'])+select('laundry','Laundry frequency',['Every few days','Weekly','No laundry planned'])+'</div><label>Personal essentials</label><div class="packing-chips" id="packing-items"></div><div class="add-item-row"><input id="new-packing-item" maxlength="80" aria-label="Personal packing item" placeholder="Add a personal item"><button id="add-packing-item" type="button">＋ Add</button></div>'+textField('packingExclusions','Usually leave at home','e.g. hair dryer, travel pillow',500))+
 card('Traveler details','♧',textField('nationality','Nationality (optional)','Your nationality',100)+[['Travel companions','companions','Names or nicknames'],['Accessibility needs','accessibility','Only share what you want us to remember'],['Pets','pets','Pets you travel with']].map(([title,name,placeholder])=>'<details class="profile-expand"><summary>'+title+'</summary>'+textField(name,title,placeholder,500)+'</details>').join(''));
 const form=$('#profile-form');
-form.querySelector('.profile-expand').open=true;
+const accountEditor=form.querySelector('.profile-expand');
+accountEditor.classList.add('identity-editor');
+accountEditor.querySelector('summary').textContent='Edit email & user ID';
+for(const input of accountEditor.querySelectorAll('input'))input.setAttribute('form','profile-form');
+$('.identity-bar').append(accountEditor);
+const usernameInput=form.elements.username;
+usernameInput.parentElement.firstChild.textContent='User ID';
+const handleControl=document.createElement('span');handleControl.className='handle-control';
+const prefix=document.createElement('span');prefix.textContent='@';prefix.setAttribute('aria-hidden','true');
+usernameInput.before(handleControl);handleControl.append(prefix,usernameInput);
+usernameInput.placeholder='alex123';
+usernameInput.title='Use 3–50 letters and numbers only.';
+const accountSave=document.createElement('button');accountSave.type='submit';accountSave.setAttribute('form','profile-form');accountSave.textContent='Save profile';accountEditor.append(accountSave);
+const accountFeedback=document.createElement('p');accountFeedback.id='account-feedback';accountFeedback.setAttribute('role','status');accountEditor.append(accountFeedback);
+new MutationObserver(()=>{accountFeedback.textContent=$('#save-feedback').textContent;}).observe($('#save-feedback'),{childList:true,subtree:true,characterData:true});
 form.elements.username.minLength=3;
-form.elements.username.pattern='[a-zA-Z0-9._-]+';
+form.elements.username.pattern='[a-zA-Z0-9]+';
 form.elements.username.autocomplete='username';
 form.elements.email.autocomplete='email';
 const identityInfo=$('#profile-name').parentElement;
 const userIdLabel=document.createElement('small');userIdLabel.id='profile-user-id';identityInfo.append(userIdLabel);
 const photoControls=document.createElement('div');photoControls.className='photo-controls';
-photoControls.innerHTML='<label class="photo-upload">Change photo<input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp"></label><button id="remove-photo" type="button" hidden>Remove photo</button><span id="photo-feedback" role="status"></span>';
-$('.identity-bar').after(photoControls);
+photoControls.innerHTML='<input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" hidden><button id="remove-photo" type="button" hidden>Remove photo</button><span id="photo-feedback" role="status"></span>';
+$('.identity-bar').append(photoControls);
+const photoTarget=$('#profile-initials');photoTarget.setAttribute('role','button');photoTarget.tabIndex=0;photoTarget.setAttribute('aria-label','Change profile picture');photoTarget.title='Click to change profile picture';
+photoTarget.onclick=()=>$('#profile-photo-input').click();
+photoTarget.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#profile-photo-input').click();}};
+form.addEventListener('invalid',()=>{accountEditor.open=true;},true);
 function renderPhoto(picture){
   const avatar=$('#profile-initials');
   if(picture){const img=document.createElement('img');img.src=picture;img.alt='Your profile photo';avatar.replaceChildren(img);}
@@ -57,8 +75,8 @@ function addItem(){const input=$('#new-packing-item'),v=input.value.trim();if(v&
 $('#add-packing-item').onclick=addItem;$('#new-packing-item').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addItem();}};
 function updateCount(){$('#interest-count').textContent='· '+form.querySelectorAll('[name=interests]:checked').length+' selected';}
 form.addEventListener('change',updateCount);
-function identity(user){$('#profile-name').textContent=user.fullName;$('#profile-user-id').textContent='User ID: '+user.id;renderPhoto(saved.picture);}
-$('#edit-profile').onclick=()=>{form.elements.fullName.focus();form.elements.fullName.scrollIntoView({block:'center',behavior:'smooth'});};
+function identity(user){$('#profile-name').textContent=user.fullName;$('#profile-user-id').textContent='@'+user.username;renderPhoto(saved.picture);}
+$('#edit-profile').onclick=()=>{accountEditor.open=!accountEditor.open;if(accountEditor.open)form.elements.username.focus();};
 async function load(){try{const user=await window.PackSwift.authReady;if(!user){$('#profile-status').hidden=true;$('#profile-guest').hidden=false;return;}const result=await window.PackSwift.api('/api/profile/preferences');saved=result.preferences||{};identity(user);for(const n of ['fullName','username','email'])form.elements[n].value=user[n]||'';for(const n of fields)form.elements[n].value=saved[n]||'';for(const input of form.querySelectorAll('[name=interests]'))input.checked=(saved.interests||[]).includes(input.value);items=[...(saved.packingItems||[])];renderItems();updateCount();$('#profile-content').hidden=false;$('#profile-status').hidden=true;}catch(e){$('#profile-status').textContent='Unable to load profile: '+e.message;}}
 form.onsubmit=async e=>{e.preventDefault();const feedback=$('#save-feedback'),button=form.querySelector('[type=submit]');button.disabled=true;feedback.textContent='Saving…';try{const account=Object.fromEntries(['fullName','username','email'].map(n=>[n,form.elements[n].value.trim()]));const result=await window.PackSwift.api('/api/auth/settings',{method:'PUT',body:JSON.stringify(account)});window.PackSwift.setCurrentUser(result.user);identity(result.user);const preferences=Object.fromEntries(fields.map(n=>[n,form.elements[n].value.trim()]));preferences.interests=[...form.querySelectorAll('[name=interests]:checked')].map(x=>x.value);preferences.packingItems=items;await window.PackSwift.api('/api/profile/preferences',{method:'PUT',body:JSON.stringify(preferences)});saved={...saved,...preferences};feedback.textContent='Profile and preferences saved.';}catch(error){feedback.textContent='Some changes may not be saved. '+error.message;}finally{button.disabled=false;}};
 $('#password-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,b=f.querySelector('button');b.disabled=true;try{await window.PackSwift.api('/api/auth/password',{method:'PUT',body:JSON.stringify(Object.fromEntries(new FormData(f)))});f.reset();$('#password-feedback').textContent='Password updated.';}catch(error){$('#password-feedback').textContent=error.message;}finally{b.disabled=false;}};

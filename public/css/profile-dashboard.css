@@ -13,3 +13,12 @@ html body[data-page="profile"] .profile-shell{font-family:Arial,sans-serif}
 .profile-shell .photo-upload{display:inline-flex;position:relative;cursor:pointer;background:#e1f3ec;border:1px solid #88bcb5;border-radius:10px;padding:11px 18px;font-weight:600;color:#075c5d}
 .photo-upload input{position:absolute;inset:0;opacity:0;cursor:pointer}.photo-upload:focus-within{outline:3px solid #138e91;outline-offset:3px}
 #photo-feedback,#profile-user-id{font-size:13px;color:#526b67}
+.identity-bar{flex-wrap:wrap}
+.identity-editor{flex:0 0 100%;box-sizing:border-box}
+.identity-editor>button{margin-top:14px}
+.identity-bar .photo-controls{flex:0 0 100%;margin:0;padding:0}
+.profile-avatar[role=button]{cursor:pointer;position:relative}
+.profile-avatar[role=button]:hover{box-shadow:0 0 0 4px #91d3c5}
+.handle-control{display:flex;align-items:center;gap:0;border:1px solid #cbdad5;border-radius:9px;background:#fffefa}
+.handle-control>span{padding-left:12px;color:#087e80;font-weight:bold}
+.profile-shell .handle-control input{border:0;background:transparent}

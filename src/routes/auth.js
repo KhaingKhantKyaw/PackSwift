@@ -33,8 +33,8 @@ const accountValidators = [
   body("username")
     .trim()
     .isLength({ min: 3, max: 50 })
-    .matches(/^[a-zA-Z0-9._-]+$/)
-    .withMessage("Use 3–50 letters, numbers, dots, underscores, or hyphens."),
+    .matches(/^[a-zA-Z0-9]+$/)
+    .withMessage("Use 3–50 letters and numbers only for your user ID."),
   body("email").trim().isEmail().withMessage("Enter a valid email address.").normalizeEmail(),
 ];
 
