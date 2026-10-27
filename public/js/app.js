@@ -82,10 +82,6 @@ const planningThemeStyles=document.createElement('link');
 planningThemeStyles.rel='stylesheet';planningThemeStyles.href='/css/planning-theme.css';document.head.append(planningThemeStyles);
 const websiteThemeStyles=document.createElement('link');
 websiteThemeStyles.rel='stylesheet';websiteThemeStyles.href='/css/website-theme.css';document.head.append(websiteThemeStyles);
-if(page==='planner-studio'){
- const style=document.createElement('link');style.rel='stylesheet';style.href='/css/planner-open.css';document.head.append(style);
- const script=document.createElement('script');script.src='/js/planner-open.js';document.head.append(script);
-}
 const globalHeader=document.createElement('header');
 globalHeader.className='ps-global-header';
 globalHeader.dataset.variant=page==='planner-studio'?'solid':'overlay';
