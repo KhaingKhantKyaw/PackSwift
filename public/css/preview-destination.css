@@ -1,0 +1,38 @@
+/* Destination heading and softly tinted feature panels. Existing tools stay mounted. */
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .studio-dashboard{background:var(--planning-paper)!important;background-image:none!important;border:0!important;box-shadow:none!important}
+html[data-theme] body.planner-horizontal #studio-dashboard-content{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section]{grid-column:auto!important;min-width:0;background:var(--feature-tint)!important;border:1px solid color-mix(in srgb,var(--feature-ink) 12%,transparent)!important;border-top:0!important;border-radius:22px!important;padding:20px!important;box-shadow:0 3px 12px #102e3510!important;--feature-tint:#e8f0fc;--feature-ink:#27538b}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"]{--feature-tint:#fcebe5!important;--feature-ink:#973f35!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Transportation"]{--feature-tint:#e6efff!important;--feature-ink:#285b9b!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{--feature-tint:#f3f1d9!important;--feature-ink:#76631c!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{--feature-tint:#e4f3eb!important;--feature-ink:#286b55!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"]{--feature-tint:#352b32!important;--feature-ink:#ffc4b4!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Transportation"]{--feature-tint:#20324b!important;--feature-ink:#afccff!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{--feature-tint:#343525!important;--feature-ink:#e7d88f!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{--feature-tint:#213a33!important;--feature-ink:#a5e4c8!important}
+html[data-theme] body.planner-horizontal .reference-preview-card>summary{font:700 20px/1.4 Arial,sans-serif!important;color:var(--feature-ink)!important;background:var(--feature-tint)!important}
+html[data-theme] body.planner-horizontal .reference-preview-card .preview-icon{background:transparent!important;color:var(--feature-ink)!important;border-radius:0!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section="Overview"]{grid-column:1/-1!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:8px 0 20px!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Overview"]>summary{display:none!important}
+.destination-overview-heading{display:flex;align-items:center;gap:12px;min-width:0}
+html[data-theme] body.planner-horizontal .destination-overview-heading h2{font:750 clamp(32px,4vw,56px)/1.15 Arial,sans-serif!important;color:var(--planning-text)!important;margin:0;overflow-wrap:anywhere}
+html[data-theme] body.planner-horizontal .destination-overview-heading button{background:transparent!important;border:0!important;color:var(--planning-muted)!important;font-size:26px;padding:8px;min-width:44px;min-height:44px}
+html[data-theme] body.planner-horizontal .destination-overview-dates{font:400 clamp(18px,2vw,24px)/1.5 Arial,sans-serif!important;margin:12px 0 6px;color:var(--planning-text)!important}
+.destination-overview-meta{font:14px/1.6 Arial,sans-serif;color:var(--planning-muted);margin:0 0 10px}
+.destination-overview-details>summary{font:600 14px Arial,sans-serif;cursor:pointer;padding:10px 0}
+html[data-theme] body.planner-horizontal .reference-preview-card:is([data-preview-section="Itinerary"],[data-preview-section="Packing List"])[open]>summary{background:var(--feature-tint)!important;top:-20px}
+html[data-theme] body.planner-horizontal .booking-results-scroll .booking-result,html[data-theme] body.planner-horizontal .itinerary-suggestion-grid .booking-result{background:var(--planning-paper)!important;border:1px solid var(--planning-line)!important;border-radius:16px!important;padding:14px!important}
+html[data-theme] body.planner-horizontal .reference-preview-card :is(h3,h4){font-family:Arial,sans-serif!important}
+/* A single feature-board row; overview remains a full-width heading. */
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] :is(.studio-columns,.studio-dashboard,#studio-dashboard-content){min-width:0!important;max-width:100%!important;box-sizing:border-box}
+html[data-theme] body.planner-horizontal #studio-dashboard-content{width:100%!important;contain:inline-size}
+html[data-theme] body.planner-horizontal #studio-dashboard-content{grid-template-columns:repeat(4,minmax(300px,1fr))!important;overflow-x:auto;align-items:start!important;padding-bottom:14px;scrollbar-gutter:stable;scroll-snap-type:x proximity}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section]:not([data-preview-section="Overview"]){grid-row:2;scroll-snap-align:start;max-height:720px;box-sizing:border-box}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section]:not([data-preview-section="Overview"])[open]{height:720px;overflow-y:auto!important;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section]:not([data-preview-section="Overview"])>summary{position:sticky;top:-20px;z-index:3;min-height:48px!important;box-sizing:border-box;padding-bottom:12px!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"] .reference-preview-content{grid-template-columns:minmax(0,1fr)!important}
+html[data-theme] body.planner-horizontal .itinerary-suggestion-grid{grid-template-columns:minmax(0,1fr)!important}
+html[data-theme] body.planner-horizontal .directions-location-row{display:grid;grid-template-columns:1fr!important}
+html[data-theme] body.planner-horizontal .reference-preview-card .booking-card-summary{min-height:0}
+html[data-theme] body.planner-horizontal .reference-preview-card .booking-stay-filter label{white-space:normal;flex-wrap:wrap}
+@media(max-width:600px){html[data-theme] body.planner-horizontal #studio-dashboard-content{grid-template-columns:repeat(4,minmax(280px,85vw))!important}html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Overview"]{max-width:85vw}}
