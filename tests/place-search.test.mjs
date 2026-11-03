@@ -45,3 +45,31 @@ test('suggestions include proxied real photos and attribution, with no invented 
  assert.equal(places[1].imageUrl,'');
  assert.deepEqual(places[1].imageAuthors,[]);
 });
+test('popular activities expose provider ratings, sort by review count, and exclude stays',async()=>{
+ let request;
+ const service=new PlaceSearchService({apiKey:'test-only',fetchImpl:async(url,options)=>{request=options;return {ok:true,json:async()=>({places:[
+  {id:'museum',displayName:{text:'Museum'},rating:4.8,userRatingCount:80,photos:[{authorAttributions:[{displayName:'Photo credit',uri:'https://example.com/author'}]}]},
+  {id:'park',displayName:{text:'Park'},rating:4.5,userRatingCount:120},
+  {id:'unknown',displayName:{text:'New attraction'}},
+  {id:'hotel',displayName:{text:'Hotel'},types:['hotel'],rating:5,userRatingCount:999}
+ ]})};}});
+ const response=await service.popularActivities({destination:'Bangkok',purpose:'Culture, History & Heritage',style:'Balanced'});
+ const result=response.items;
+ assert.equal(JSON.parse(request.body).textQuery,'good value popular museums and historic sites in Bangkok');
+ assert.equal(response.nextPageToken,null);
+ assert.match(request.headers['X-Goog-FieldMask'],/places.userRatingCount/);
+ assert.deepEqual(result.map(p=>p.id),['park','museum','unknown']);
+ assert.equal(result[0].rating,4.5);assert.equal(result[0].ratingCount,120);
+ assert.equal(result[1].imageUrl,'/api/activities/photo/museum');
+ assert.equal(result[1].imageAuthors[0].name,'Photo credit');
+ assert.equal(result[2].rating,null);assert.equal(result[2].ratingCount,null);
+});
+test('activity pagination keeps search context and passes the provider cursor',async()=>{
+ const requests=[];
+ const service=new PlaceSearchService({apiKey:'test-only',fetchImpl:async(url,options)=>{requests.push(JSON.parse(options.body));return {ok:true,json:async()=>({places:[],nextPageToken:'next-cursor'})};}});
+ const context={destination:'Hanoi',purpose:'Food, Drink & Culinary',style:'Pocket Friendly',variant:1};
+ assert.equal((await service.popularActivities(context)).nextPageToken,'next-cursor');
+ await service.popularActivities({...context,pageToken:'next-cursor'});
+ assert.deepEqual(requests[1],{...requests[0],pageToken:'next-cursor'});
+ assert.match(requests[0].textQuery,/free and affordable cooking classes and culinary experiences in Hanoi/);
+});
