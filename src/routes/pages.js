@@ -16,6 +16,7 @@ const pages = new Map([
   ["/my-trips", "my-trips.html"],
   ["/about", "about.html"],
   ["/help", "help.html"],
+  ["/emergency-contacts", "emergency-contacts.html"],
   ["/login", "login.html"],
   ["/signup", "signup.html"],
   ["/profile", "profile.html"],

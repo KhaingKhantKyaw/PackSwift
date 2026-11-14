@@ -4,6 +4,8 @@ import {randomBytes,createHash} from 'node:crypto';
 import {rateLimit} from 'express-rate-limit';
 import {getDatabasePool} from '../config/database.js';
 import {requireAuth} from '../middleware/auth.js';
+import '../../public/js/itinerary-plan-model.js';
+import '../../public/js/travel-guidance-model.js';
 export const tripDraftRouter=Router();
 const cookie='packswift_trip_draft';
 const options={httpOnly:true,sameSite:'strict',secure:process.env.NODE_ENV==='production',path:'/api/trip-drafts',maxAge:20*60*1000};
@@ -15,6 +17,13 @@ tripDraftRouter.post('/',async(req,res)=>{
   const {payload,action}=req.body||{};
   if(!['plan','save','board'].includes(action)||!payload||typeof payload!=='object'||Array.isArray(payload)||JSON.stringify(payload).length>100000)return res.status(400).json({message:'Trip draft is too large or incomplete.'});
   try{
+    for(const field of Array.isArray(payload.fields)?payload.fields:[]){
+      if(field?.name==='travelGuidance')field.value=JSON.stringify(globalThis.PackSwiftTravelGuidanceModel.normalize(field.value));
+      if(field?.name!=='itineraryPlan'||!field.value)continue;
+      const plan=globalThis.PackSwiftItineraryPlanModel.normalize(field.value);
+      if(!plan)return res.status(400).json({message:'Your itinerary could not be read. Review it before saving.'});
+      field.value=JSON.stringify(globalThis.PackSwiftItineraryPlanModel.persist(plan));
+    }
     if(Array.isArray(payload.preview?.places))payload.preview.places=payload.preview.places.map(placeReference);
     const db=getDatabasePool();const token=randomBytes(32).toString('hex');
     await db.execute('DELETE FROM temporary_trip_drafts WHERE expires_at <= UTC_TIMESTAMP()');

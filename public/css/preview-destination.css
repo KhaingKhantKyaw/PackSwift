@@ -1,15 +1,27 @@
 /* Destination heading and softly tinted feature panels. Existing tools stay mounted. */
+/* Brand accents stay restrained: forest for planning, ocean for discovery. */
+@media screen {
+ html[data-theme] body.planner-horizontal #studio-dashboard-content .reference-preview-card[data-preview-section] {
+  --feature-tint:var(--ps-inset)!important;
+  --feature-ink:var(--ps-accent)!important;
+ }
+ html[data-theme] body.planner-horizontal #studio-dashboard-content .reference-preview-card:is([data-preview-section="Flight & Stay"],[data-preview-section="Activities"]) {
+  --feature-tint:var(--ps-ocean-tint)!important;
+  --feature-ink:var(--ps-ocean)!important;
+ }
+ html[data-theme] body.planner-horizontal #studio-dashboard-content a.booking-result-action {color:var(--ps-ocean)!important}
+}
 html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .studio-dashboard{background:var(--planning-paper)!important;background-image:none!important;border:0!important;box-shadow:none!important}
 html[data-theme] body.planner-horizontal #studio-dashboard-content{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px!important}
 html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section]{grid-column:auto!important;min-width:0;background:var(--feature-tint)!important;border:1px solid color-mix(in srgb,var(--feature-ink) 12%,transparent)!important;border-top:0!important;border-radius:22px!important;padding:20px!important;box-shadow:0 3px 12px #102e3510!important;--feature-tint:#e8f0fc;--feature-ink:#27538b}
-html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"]{--feature-tint:#fcebe5!important;--feature-ink:#973f35!important}
-html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Activities"]{--feature-tint:#e6efff!important;--feature-ink:#285b9b!important}
-html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{--feature-tint:#f3f1d9!important;--feature-ink:#76631c!important}
-html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{--feature-tint:#e4f3eb!important;--feature-ink:#286b55!important}
-html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"]{--feature-tint:#352b32!important;--feature-ink:#ffc4b4!important}
-html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Activities"]{--feature-tint:#20324b!important;--feature-ink:#afccff!important}
-html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{--feature-tint:#343525!important;--feature-ink:#e7d88f!important}
-html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{--feature-tint:#213a33!important;--feature-ink:#a5e4c8!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"]{--feature-tint:#fff0e8!important;--feature-ink:#853e22!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Activities"]{--feature-tint:#ebf2ff!important;--feature-ink:#234f86!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{--feature-tint:#f8f2d6!important;--feature-ink:#655011!important}
+html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{--feature-tint:#e7f5ee!important;--feature-ink:#145a47!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Flight & Stay"]{--feature-tint:#372b30!important;--feature-ink:#ffc5a9!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Activities"]{--feature-tint:#1b2d49!important;--feature-ink:#b4d3ff!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Itinerary"]{--feature-tint:#333026!important;--feature-ink:#f7db87!important}
+html[data-theme="dark"] body.planner-horizontal .reference-preview-card[data-preview-section="Packing List"]{--feature-tint:#19352f!important;--feature-ink:#aaf0cb!important}
 html[data-theme] body.planner-horizontal .reference-preview-card>summary{font:700 20px/1.4 Arial,sans-serif!important;color:var(--feature-ink)!important;background:var(--feature-tint)!important}
 html[data-theme] body.planner-horizontal .reference-preview-card .preview-icon{background:transparent!important;color:var(--feature-ink)!important;border-radius:0!important}
 html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section="Overview"]{grid-column:1/-1!important;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:8px 0 20px!important}
@@ -101,7 +113,10 @@ html[data-theme] body.planner-horizontal .activities-discovery span{text-transfo
 .activities-card-list{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin:12px 0}
 html[data-theme] body.planner-horizontal .activities-destination{font:600 14px/1.5 Arial,sans-serif!important;margin:0!important;color:var(--feature-ink)!important}
 html[data-theme] body.planner-horizontal .activities-vote-count{display:block;margin:4px 0;color:var(--planning-muted)!important;font:12px/1.5 Arial,sans-serif!important}
-.activities-vote-count:empty{display:none!important}
+.activities-vote-count:empty{visibility:hidden}
+.activities-vote-count{min-height:21px}
+.activities-card-list{overflow-anchor:none}
+.activity-replacement-status{min-height:100%;padding:24px;font:14px/1.5 Arial,sans-serif;color:var(--planning-muted)}
 html[data-theme] body.planner-horizontal .activity-preview-card{min-width:0;overflow:hidden;background:var(--planning-paper)!important;border:1px solid var(--planning-line);border-radius:16px;padding:0!important;transition:border-color .15s ease}
 .activity-preview-photo{aspect-ratio:16/9;overflow:hidden;display:grid;place-items:center;background:var(--planning-inset);color:var(--planning-muted);font:13px Arial,sans-serif}
 .activity-preview-photo img{display:block;width:100%;height:100%;object-fit:cover}
@@ -127,3 +142,186 @@ html[data-theme] body.planner-horizontal .activities-discovery [hidden]{display:
 html[data-theme] body.planner-horizontal .activity-match-label{display:block;margin:0 0 8px;font:12px/1.5 Arial,sans-serif!important;color:var(--feature-ink)!important}
 html[data-theme] body.planner-horizontal .activities-undo{display:block;min-height:44px;margin:4px 0;padding:8px 10px;background:var(--planning-paper)!important;color:var(--planning-text)!important;border:1px solid var(--planning-line);border-radius:10px;font:600 12px Arial,sans-serif!important;cursor:pointer}
 .activities-scroll-sentinel{height:1px;pointer-events:none}
+/* Fixed text regions keep the next card's actions under the same pointer. */
+html[data-theme] body.planner-horizontal .activity-preview-card{display:flex;flex-direction:column;box-sizing:border-box}
+.activity-preview-photo{flex-shrink:0}
+.activity-preview-body{flex:1;display:flex;flex-direction:column}
+html[data-theme] body.planner-horizontal .activity-preview-body h3{min-height:2.9em;max-height:2.9em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+html[data-theme] body.planner-horizontal .activity-match-label{min-height:3em;max-height:3em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.activity-preview-actions{margin-top:auto}
+.activity-preview-credits{height:19px;box-sizing:border-box;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.activity-preview-credits>*{flex-shrink:0}
+.activity-preview-credits::-webkit-scrollbar{display:none}
+
+/* Connected planning: readable panels without horizontal page scrolling. */
+html[data-theme] body.planner-horizontal #studio-dashboard-content{grid-template-columns:repeat(4,minmax(0,1fr))!important;overflow-x:clip;scroll-snap-type:none}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section]:not([data-preview-section="Overview"]){grid-row:auto;min-width:0}
+html[data-theme] body.planner-horizontal .preview-expand{margin-left:auto;flex-shrink:0;min-height:44px;padding:8px;font:600 12px/1.3 Arial,sans-serif!important;border:1px solid var(--planning-line);border-radius:10px;background:var(--planning-paper);color:var(--planning-text);cursor:pointer}
+html[data-theme] body.planner-horizontal #studio-dashboard-content.has-expanded-panel{grid-template-columns:minmax(0,1fr)!important}
+html[data-theme] body.planner-horizontal #studio-dashboard-content.has-expanded-panel>.reference-preview-card:not(.is-expanded){display:none!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] #studio-dashboard-content>.is-expanded{grid-column:1/-1!important}
+.is-expanded .activities-card-list{grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))}
+html[data-theme] body.planner-horizontal .activity-preview-body h3{font-size:16px!important}
+html[data-theme] body.planner-horizontal :is(.activity-preview-actions button,.activity-preview-rating,.activity-match-label,.activities-vote-count){font-size:14px!important}
+.itinerary-shortlist{display:grid;gap:12px;margin:12px 0}
+.itinerary-shortlist-row{padding:12px;background:var(--planning-paper);border:1px solid var(--planning-line);border-radius:12px;min-width:0}
+.itinerary-shortlist-row>strong{display:block;overflow-wrap:anywhere;margin-bottom:10px}
+.shortlist-actions{display:flex;flex-wrap:wrap;gap:8px}
+.shortlist-actions :is(button,select){min-height:44px;min-width:0;max-width:100%;padding:8px;border-radius:8px;border:1px solid var(--planning-line);background:var(--planning-action);color:var(--planning-text);font:600 14px/1.4 Arial,sans-serif}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-field.trip-comfort-controls{grid-column:1/-1!important;width:100%!important}
+.trip-comfort-controls h2 svg{width:24px;height:24px;margin-right:12px}
+.comfort-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.comfort-fields label{display:grid;gap:6px;min-width:0}
+.comfort-fields{font:14px/1.5 Arial,sans-serif}
+.comfort-fields select{width:100%;min-width:0;min-height:44px}
+.packing-quantity-note{display:block;margin:-2px 0 12px;padding-left:30px;font:12px/1.5 Arial,sans-serif;color:var(--planning-muted)}
+.packing-weather{margin:12px 0;padding:12px;border:1px solid var(--planning-line);border-radius:12px;background:var(--planning-paper)}
+.packing-weather p{font-size:14px!important;line-height:1.5!important}
+.packing-weather small{display:block}
+.final-trip-budget .support-fields{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.final-trip-budget .support-fields select{width:100%;min-height:44px;padding:10px;border:1px solid var(--planning-line);border-radius:10px;font:16px Arial,sans-serif;background:var(--planning-paper);color:var(--planning-text)}
+body.planner-sketch #trip-planner-form>#studio-save-status{display:none}
+@media(max-width:1450px){html[data-theme] body.planner-horizontal #studio-dashboard-content{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:720px){
+ html[data-theme] body.planner-horizontal #studio-dashboard-content{grid-template-columns:minmax(0,1fr)!important}
+ html[data-theme] body.planner-horizontal .reference-preview-card[data-preview-section="Overview"]{max-width:100%}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .reference-preview-card[data-preview-section]:not([data-preview-section="Overview"])[open]{height:640px;max-height:80vh}
+ .comfort-fields{grid-template-columns:minmax(0,1fr)}
+}
+
+/* Keep the complete setup in view on laptops, without clipping expanded controls.
+   These rules own setup geometry only; the trip-plan board is unchanged. */
+@media(min-width:1180px){
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup{grid-template-columns:minmax(0,3fr) minmax(0,1fr)}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .studio-setup{padding:16px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-fields{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-field[data-field]{min-height:0;padding:10px 12px!important;margin:0!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-field[data-field]>h2{font-size:14px!important;line-height:22px!important;height:22px;margin:0 0 8px!important;gap:8px}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-field>h2 svg{width:20px;height:20px;flex:none;margin:0}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-field[data-field]>.sketch-pair{margin-top:0!important;gap:8px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-control>label{font-size:12px!important;line-height:18px!important;margin:0 0 4px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-field[data-field="Travelers"] .sketch-control{grid-template-rows:22px 40px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-field[data-field="Location"] .sketch-pair{grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr)!important;gap:6px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .route-swap{width:28px;height:36px;min-width:28px;padding:0!important;align-self:end;margin-bottom:2px}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-date input{padding-left:8px!important;padding-right:30px!important;font-size:12px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-date .sketch-calendar-trigger{width:28px!important;min-width:28px!important;padding:4px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .purpose-multiselect{border:1px solid var(--planning-line)!important;border-radius:9px!important;background:var(--planning-paper)}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .purpose-multiselect>summary{border:0!important;border-radius:8px!important}
+
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-panel{display:grid!important;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);grid-template-areas:"heading heading" "intro view" "choices view" "footer footer";column-gap:16px!important;row-gap:6px!important;padding:12px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-panel[data-field]>h2{grid-area:heading;margin:0!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-intro{grid-area:intro;margin:0!important;font-size:12px!important;line-height:18px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-choices{grid-area:choices;gap:8px}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-choice{min-height:68px!important;padding:10px!important;gap:4px;border-radius:10px}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-choice[aria-checked="true"]{padding:9px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-choice-title{font-size:14px!important;line-height:20px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-choice-copy{font-size:12px!important;line-height:18px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-view{grid-area:view;align-self:center;display:grid;justify-content:stretch;gap:6px;margin:0;padding-left:16px;border-left:1px solid var(--planning-line)}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-view-label{font-size:12px!important;line-height:18px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-levels{display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:3px}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-levels button{padding:8px 6px!important;min-height:40px!important;font-size:12px!important;white-space:normal}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-footer{grid-area:footer;margin:0;gap:0 12px}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-note{font-size:12px!important;line-height:18px!important}
+
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .trip-comfort-controls .comfort-fields{margin-top:0;gap:12px}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .trip-comfort-controls .comfort-fields label{font-size:12px!important;line-height:18px!important;gap:4px;padding:0!important;margin:0!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .trip-comfort-controls select{min-height:40px;height:40px;font-size:13px!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-overview{padding:24px 20px}
+ html[data-theme] body.planner-horizontal #trip-overview-title{margin-bottom:18px!important}
+ html[data-theme] body.planner-horizontal #trip-overview .destination-overview-heading h2{font-size:clamp(28px,2.5vw,38px)!important;line-height:1.15!important}
+ html[data-theme] body.planner-horizontal #trip-overview .destination-overview-dates{font-size:16px!important;line-height:1.5!important;margin:14px 0 8px!important}
+ html[data-theme] body.planner-horizontal #trip-overview .destination-overview-meta{font-size:13px!important;line-height:1.6!important;margin-bottom:12px}
+ html[data-theme] body.planner-horizontal #trip-overview .destination-overview-choices{gap:6px;margin:12px 0}
+ html[data-theme] body.planner-horizontal #trip-overview .destination-overview-choices>span{padding:5px 8px}
+}
+@media(min-width:1280px){
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .sketch-date input{font-size:13px!important}
+}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .studio-dashboard>h2{color:var(--planning-text)!important}
+
+/* The board uses category color for orientation, neutral surfaces for reading,
+   and the site's action palette for things the traveler can actually do. */
+@media screen {
+  #studio-dashboard-content .reference-preview-card > summary,
+  #studio-dashboard-content .reference-preview-card > summary > span {
+    color: var(--feature-ink) !important;
+  }
+  #studio-dashboard-content .preview-expand {
+    background: var(--ps-surface) !important;
+    border-color: var(--feature-ink) !important;
+    color: var(--feature-ink) !important;
+  }
+  #studio-dashboard-content .preview-expand[aria-pressed="true"] {
+    background: var(--feature-ink) !important;
+    color: var(--feature-tint) !important;
+  }
+  #studio-dashboard-content :is(.reference-route, .reference-route > div:last-child, .stay-search-preview,
+      .activity-preview-card, .booking-result, .itinerary-editor-stop-body, .packing-tabpanel > [data-category]) {
+    background: var(--ps-surface) !important;
+    border-color: var(--ps-border) !important;
+    color: var(--ps-ink) !important;
+  }
+  #studio-dashboard-content .booking-card-summary > :is(strong, span),
+  #studio-dashboard-content .booking-result > strong,
+  #studio-dashboard-content .activity-preview-body h3 {
+    color: var(--ps-ink) !important;
+  }
+  #studio-dashboard-content .booking-result > strong:nth-of-type(2),
+  #studio-dashboard-content :is(.activity-match-label, .itinerary-editor-time, .packing-progress-text, .preparation-progress) {
+    color: var(--feature-ink) !important;
+  }
+  #studio-dashboard-content :is(.booking-embedded small, .booking-search-notice, .booking-card-summary small,
+      .activities-provider-status, .activities-vote-count, .activity-preview-rating, .activity-preview-credits a,
+      .activity-preview-credits span, .itinerary-editor-meta, .packing-quantity-note) {
+    color: var(--ps-muted) !important;
+  }
+
+  #studio-dashboard-content :is(button.booking-search-link:not(:disabled), .itinerary-editor-primary:not(:disabled),
+      .itinerary-editor-tabs [aria-selected="true"], .packing-tabs [aria-selected="true"]),
+  html[data-theme] body.planner-horizontal .itinerary-editor-dialog .itinerary-editor-primary:not(:disabled) {
+    background: var(--ps-accent) !important;
+    color: var(--ps-on-accent) !important;
+    border-color: var(--ps-accent) !important;
+  }
+  #studio-dashboard-content button.booking-search-link:disabled {
+    background: var(--ps-canvas) !important;
+    color: var(--ps-muted) !important;
+    border-color: var(--ps-border) !important;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+  #studio-dashboard-content a.booking-search-link {
+    background: transparent !important;
+    color: var(--ps-accent) !important;
+    text-decoration: underline;
+  }
+  #studio-dashboard-content :is(a.booking-result-action, .activity-preview-actions button:not([aria-pressed="true"])) {
+    background: var(--ps-field) !important;
+    border-color: var(--ps-control-border) !important;
+    color: var(--ps-accent) !important;
+  }
+  #studio-dashboard-content .activity-preview-actions button[data-vote="up"][aria-pressed="true"],
+  #trip-overview .destination-overview-choices > span {
+    background: var(--ps-selected-bg) !important;
+    color: var(--ps-selected-ink) !important;
+    border-color: var(--ps-accent) !important;
+  }
+  #studio-dashboard-content :is(.packing-item, .preparation-item) input[type="checkbox"],
+  #studio-dashboard-content .packing-essentials progress {
+    accent-color: var(--ps-accent);
+  }
+  #studio-dashboard-content .packing-item > button {
+    color: var(--ps-danger, #a13b39) !important;
+  }
+  html[data-theme="dark"] #studio-dashboard-content .packing-item > button {
+    color: var(--ps-danger, #ffb8b3) !important;
+  }
+  #studio-dashboard-content :is(a.booking-result-action, .preview-expand, .activity-preview-actions button:not([aria-pressed="true"])):hover {
+    border-color: currentColor !important;
+    text-decoration: underline;
+    text-underline-offset: .18em;
+  }
+  #studio-dashboard-content :focus-visible, #trip-overview :focus-visible {
+    outline: 3px solid var(--ps-focus) !important;
+  }
+}

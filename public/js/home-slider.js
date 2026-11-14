@@ -3,44 +3,44 @@
     {
       id: "singapore", name: "Singapore", city: "SINGAPORE", country: "Singapore",
       pillLabel: "📍 Singapore, Singapore", spots: "Marina Bay Gardens",
-      description: "Garden paths above the city. Hawker flavours around the corner. A small island with a world of possibilities.",
+      description: "Gardens, city walks and hawker food.",
       bgImage: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1920&q=80",
       cardImage: "https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&w=600&q=80",
     },
     {
       id: "bali", name: "Bali", city: "BALI", country: "Indonesia",
       pillLabel: "📍 Bali, Indonesia", spots: "Ubud Uluwatu",
-      description: "Emerald rice terraces, ocean breezes and temples above the waves. Slow down and discover your own island rhythm.",
+      description: "Rice terraces, beaches and temples.",
       bgImage: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1920&q=80",
       cardImage: "https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=600&q=80",
     },
     {
       id: "yangon", name: "Yangon", city: "YANGON", country: "Myanmar",
       pillLabel: "📍 Yangon, Myanmar", spots: "RGN YGN Shwedagon Bogyoke",
-      description: "Golden pagodas reflecting the evening sun, colonial streets, and authentic heritage waiting around every corner.",
+      description: "Pagodas, markets and historic streets.",
       bgImage: "https://images.unsplash.com/photo-1515832730975-869da433df66?auto=format&fit=crop&w=1920&q=80",
       cardImage: "https://images.unsplash.com/photo-1515832730975-869da433df66?auto=format&fit=crop&w=600&q=80",
     },
     {
       id: "bangkok", name: "Bangkok", city: "BANGKOK", country: "Thailand",
       pillLabel: "📍 Bangkok, Thailand", spots: "Wat Arun Grand Palace",
-      description: "Golden temples, riverside sunsets and unforgettable street food. Find your own rhythm in Thailand’s vibrant capital.",
+      description: "Temples, riverside walks and street food.",
       bgImage: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=1920&q=80",
       cardImage: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?auto=format&fit=crop&w=600&q=80",
     },
     {
       id: "hanoi", name: "Hanoi", city: "HANOI", country: "Vietnam",
       pillLabel: "📍 Hanoi, Vietnam", spots: "Old Quarter Hoan Kiem",
-      description: "Lakeside mornings, fragrant coffee and lantern-lit lanes. Wander the Old Quarter and savour Vietnam’s timeless capital.",
+      description: "Lakeside walks, coffee and the Old Quarter.",
       bgImage: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1920&q=80",
       cardImage: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80",
     },
   ];
   destinations.push(
-    {id:'taipei',name:'Taipei',city:'TAIPEI',country:'Taiwan',pillLabel:'📍 Taipei, Taiwan',spots:'TPE Taiwan Taipei 101 night markets',description:'Mountain-framed streets, lively night markets and a skyline that invites you to look up. Discover Taiwan through Taipei.',attractions:['Taipei 101','National Palace Museum','Daan Forest Park','Raohe Street Night Market']},
-    {id:'tokyo',name:'Tokyo',city:'TOKYO',country:'Japan',pillLabel:'📍 Tokyo, Japan',spots:'TYO Japan Shibuya Senso-ji',description:'Quiet temple gardens meet bright city streets. Find small discoveries between Tokyo’s extraordinary neighbourhoods.'},
-    {id:'seoul',name:'Seoul',city:'SEOUL',country:'South Korea',pillLabel:'📍 Seoul, South Korea',spots:'ICN Korea palaces cafes',description:'Palace courtyards, creative cafés and streets full of flavour. Explore the many moods of Seoul.'},
-    {id:'paris',name:'Paris',city:'PARIS',country:'France',pillLabel:'📍 Paris, France',spots:'France Eiffel Louvre',description:'Riverside walks, neighbourhood bakeries and art around every corner. Make room for a slower kind of discovery.'}
+    {id:'taipei',name:'Taipei',city:'TAIPEI',country:'Taiwan',pillLabel:'📍 Taipei, Taiwan',spots:'TPE Taiwan Taipei 101 night markets',description:'Night markets, mountain views and city sights.',attractions:['Taipei 101','National Palace Museum','Daan Forest Park','Raohe Street Night Market']},
+    {id:'tokyo',name:'Tokyo',city:'TOKYO',country:'Japan',pillLabel:'📍 Tokyo, Japan',spots:'TYO Japan Shibuya Senso-ji',description:'Temple gardens and lively neighborhoods.'},
+    {id:'seoul',name:'Seoul',city:'SEOUL',country:'South Korea',pillLabel:'📍 Seoul, South Korea',spots:'ICN Korea palaces cafes',description:'Palaces, cafés and local food.'},
+    {id:'paris',name:'Paris',city:'PARIS',country:'France',pillLabel:'📍 Paris, France',spots:'France Eiffel Louvre',description:'Art, bakeries and riverside walks.'}
   );
   const el = id => document.getElementById(id);
   const FALLBACK_IMAGE = "/images/packswift1.jpg";

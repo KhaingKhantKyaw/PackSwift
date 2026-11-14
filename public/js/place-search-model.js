@@ -7,7 +7,7 @@ globalThis.PackSwiftPlaceSearchModel=(()=>{
  function schedule(selected,days,preferences={}){
   const result=Array.from({length:days},(_,i)=>({day:i+1,title:`Day ${i+1}`,activities:[],load:0})),unscheduled=[];
   const prefs=new Map((preferences.activityPreferences||[]).map(p=>[p.activityId,p]));
-  const requestedCap={relaxed:2,balanced:3,packed:4}[preferences.dailyPace]||{'Pocket Friendly':3,'Balanced':3,'Comfort & Value':2,'Full Experience':4,'Ultimate Luxury':1}[preferences.travelStyle]||{relaxed:2,balanced:3,packed:4}[preferences.tripPace]||3;
+  const requestedCap={relaxed:2,balanced:3,packed:4}[preferences.tripPace]||{relaxed:2,balanced:3,packed:4}[preferences.dailyPace]||3;
   const minutes=t=>/^([01]\d|2[0-3]):[0-5]\d$/.test(t||'')?Number(t.slice(0,2))*60+Number(t.slice(3)):null;
   const start=minutes(preferences.preferredDayStart),end=minutes(preferences.preferredDayEnd);
   const timeCap=start!==null&&end!==null&&end>start?Math.max(1,Math.floor((end-start)/150)):requestedCap;
@@ -19,13 +19,16 @@ globalThis.PackSwiftPlaceSearchModel=(()=>{
   // Nearest-neighbour clustering is a geographic heuristic, not a travel-time estimate.
   while(remaining.length){let index=0;const last=sorted.at(-1);if(last&&!prefs.get(identity(remaining[0]))?.preferredDay){let best=Infinity;remaining.forEach((p,i)=>{if(score(p)!==score(remaining[0]))return;const km=distance(last.coordinates,p.coordinates);if(km!==null&&km<best){best=km;index=i;}});}sorted.push(remaining.splice(index,1)[0]);}
   for(const p of sorted){const f=prefs.get(identity(p))||{},long=['day_trip','overnight_option','long_distance'].includes(p.tripType),weight=long?1:1/cap;
+   if(preferences.planningMode==='manual'&&!f.preferredDay){unscheduled.push({...p,reason:'Choose a day to add this place to your schedule.'});continue;}
    if(p.needsRefresh||p.tripType==='unknown'){unscheduled.push({...p,reason:'Refresh place details and verify travel before scheduling.'});continue;}
    if(p.tripType==='long_distance'){unscheduled.push({...p,reason:'Long-distance side trip: arrange transport and dates before fitting this into your main itinerary.'});continue;}
    const candidates=f.preferredDay?[result[f.preferredDay-1]].filter(Boolean):[...result.slice(days>2?1:0,days>2?-1:undefined),...result.filter(d=>d.day===1||d.day===days)];
    const nearby=d=>d.activities.every(a=>{const km=distance(a.coordinates,p.coordinates);return km===null||km<=15;});
-   const available=candidates.filter(d=>d.load+weight<=1.001&&(f.preferredDay||nearby(d)));
+   const exact=f.preferredTimePeriod==='specific'?minutes(f.specificTime):null;
+   const timeFits=d=>exact===null||((start===null||exact>=start)&&(end===null||exact+90<=end)&&(d.day!==1||arrival===null||exact>=arrival+210)&&d.activities.every(a=>{const booked=minutes(a.planningTime);return booked===null||Math.abs(booked-exact)>=120;}));
+   const available=candidates.filter(d=>d.load+weight<=1.001&&(f.preferredDay||nearby(d))&&timeFits(d));
    if(!f.preferredDay)available.sort((a,b)=>{const cost=d=>d.activities.length?Math.min(...d.activities.map(x=>distance(x.coordinates,p.coordinates)??100)):20;return cost(a)-cost(b);});
-   const day=available[0];if(!day){unscheduled.push({...p,reason:f.preferredDay?'Preferred day has insufficient room. Change the day or remove another activity.':'No suitable nearby day has room. Keep this place for another day or extend the trip.'});continue;}
+   const day=available[0];if(!day){unscheduled.push({...p,reason:exact!==null&&candidates.some(d=>!timeFits(d))?'Time conflicts with another stop, your day hours or arrival buffer. Allow about 2 hours between timed stops; verify actual durations.':f.preferredDay?'Preferred day has insufficient room. Change the day or remove another activity.':'No suitable nearby day has room. Keep this place for another day or extend the trip.'});continue;}
    const period=f.preferredTimePeriod==='specific'?f.specificTime:f.preferredTimePeriod!=='any'?f.preferredTimePeriod:p.activityType==='dining'?'Meal stop · lunch or dinner':'Flexible time';
    day.activities.push({...p,preferredDay:f.preferredDay||null,priority:f.priority||'would_like',planningTime:period||'Flexible time',planningBlocks:long?['Outbound transfer · confirm route and duration',p.title||p.name,'Meal / rest break','Return transfer · confirm last departure']:[]});day.load+=weight;
    if(long)day.title='Day trip · '+(p.title||p.name);

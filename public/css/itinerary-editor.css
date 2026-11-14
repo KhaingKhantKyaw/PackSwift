@@ -1,0 +1,65 @@
+/* Keep the editor inside its existing scrollable planner panel. */
+.itinerary-editor,.itinerary-editor-dialog{color:var(--planning-text,#163b40);font-size:15px;line-height:1.55;overflow-wrap:anywhere}
+.itinerary-editor{margin:0;padding:0;min-width:0}
+.itinerary-editor h3,.itinerary-editor-dialog h3{font-size:1.2rem;line-height:1.3;margin:0 0 8px}
+.itinerary-editor h4,.itinerary-editor-dialog h4{font-size:1rem;line-height:1.4;margin:0 0 8px}
+.itinerary-editor p,.itinerary-editor-dialog p{margin:8px 0 12px}
+.itinerary-editor-intro,.itinerary-editor-meta{color:var(--planning-muted,#4c666b)!important;font-size:.9rem}
+.itinerary-editor-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0}
+.itinerary-editor :is(button,a.itinerary-editor-link),.itinerary-editor-dialog :is(button,a.itinerary-editor-link){box-sizing:border-box;min-height:44px;padding:10px 13px;border:1px solid var(--planning-line,#b4ccc8);border-radius:11px;background:var(--planning-action,#dcf3eb);color:var(--planning-action-text,#075b56);font:inherit;font-size:.88rem;font-weight:600;line-height:1.3;text-decoration:none;cursor:pointer;white-space:normal}
+.itinerary-editor :is(button:disabled),.itinerary-editor-dialog button:disabled{opacity:.5;cursor:not-allowed}
+.itinerary-editor :is(button,a,summary,input,select,textarea):focus-visible,.itinerary-editor-dialog :is(button,a,summary,input,select,textarea):focus-visible{outline:3px solid var(--planning-focus,#007c88);outline-offset:3px}
+html body .itinerary-editor .itinerary-editor-primary,html body .itinerary-editor-dialog .itinerary-editor-primary{background:var(--planning-action-text,#075b56)!important;color:var(--planning-paper,#fffdf8)!important;border-color:var(--planning-action-text,#075b56)!important}
+html[data-theme="dark"] body .itinerary-editor .itinerary-editor-primary,html[data-theme="dark"] body .itinerary-editor-dialog .itinerary-editor-primary{color:#102f35!important}
+.itinerary-editor-status,.itinerary-editor-notice,.itinerary-editor-empty{padding:12px 14px;border-radius:12px;background:var(--planning-inset,#f2f7f4);border:1px solid var(--planning-line,#b4ccc8)}
+.itinerary-editor-status.is-error,.itinerary-editor-notice{border-left:4px solid #b06a19}
+.itinerary-editor-status:empty{display:none}
+.itinerary-editor-tabs{display:flex;gap:8px;overflow-x:auto;padding:5px 3px 10px;margin:18px 0 8px;scrollbar-width:thin}
+.itinerary-editor-tabs button{flex:0 0 auto;min-width:115px}
+html body .itinerary-editor-tabs button[aria-selected="true"]{background:var(--planning-action-text,#075b56)!important;color:var(--planning-paper,#fffdf8)!important;border-color:var(--planning-action-text,#075b56)!important}
+html[data-theme="dark"] body .itinerary-editor-tabs button[aria-selected="true"]{color:#102f35!important}
+.itinerary-editor-day{padding:8px 0}
+.itinerary-editor-totals{display:flex;flex-wrap:wrap;gap:8px 16px;margin:10px 0 16px;padding:13px;border:1px solid var(--planning-line,#b4ccc8);border-radius:12px;background:var(--planning-inset,#f2f7f4);font-size:.85rem}
+.itinerary-editor-totals span{display:block}
+.itinerary-editor-totals small{flex-basis:100%;color:var(--planning-muted,#4c666b)}
+.itinerary-editor-link{display:inline-flex;align-items:center;margin:4px 0 10px}
+.itinerary-editor-timeline{list-style:none;padding:0;margin:14px 0}
+.itinerary-editor-stop{margin:0 0 13px;padding:0;position:relative}
+.itinerary-editor-stop-body{padding:14px;background:var(--planning-paper,#fffdf8);border:1px solid var(--planning-line,#b4ccc8);border-radius:14px}
+.itinerary-editor-stop-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 12px}
+.itinerary-editor-stop-heading h4{flex:1 1 160px;margin:0;font-size:1rem}
+.itinerary-editor-time{font-variant-numeric:tabular-nums;font-weight:750;color:var(--planning-action-text,#075b56)}
+.itinerary-editor-badge{font-size:.75rem;border:1px solid var(--planning-line,#b4ccc8);border-radius:20px;padding:3px 8px;background:var(--planning-action,#dcf3eb);white-space:nowrap}
+.itinerary-editor-notes{white-space:pre-wrap;font-size:.9rem}
+.itinerary-editor-stop .itinerary-editor-actions{margin-bottom:0}
+.itinerary-editor-stop .itinerary-editor-actions button{font-size:.8rem;padding:9px 11px}
+.itinerary-editor-leg{margin:0 0 10px 15px;border-left:2px dashed var(--planning-line,#b4ccc8);padding:9px 0 9px 16px;font-size:.82rem;color:var(--planning-muted,#4c666b)}
+.itinerary-editor-leg a.itinerary-editor-link{display:table;font-size:.8rem;margin:8px 0 0;min-height:40px}
+.itinerary-editor-warnings{margin:10px 0;font-size:.87rem}
+.itinerary-editor-warnings summary,.itinerary-editor-unscheduled>summary{padding:10px 0;min-height:44px;cursor:pointer;font-weight:600}
+.itinerary-editor-warnings ul{padding-left:22px;margin:4px 0 12px}
+.itinerary-editor-warnings li{margin:5px 0}
+.itinerary-editor-dialog{box-sizing:border-box;width:min(680px,calc(100vw - 28px));max-height:88dvh;padding:24px;border:1px solid var(--planning-line,#b4ccc8);border-radius:20px;background:var(--planning-paper,#fffdf8);box-shadow:0 18px 80px #071d3460;overflow:auto}
+.itinerary-editor-dialog::backdrop{background:#061b2a99;backdrop-filter:blur(3px)}
+.itinerary-editor-dialog>h3{padding-right:75px}
+.itinerary-editor-dialog .itinerary-editor-close{position:absolute;top:14px;right:14px;padding:8px 12px}
+.itinerary-editor-dialog label{display:grid;gap:7px;font-size:.9rem;font-weight:600;margin:15px 0}
+.itinerary-editor-dialog :is(input,select,textarea){box-sizing:border-box;width:100%;min-width:0;min-height:46px;border:1px solid var(--planning-line,#b4ccc8);border-radius:10px;background:var(--planning-paper,#fffdf8);color:var(--planning-text,#163b40);padding:10px 12px;font:inherit;font-weight:400}
+.itinerary-editor-dialog textarea{resize:vertical;min-height:90px}
+.itinerary-editor-dialog .itinerary-editor-notice:empty{display:none}
+.itinerary-editor-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.itinerary-editor-replacements{display:grid;gap:10px;margin:18px 0}
+.itinerary-editor-replacements button{text-align:left}
+.itinerary-editor-preview>section{border-top:1px solid var(--planning-line,#b4ccc8);padding-top:16px;margin-top:16px}
+.itinerary-editor-preview ol{padding-left:22px;margin:8px 0 14px}
+.itinerary-editor-preview li{margin:9px 0}
+.itinerary-editor-unscheduled .itinerary-editor-stop-body{margin:12px 0}
+.itinerary-editor-unscheduled label{display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:.9rem}
+.itinerary-editor-unscheduled select{min-height:44px;padding:8px 10px;border:1px solid var(--planning-line,#b4ccc8);border-radius:10px;background:var(--planning-paper,#fffdf8);color:var(--planning-text,#163b40);font:inherit}
+@media(max-width:540px){.itinerary-editor-dialog{padding:21px 17px}.itinerary-editor-pair{grid-template-columns:1fr;gap:0}.itinerary-editor-stop-body{padding:12px}.itinerary-editor-actions button{flex-grow:1}.itinerary-editor-totals{display:grid;gap:7px}.itinerary-editor-time{flex-basis:100%}}
+@media(prefers-reduced-motion:reduce){.itinerary-editor *,.itinerary-editor-dialog *{scroll-behavior:auto!important}}
+@media print{.itinerary-editor-actions,.itinerary-editor-tabs,.itinerary-editor-dialog,.itinerary-editor-link{display:none!important}.itinerary-editor-stop-body{break-inside:avoid}}
+/* Keep the active day and primary action distinct from inherited preview buttons. */
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] #studio-dashboard-content .itinerary-editor :is(.itinerary-editor-primary,[role="tab"][aria-selected="true"]){background:var(--planning-action-text)!important;color:var(--planning-paper)!important;border-color:var(--planning-action-text)!important}
+html[data-theme="dark"] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] #studio-dashboard-content .itinerary-editor :is(.itinerary-editor-primary,[role="tab"][aria-selected="true"]){color:#102f35!important}
+.itinerary-editor-checks{border-top:1px solid var(--planning-line);margin-top:16px;padding-top:6px}.itinerary-editor-status{font-size:.86rem;padding:9px 12px}.itinerary-editor-tabs{margin-top:10px}.itinerary-editor-day>.itinerary-editor-warnings{margin:4px 0}

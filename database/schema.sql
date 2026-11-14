@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS trip_sessions (
   hotel_address VARCHAR(255) NULL,
   start_date DATE NULL,
   end_date DATE NULL,
-  budget_amount DECIMAL(12, 2) NOT NULL,
+  budget_amount DECIMAL(12, 2) NULL,
   budget_currency CHAR(3) NOT NULL,
   travelers SMALLINT UNSIGNED NOT NULL DEFAULT 1,
   adult_count SMALLINT UNSIGNED NOT NULL DEFAULT 1,
@@ -659,3 +659,4 @@ VALUES
    'A quick visual travel idea to inspire your next PackSwift itinerary.',
    '#shorts #travel #italy', 'Italy',
    '/videos/packswift-trip-example.m4v', 'video/x-m4v');
+ 

@@ -3,8 +3,31 @@ import { requireAuth } from "../middleware/auth.js";
 import { requireDatabase } from "../middleware/database.js";
 import { getProfile } from "../repositories/profile-repository.js";
 import { getDatabasePool } from "../config/database.js";
+import { validateDashboardState } from "../services/dashboard-state.js";
 
 export const profileRouter = Router();
+
+profileRouter.get("/dashboard", requireAuth, requireDatabase, async (req,res,next) => {
+  try {
+    const [rows]=await getDatabasePool().execute("SELECT preferences FROM user_profile_preferences WHERE user_id = ?",[req.auth.userId]);
+    const raw=rows[0]?.preferences,prefs=typeof raw==='string'?JSON.parse(raw):raw||{};
+    res.set("Cache-Control","no-store").json({dashboard:prefs.dashboard||{revision:0,currency:prefs.currency||'USD',expenses:[],stories:[],contacts:[],entryChecks:[]}});
+  } catch(e){next(e);}
+});
+profileRouter.put("/dashboard", requireAuth, requireDatabase, async (req,res,next) => {
+  let connection;
+  try {
+    const data=validateDashboardState(req.body);
+    connection=await getDatabasePool().getConnection();await connection.beginTransaction();
+    await connection.execute("INSERT IGNORE INTO user_profile_preferences (user_id, preferences) VALUES (?, ?)",[req.auth.userId,'{}']);
+    const [rows]=await connection.execute("SELECT preferences FROM user_profile_preferences WHERE user_id = ? FOR UPDATE",[req.auth.userId]);
+    const raw=rows[0].preferences,prefs=typeof raw==='string'?JSON.parse(raw):raw||{};
+    if((prefs.dashboard?.revision||0)!==data.revision){await connection.rollback();return res.status(409).json({error:"Dashboard changed in another tab. Reload before saving."});}
+    data.revision++;
+    await connection.execute("UPDATE user_profile_preferences SET preferences = ? WHERE user_id = ?",[JSON.stringify({...prefs,dashboard:data}),req.auth.userId]);
+    await connection.commit();res.set("Cache-Control","no-store").json({dashboard:data});
+  }catch(e){if(connection)await connection.rollback();next(e);}finally{connection?.release();}
+});
 
 profileRouter.get("/preferences", requireAuth, requireDatabase, async (request, response, next) => {
   try {

@@ -1,4 +1,6 @@
 import { Router } from "express";
+import {itineraryPlanRouter} from './itinerary-plan.js';
+import {tripForecastRouter} from './trip-forecast.js';
 import {localDirectionsRouter} from './local-directions.js';
 import {bookingSearchRouter} from './booking-search.js';
 import {placeSearchRouter} from './place-search.js';
@@ -29,6 +31,8 @@ import { tripWorkspaceRouter } from './trip-workspace.js';
 import { tripPlanRouter } from "./trip-plan.js";
 
 export const apiRouter = Router();
+apiRouter.use('/itinerary-plan',itineraryPlanRouter);
+apiRouter.use('/trip-forecast',tripForecastRouter);
 apiRouter.use('/local-directions',localDirectionsRouter);
 apiRouter.use('/booking-search',bookingSearchRouter);
 apiRouter.use('/places',placeSearchRouter);

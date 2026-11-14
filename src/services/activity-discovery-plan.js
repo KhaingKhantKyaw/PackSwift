@@ -18,13 +18,14 @@ export const activityStyles=Object.freeze({
  'Full Experience':'immersive local',
  'Ultimate Luxury':'premium private luxury'
 });
+const popularTopics=['visitor attractions and things to do','local landmarks and visitor experiences','popular parks and cultural sites'];
 export function activitySearchQuery(destination,purpose,style,variant=0){
- if(!Object.hasOwn(activityTopics,purpose)||!Object.hasOwn(activityStyles,style)||!Number.isInteger(variant)||variant<0||variant>2)throw Object.assign(new Error('Choose valid travel purposes and a travel style.'),{status:422});
- return `${activityStyles[style]} ${activityTopics[purpose][variant]} in ${destination}`;
+ if((purpose!=null&&!Object.hasOwn(activityTopics,purpose))||(style!=null&&!Object.hasOwn(activityStyles,style))||!Number.isInteger(variant)||variant<0||variant>2)throw Object.assign(new Error('Choose valid activity preferences.'),{status:422});
+ return `${style?activityStyles[style]:'popular'} ${(purpose?activityTopics[purpose]:popularTopics)[variant]} in ${destination}`;
 }
 export function rankActivities(items,style){
  const prices={PRICE_LEVEL_FREE:0,PRICE_LEVEL_INEXPENSIVE:1,PRICE_LEVEL_MODERATE:2,PRICE_LEVEL_EXPENSIVE:3,PRICE_LEVEL_VERY_EXPENSIVE:4};
- const fit=item=>{const price=prices[item.priceLevel];if(price===undefined)return 2;
+ const fit=item=>{if(!style)return 0;const price=prices[item.priceLevel];if(price===undefined)return 2;
   if(style==='Pocket Friendly')return price<=1?0:price;
   if(style==='Balanced'||style==='Comfort & Value')return price<=2?0:price;
   if(style==='Ultimate Luxury')return price>=3?0:2;

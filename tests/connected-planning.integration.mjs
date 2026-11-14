@@ -1,0 +1,42 @@
+// Real local SQL verification in one rolled-back transaction; no test account persists.
+import 'dotenv/config';
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {getDatabasePool} from '../src/config/database.js';
+import {savePlannerDraft} from '../src/services/planner-draft.js';
+const pool=getDatabasePool(),connection=await pool.getConnection();
+const transactionPool={getConnection:async()=>({beginTransaction:async()=>{},commit:async()=>{},rollback:async()=>{},release:()=>{},execute:connection.execute.bind(connection)})};
+try{
+ await connection.beginTransaction();
+ const name='draftcheck'+randomUUID().replaceAll('-','').slice(0,12);
+ const [user]=await connection.execute('INSERT INTO users (full_name,username,email,password_hash) VALUES (?,?,?,?)',['Draft Check',name,name+'@example.invalid','not-a-login-hash']);
+ const values={origin:'Yangon',destination:'Bangkok',startDate:'2027-01-01',endDate:'2027-01-06',adults:'2',children:'0',childAges:'[]',currency:'USD',travelPurposes:'[]',packingSnapshot:JSON.stringify([{id:'passport',name:'Passport',category:'Documents',quantity:1,packed:false}]),packingChecklist:JSON.stringify({edits:{}})};
+ const preparationTask=globalThis.PackSwiftTravelGuidanceModel.tasks(values)[0];
+ values.travelGuidance=JSON.stringify({version:1,experience:'first',detailLevel:'auto',preparation:{bookings:preparationTask.context}});
+ const body=()=>({fields:Object.entries(values).map(([name,value])=>({name,value,type:'text'})),selected:[]});
+ const created=await savePlannerDraft(user.insertId,null,body(),transactionPool);
+ const [first]=await connection.execute('SELECT * FROM trip_sessions WHERE public_id=?',[created.tripId]);assert.equal(first[0].budget_amount,null);assert.equal(first[0].adult_count,2);
+ const [packing]=await connection.execute('SELECT * FROM packing_lists WHERE trip_session_id=?',[first[0].id]);assert.equal(packing.length,1);
+ await connection.execute('UPDATE packing_lists SET is_completed=1 WHERE id=?',[packing[0].id]);
+ const preferences=typeof first[0].preferences_json==='string'?JSON.parse(first[0].preferences_json):first[0].preferences_json;
+ preferences.workspace.plannerDraft=false;preferences.workspace.needs=[packing[0].id];preferences.workspace.itineraryReviewedAt='2026-11-05T00:00:00.000Z';
+ await connection.execute('UPDATE trip_sessions SET preferences_json=? WHERE id=?',[JSON.stringify(preferences),first[0].id]);
+ values.travelGuidance=JSON.stringify({...JSON.parse(values.travelGuidance),detailLevel:'quick'});
+ await savePlannerDraft(user.insertId,created.tripId,body(),transactionPool);
+ const [updated]=await connection.execute('SELECT preferences_json FROM trip_sessions WHERE id=?',[first[0].id]);
+ const saved=typeof updated[0].preferences_json==='string'?JSON.parse(updated[0].preferences_json):updated[0].preferences_json;
+ assert.equal(saved.workspace.plannerDraft,false);assert.ok(saved.workspace.itineraryReviewedAt);assert.deepEqual(saved.workspace.needs,[packing[0].id]);
+ const guidance=JSON.parse(saved.detailPlanning.fields.find(f=>f.name==='travelGuidance').value);
+ assert.equal(guidance.experience,'first');assert.equal(guidance.detailLevel,'quick');assert.equal(guidance.preparation.bookings,preparationTask.context);
+ const [kept]=await connection.execute('SELECT * FROM packing_lists WHERE trip_session_id=?',[first[0].id]);assert.equal(kept[0].id,packing[0].id);assert.equal(kept[0].is_completed,1);
+ values.endDate='2027-01-08';values.adults='3';values.currency='THB';
+ values.planningSupport=JSON.stringify({costs:{flights:1000,stay:2000,daily:100},costCurrency:'THB',costContext:['origin','destination','startDate','endDate','adults','children','childAges'].map(k=>values[k]).join('|')});
+ await savePlannerDraft(user.insertId,created.tripId,body(),transactionPool);
+ const [last]=await connection.execute('SELECT * FROM trip_sessions WHERE id=?',[first[0].id]);assert.equal(last[0].end_date,'2027-01-08');assert.equal(last[0].adult_count,3);assert.equal(last[0].budget_currency,'THB');assert.equal(Number(last[0].budget_amount),3800);
+ await assert.rejects(savePlannerDraft(-1,created.tripId,body(),transactionPool),/not found/);
+ const plan={version:1,generatedAt:'2026-11-06T00:00:00.000Z',contextKey:'integration',destination:'Bangkok',startDate:values.startDate,endDate:values.endDate,currency:'THB',days:Array.from({length:8},(_,i)=>({day:i+1,date:`2027-01-0${i+1}`,stops:i?[]:[{id:'personal-visit',name:'Meet a friend',kind:'custom',custom:true,locked:true,startTime:'14:30',durationMinutes:60,currency:'THB',costAmount:250,notes:'Keep this appointment'}]}))};
+ values.itineraryPlan=JSON.stringify(plan);await savePlannerDraft(user.insertId,created.tripId,body(),transactionPool);
+ const [withPlan]=await connection.execute('SELECT preferences_json FROM trip_sessions WHERE id=?',[first[0].id]);const stored=typeof withPlan[0].preferences_json==='string'?JSON.parse(withPlan[0].preferences_json):withPlan[0].preferences_json;
+ const restored=JSON.parse(stored.detailPlanning.fields.find(f=>f.name==='itineraryPlan').value);assert.equal(restored.days[0].stops[0].name,'Meet a friend');assert.equal(restored.days[0].stops[0].startTime,'14:30');assert.equal(restored.days[0].stops[0].locked,true);assert.equal(restored.days[0].stops[0].costAmount,250);
+ console.log('PASS: real SQL draft creation, same-ID update, unknown/complete budgets, canonical dates/group/currency, packing IDs/progress, manual-itinerary preservation, editable itinerary time/lock/cost persistence and owner isolation. All test data rolled back.');
+}finally{await connection.rollback();connection.release();await pool.end();}

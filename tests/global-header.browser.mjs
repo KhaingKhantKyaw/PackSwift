@@ -10,7 +10,13 @@ try{
   await page.goto((process.env.PLANNER_TEST_URL||'http://127.0.0.1:3000')+path);
   await page.waitForFunction(()=>document.querySelector('link[href="/css/global-header.css"]')?.sheet);
   await page.waitForTimeout(400);
-  const geometry=await page.evaluate(()=>['.ps-global-header','.ps-header-brand',...[...document.querySelectorAll('.ps-header-links a')].slice(0,4).map(a=>`[data-nav="${a.dataset.nav}"]`),'.ps-header-action[href="/login"]','.ps-header-start','.ps-header-theme'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [r.x,r.y,r.width,r.height].map(n=>Math.round(n*100)/100);}));
+  const geometry=await page.evaluate(()=>['.ps-global-header','.ps-header-brand',...[...document.querySelectorAll('.ps-header-links a')].slice(0,4).map(a=>`[data-nav="${a.dataset.nav}"]`),'.ps-header-action[href="/login"]','.ps-header-theme'].map(selector=>{const r=document.querySelector(selector).getBoundingClientRect();return [r.x,r.y,r.width,r.height].map(n=>Math.round(n*100)/100);}));
+  assert.equal(await page.locator('.ps-global-header a[href="/signup"]').count(),0,'No competing account-creation CTA');
+  if(name==='home'){
+   assert.equal(await page.locator('.ps-global-header').getByRole('link',{name:'Log in',exact:true}).isVisible(),true);
+   assert.equal(await page.getByRole('link',{name:'Plan a trip',exact:true}).getAttribute('href'),'/trip-planner?destination=Singapore');
+   assert.equal(await page.getByText('No account needed to plan',{exact:true}).isVisible(),true);
+  }
   assert.equal(geometry[0][3],88);
   if(baseline)assert.deepEqual(geometry,baseline,`${name} geometry differs`);else baseline=geometry;
   if(name!=='trips') assert.equal(await page.locator('.ps-header-link[aria-current=page]').getAttribute('data-nav'),active);

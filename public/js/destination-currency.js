@@ -7,10 +7,19 @@ globalThis.PackSwiftCurrency = (() => {
  const currencies=Object.fromEntries([...new Set(Object.values(countryCurrencies))].map(code=>[code,{symbol:symbols[code]||code,suggested:null}]));
  function resolve(destination){
   const parts=(typeof destination==='object'?[destination?.country,destination?.name]:String(destination||'').split(',').reverse()).filter(Boolean).map(v=>v.trim().toLowerCase());
-  let country=parts.find(p=>countryCurrencies[p])||parts.map(p=>cityCountries[p]).find(Boolean)?.toLowerCase();
+  const country=parts.find(p=>Object.hasOwn(countryCurrencies,p))||parts.filter(p=>Object.hasOwn(cityCountries,p)).map(p=>cityCountries[p]).find(Boolean)?.toLowerCase();
   const code=countryCurrencies[country]||'USD';
   return {code,...currencies[code],country:country||'',countryCode:countryCodes[country]||'',known:Boolean(country)};
  }
  function formatCurrency(amount,destination){return new Intl.NumberFormat('en',{style:'currency',currency:resolve(destination).code,currencyDisplay:'code'}).format(Number(amount)||0);}
- return {resolve,formatCurrency,currencies,cityCountries,countryCurrencies};
+ // Booking prices follow the origin, independently of the editable trip budget.
+ const airportCities={TYO:'Tokyo',SEL:'Seoul',SIN:'Singapore',KUL:'Kuala Lumpur',DPS:'Bali',HAN:'Hanoi',PPS:'Palawan',BJS:'Beijing',JAI:'Jaipur',BKK:'Bangkok',CNX:'Chiang Mai',HKT:'Phuket',RGN:'Yangon',NYU:'Bagan',MDL:'Mandalay',PAR:'Paris',ROM:'Rome',BCN:'Barcelona',BER:'Berlin',ZRH:'Zurich',AMS:'Amsterdam',ATH:'Athens',LIS:'Lisbon',NYC:'New York City',YVR:'Vancouver',MEX:'Mexico City',RIO:'Rio de Janeiro',SYD:'Sydney',AKL:'Auckland',DXB:'Dubai',DOH:'Doha',RUH:'Riyadh',CPT:'Cape Town',RAK:'Marrakech',CAI:'Cairo',NBO:'Nairobi'};
+ // https://serpapi.com/google-travel-currencies — unsupported currencies need a dated estimate.
+ const bookingCurrencies=new Set('ALL DZD ARS AMD AWG AUD AZN BSD BHD BYN BMD BAM BRL GBP BGN XPF CAD CLP CNY COP CRC CUP CZK DKK DOP EGP EUR GEL HKD HUF ISK INR IDR IRR ILS JMD JPY JOD KZT KWD LBP MKD MYR MXN MDL MAD TWD NZD NOK OMR PKR PAB PEN PHP PLN QAR RON RUB SAR RSD SGD ZAR KRW SEK CHF THB TRY USD UAH AED VND'.split(' '));
+ function booking(origin){
+  const name=typeof origin==='string'?origin.normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim():origin;
+  const local=resolve(typeof name==='string'?(airportCities[name.toUpperCase()]||name):name);
+  return {...local,providerCode:bookingCurrencies.has(local.code)?local.code:'USD',needsConversion:local.known&&!bookingCurrencies.has(local.code)};
+ }
+ return {resolve,formatCurrency,booking,currencies,cityCountries,countryCurrencies};
 })();

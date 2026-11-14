@@ -9,3 +9,9 @@ function filterHelp(){
 search.addEventListener('input',filterHelp);
 document.querySelectorAll('[data-help-topic]').forEach(button=>button.addEventListener('click',()=>{search.value=button.dataset.helpTopic;filterHelp();search.focus();}));
 filterHelp();
+// Public emergency information must not require sign-in or the concierge.
+const emergencyLink=document.createElement('a');
+emergencyLink.href='/emergency-contacts.html';
+emergencyLink.className='button button-secondary';
+emergencyLink.textContent='Emergency contacts by country →';
+document.querySelector('.concierge-start')?.prepend(emergencyLink);

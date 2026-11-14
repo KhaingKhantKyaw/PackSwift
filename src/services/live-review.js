@@ -21,7 +21,7 @@ export function buildLiveReview(input) {
   const places = Array.isArray(input.selectedPlaces) ? input.selectedPlaces.slice(0, 150).filter(p => p && typeof (p.title || p.name) === 'string' && !p.isSample) : [];
   const plan = globalThis.PackSwiftTripEngine.generateDynamicTrip(input.destination, Math.max(1, days - 2), input.notes, input.pace, {places, level:style, travelers:adults+children, currency:estimate.currency, accessibility:input.accessibility});
   let support={};try{support=JSON.parse(input.planningSupport||'{}').preferences||{};}catch{}
-  const selectionPlan=globalThis.PackSwiftPlaceSearchModel.schedule(places,days,{tripPace:input.pace,...input.itineraryPreferences,travelStyle:input.travelStyle,arrivalTime:input.arrivalTime,dailyPace:support.dailyPace,walking:support.walking,restBreaks:support.restBreaks});
+  const selectionPlan=globalThis.PackSwiftPlaceSearchModel.schedule(places,days,{tripPace:input.pace,...input.itineraryPreferences,arrivalTime:input.arrivalTime,walking:input.comfortWalking||support.walking,restBreaks:input.restBreaks||support.restBreaks});
   const range = amount => ({minimum:Math.round(amount * .85), maximum:Math.round(amount * 1.2)});
   const stayFactor = {hostel:.6,budget:.8,comfortable:1,luxury:1.8}[input.accommodationStyle] || 1;
   const categories = [['Accommodation', .45], ['Food', .25], ['Local transport', .15], ['Activities allowance', .10], ['Daily essentials', .05]].map(([label, share]) => ({label, ...range(estimate.totalEstimate * share * (label === 'Accommodation' ? stayFactor : days / estimate.totalNights))}));

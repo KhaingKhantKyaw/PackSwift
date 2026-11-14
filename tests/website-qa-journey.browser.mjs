@@ -15,7 +15,8 @@ try {
  page.on('pageerror',e=>errors.push(e.message));
  page.on('response',r=>{if(r.status()>=400&&!r.url().endsWith('/api/auth/me'))failed.push({url:new URL(r.url()).pathname,status:r.status()});});
  await page.goto(base+'/');
- await page.getByRole('link',{name:'Get Started',exact:true}).first().click();
+ await page.locator('.ps-global-header').getByRole('link',{name:'Log in',exact:true}).click();
+ await page.locator('#login-form').getByRole('link',{name:'Create an account',exact:true}).click();
  await page.locator('#signup-name').fill('PackSwift QA');await page.locator('#signup-username').fill(username);
  await page.locator('#signup-email').fill(username+'@example.com');await page.locator('#signup-password').fill(password);
  const created=page.waitForResponse(r=>r.url().endsWith('/api/auth/signup')&&r.request().method()==='POST');

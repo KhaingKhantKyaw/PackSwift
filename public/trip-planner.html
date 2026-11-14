@@ -10,28 +10,33 @@
 <link rel="stylesheet" href="/css/planner-workspace.css">
 <link rel="stylesheet" href="/css/planner-minimal.css">
 <script src="/js/itinerary-discovery.js" defer></script>
+<script src="/js/activity-choices-model.js" defer></script><script src="/js/activities-preview.js" defer></script>
+<script src="/js/travel-guidance-model.js" defer></script><script src="/js/travel-guidance.js" defer></script>
 <script src="/js/planner-motion.js" defer></script><script src="/js/transport-guide.js" defer></script><script src="/js/local-directions.js" defer></script><script src="/js/booking-preview.js" defer></script><script src="/js/packing-preview.js" defer></script><script src="/js/planner-workspace.js" defer></script>
 <link rel="stylesheet" href="/css/place-search.css"><script src="/js/place-search-model.js" defer></script><script src="/js/place-search.js" defer></script>
 <link rel="stylesheet" href="/css/activity-discovery.css">
 <script src="/js/activity-recommendation-model.js" defer></script><script src="/js/activity-discovery.js" defer></script>
-<script src="/js/itinerary-preferences-model.js" defer></script><script src="/js/itinerary-preferences.js" defer></script><script src="/js/trip-draft-gate.js" defer></script><script src="/js/planner-studio.js" defer></script>
+<script src="/js/itinerary-preferences-model.js" defer></script><script src="/js/itinerary-preferences.js" defer></script><script src="/js/itinerary-plan-model.js" defer></script><script src="/js/itinerary-editor.js" defer></script><script src="/js/trip-draft-gate.js" defer></script><script src="/js/planner-studio.js" defer></script>
 <link rel="stylesheet" href="/css/planner-editorial.css">
 <link rel="stylesheet" href="/css/planner-calendar.css">
 <link rel="stylesheet" href="/css/planner-sketch.css">
 <link rel="stylesheet" href="/css/planner-reference.css">
 <link rel="stylesheet" href="/css/planner-horizontal.css">
 <link rel="stylesheet" href="/css/planning-support.css">
+<link rel="stylesheet" href="/css/itinerary-editor.css">
+<link rel="stylesheet" href="/css/travel-guidance.css"><link rel="stylesheet" href="/css/packing-essentials.css">
 <script src="/js/planning-model.js" defer></script>
 </head>
 <body data-page="planner-studio" class="planner-studio planner-sketch">
 <a class="skip-link" href="#studio-main">Skip to trip setup</a>
 <header class="site-header"><div class="header-inner"><a class="brand" href="/">PackSwift</a><nav class="desktop-nav" aria-label="Main navigation"></nav><a class="header-action" href="/login">Login</a></div></header>
 <main id="studio-main" class="studio-shell">
-<div class="studio-page-heading"><div><span class="studio-eyebrow">LESS PLANNING. MORE LIVING.</span><h1>Your next chapter, thoughtfully planned.</h1></div><span class="studio-caption">One journey. All the essentials.</span></div>
+<div class="studio-page-heading"><div><span class="studio-eyebrow">PackSwift</span><h1>Plan your trip</h1></div><span class="studio-caption"></span></div>
 <div class="studio-columns">
+<section class="planner-trip-setup" aria-label="Trip setup and live overview">
 <form id="trip-planner-form" class="studio-setup" novalidate>
 <a href="/" class="workspace-brand">◇ PackSwift</a>
-<header class="studio-panel-heading"><div><h1>Plan Your Trip</h1><p>Create your personalized travel plan with real-time recommendations.</p></div></header>
+<header class="studio-panel-heading"><div><h1>Trip details</h1><p>Build your trip.</p></div></header>
 <nav id="studio-steps" class="studio-steps" aria-label="Planning steps"></nav>
 <section class="studio-step" data-step="0"><div class="planner-destination-card"><span class="studio-eyebrow">01 / THE JOURNEY</span><h3>Where are we going?</h3>
 <fieldset class="trip-type-control"><legend>Where are you traveling?</legend><label><input type="radio" name="tripType" value="local"> Local Trip</label><label><input type="radio" name="tripType" value="anywhere" checked> Explore Anywhere</label></fieldset>
@@ -39,10 +44,10 @@
 <label for="destination-search">Destination</label><input id="destination-search" name="destination" placeholder="e.g. Bangkok" list="studio-cities" autocomplete="off" required><datalist id="studio-cities"></datalist>
 </div><div class="planner-date-card"><h3>Travel Dates</h3><div class="studio-pair"><div><label for="start-date">Departure date</label><input id="start-date" name="startDate" type="date" required></div><div><label for="end-date">Return date</label><input id="end-date" name="endDate" type="date" required></div></div>
 </div><input id="trip-scope" name="tripScope" type="hidden" value="anywhere">
-<p class="studio-note">Start with your route and dates. Everything stays editable.</p></section>
+<p class="studio-note">Start with your route and dates.</p></section>
 <section class="studio-step" data-step="1" hidden><span class="studio-eyebrow">02 / YOUR PEOPLE</span><h3>Who’s coming along?</h3>
 <div class="studio-pair"><div><label for="adults">Adults · 18+</label><input id="adults" name="adults" type="number" min="1" max="20" value="1" required></div><div><label for="children">Children · under 18</label><input id="children" name="children" type="number" min="0" max="19" value="0" required></div></div>
-<label for="passport-country">Passport nationality</label><input id="passport-country" name="passportCountry" placeholder="e.g. Myanmar" required><p class="studio-note">For entry-check reminders, not a visa eligibility decision.</p>
+<label for="passport-country">Passport nationality</label><input id="passport-country" name="passportCountry" placeholder="e.g. Myanmar" required><p class="studio-note">Entry reminders only—not visa eligibility.</p>
 <label for="entry-mode">Entry mode</label><select id="entry-mode" name="entryMode"><option value="air">Air</option><option value="land">Land</option><option value="sea">Sea</option></select>
 <label class="studio-check"><input type="checkbox" name="travelingWithPets" id="studio-pets" value="true"> Include pet-friendly planning</label>
 <div id="studio-pet-field" hidden><label for="pet-type">Pet type</label><select id="pet-type" name="petType"><option value="dog">Dog</option><option value="cat">Cat</option><option value="rabbit">Rabbit</option><option value="bird">Pet bird</option><option value="other">Other species</option></select><p class="studio-note">Species acceptance depends on your route and carrier.</p></div></section>
@@ -56,12 +61,17 @@
 <label for="dietary-style">Food preference</label><select id="dietary-style" name="dietaryStyle"><option value="any">No preference</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="halal">Halal</option></select>
 <label for="walking-level">Walking & access</label><select id="walking-level" name="accessibility"><option value="standard">Regular walking</option><option value="limited">Short walks & rests</option><option value="step-free">Step-free preferred</option></select>
 <label for="trip-notes">Anything else? <small>Optional</small></label><textarea id="trip-notes" name="notes" rows="3" maxlength="600" placeholder="Must-see places, allergies, special requests…"></textarea></section>
-<section class="studio-step" data-step="4" hidden><span class="studio-eyebrow">05 / YOUR HIGHLIGHTS</span><h3>Choose your moments.</h3><p class="studio-note">Add places to your itinerary. Sample suggestions are labelled; confirm venue details before visiting.</p><button id="studio-find" type="button" class="studio-secondary">Find places for my trip ↗</button><p id="studio-places-status" role="status"></p><div id="studio-places"></div></section>
+<section class="studio-step" data-step="4" hidden><span class="studio-eyebrow">05 / YOUR HIGHLIGHTS</span><h3>Choose your moments.</h3><p class="studio-note">Add places. Confirm sample suggestions before visiting.</p><button id="studio-find" type="button" class="studio-secondary">Find places for my trip ↗</button><p id="studio-places-status" role="status"></p><div id="studio-places"></div></section>
 <section class="studio-step" data-step="5" hidden><h3 class="preferences-heading">Itinerary Preferences</h3><p class="studio-note">Choose how much control you want over your schedule.</p><input type="hidden" id="itinerary-preferences-state" name="itineraryPreferences" value=""><select id="pace" name="pace"><option value="relaxed">Relaxed · 2–3 main activities · more rest</option><option value="balanced" selected>Balanced · 3–4 activities · recommended</option><option value="packed">Packed · 5+ activities · see more</option></select><div id="itinerary-preferences-content"></div></section>
-<section class="studio-step" data-step="6" hidden><span class="studio-eyebrow">07 / REVIEW</span><h3>Ready for your next chapter?</h3><p class="studio-note">Review your route, dates, budget and selected activities in the workspace. Save your trip to your account when you’re ready.</p><button type="button" class="studio-secondary" id="workspace-review">Review trip overview ↗</button></section>
+<section class="studio-step" data-step="6" hidden><span class="studio-eyebrow">07 / REVIEW</span><h3>Ready for your next chapter?</h3><p class="studio-note">Review your plan, then save it.</p><button type="button" class="studio-secondary" id="workspace-review">Review trip overview ↗</button></section>
+<input type="hidden" id="activity-choices-state" name="activityChoices" value="">
 <p id="planner-feedback" class="studio-error" role="alert"></p>
 <footer class="studio-form-actions"><button id="studio-back" type="button" class="studio-secondary">← Back</button><button id="studio-next" type="button" class="studio-primary">Continue →</button></footer>
 </form>
+<aside id="trip-overview" class="planner-trip-overview" aria-labelledby="trip-overview-title">
+<h2 id="trip-overview-title">Live Preview</h2>
+</aside>
+</section>
 <section class="studio-dashboard" aria-label="Your trip plan">
 <nav class="workspace-nav" aria-label="Trip workspace"><a href="/" class="workspace-brand">Your Trip Preview</a><div><button type="button" data-workspace-target="studio-summary" aria-current="page">Overview</button><button type="button" data-workspace-target="workspace-itinerary">Itinerary</button><button type="button" data-workspace-target="workspace-map">Map</button><button type="button" data-workspace-target="workspace-packing">Packing</button><button type="button" data-workspace-target="studio-checks">Checklist</button></div><a class="workspace-account" data-auth="guest" href="/login?redirect=%2Ftrip-planner" aria-label="Log in to PackSwift"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span>Login</span></a><a class="workspace-account" data-auth="user" hidden href="/profile" aria-label="Open your profile"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg><span data-profile-name>Profile</span></a></nav>
 <header class="studio-panel-heading"><div><span class="studio-eyebrow">THE BIG PICTURE</span><h2>Your Trip Plan</h2></div><span id="studio-state" class="studio-state" role="status">Ready when you are</span></header>

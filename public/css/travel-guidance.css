@@ -1,0 +1,43 @@
+/* Guidance is a compact preference panel, not another itinerary or packing editor. */
+html body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-fields>.travel-guidance-panel{grid-column:1/-1!important;display:block!important;min-height:0!important;height:auto!important;border-top-color:var(--planning-focus,#007c88)!important}
+.travel-guidance-panel{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--planning-text,#163b40);min-width:0}
+.travel-guidance-panel h2{margin:0 0 8px;font-family:inherit;font-size:1.05rem;line-height:1.35;font-weight:700;letter-spacing:-.01em}
+.travel-guidance-panel p{line-height:1.5}
+.travel-guidance-panel .travel-guidance-intro{margin:0 0 14px;font-size:.9rem;color:var(--planning-muted,#4c666b)!important}
+.travel-guidance-choices{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+html body .travel-guidance-panel .travel-guidance-choice{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:7px;box-sizing:border-box;width:100%;height:100%;min-height:100px;padding:15px;border:1px solid var(--planning-line,#b4ccc8)!important;border-radius:14px;background:var(--planning-paper,#fffdf8)!important;color:var(--planning-text,#163b40)!important;text-align:left;white-space:normal;box-shadow:none;cursor:pointer;font:inherit;transition:border-color .15s ease,background-color .15s ease}
+.travel-guidance-choice-title{font-size:.92rem;line-height:1.35;font-weight:700}
+.travel-guidance-choice-copy{font-size:.8rem;line-height:1.45;font-weight:400;color:var(--planning-muted,#4c666b)}
+html body .travel-guidance-panel .travel-guidance-choice[aria-checked="true"]{border-color:var(--planning-focus,#007c88)!important;background:var(--planning-action,#dcf3eb)!important;box-shadow:inset 0 0 0 1px var(--planning-focus,#007c88)}
+.travel-guidance-view{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin-top:16px}
+.travel-guidance-view-label{font-size:.84rem;font-weight:650}
+.travel-guidance-levels{display:inline-flex;flex-wrap:wrap;gap:5px;padding:4px;border:1px solid var(--planning-line,#b4ccc8);border-radius:12px;background:var(--planning-inset,#f2f7f4)}
+html body .travel-guidance-panel .travel-guidance-levels button{min-height:40px;padding:8px 12px;border:1px solid transparent!important;border-radius:8px;background:transparent!important;color:var(--planning-text,#163b40)!important;font:inherit;font-size:.82rem;font-weight:600;line-height:1.35;cursor:pointer}
+html body .travel-guidance-panel .travel-guidance-levels button[aria-pressed="true"]{background:var(--planning-action,#dcf3eb)!important;color:var(--planning-action-text,#075b56)!important;border-color:var(--planning-line,#b4ccc8)!important}
+.travel-guidance-panel .travel-guidance-note{margin:10px 0 4px;font-size:.8rem;color:var(--planning-muted,#4c666b)!important}
+html body .travel-guidance-panel .travel-guidance-reset{padding:7px 0;min-height:36px;border:0!important;border-radius:4px;background:transparent!important;color:var(--planning-action-text,#075b56)!important;text-decoration:underline;text-underline-offset:3px;font:inherit;font-size:.8rem;cursor:pointer}
+.travel-guidance-panel .travel-guidance-reset[hidden]{display:none!important}
+.travel-guidance-panel .travel-guidance-reassurance{margin:10px 0 0;font-size:.76rem;color:var(--planning-muted,#4c666b)!important}
+.travel-guidance-panel button:focus-visible{outline:3px solid var(--planning-focus,#007c88)!important;outline-offset:3px}
+@media(max-width:480px){.travel-guidance-choices{gap:8px}html body .travel-guidance-panel .travel-guidance-choice{padding:12px;min-height:110px}.travel-guidance-choice-title{font-size:.87rem}.travel-guidance-choice-copy{font-size:.76rem}.travel-guidance-view{align-items:flex-start}.travel-guidance-levels{width:100%;box-sizing:border-box}.travel-guidance-levels button{flex:1}}
+@media(prefers-reduced-motion:reduce){.travel-guidance-panel *{transition:none!important}}
+@media print{.travel-guidance-panel{display:none!important}}
+/* Override the legacy form's serif controls and generic selected-button color. */
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .planner-trip-setup .travel-guidance-panel{padding:18px!important;border:1px solid var(--planning-line)!important;border-top:3px solid var(--planning-focus)!important;border-radius:14px!important;grid-column:1/-1!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel :is(h2,p,span,button){font-family:Inter,Arial,sans-serif!important;letter-spacing:normal!important;text-transform:none!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel h2{margin:0 0 6px!important;justify-content:flex-start!important;gap:12px;font-size:16px!important;line-height:1.4!important}
+.travel-guidance-panel h2 svg{width:24px;height:24px;flex:none;color:var(--planning-action-text)}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel .travel-guidance-choice{min-height:94px!important;height:auto!important;padding:16px!important;background:var(--planning-paper)!important;color:var(--planning-text)!important;border:1px solid var(--planning-line)!important;position:relative}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel .travel-guidance-choice[aria-checked="true"]{background:var(--planning-action)!important;border:2px solid var(--planning-focus)!important;padding:15px!important}
+.travel-guidance-choice[aria-checked="true"]::after{content:'✓';position:absolute;right:10px;top:8px;font:700 15px Arial,sans-serif;color:var(--planning-action-text)}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel .travel-guidance-choice-title{font-size:15px!important;line-height:1.4!important;font-weight:700!important;padding-right:12px}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel .travel-guidance-choice-copy{font-size:13px!important;line-height:1.5!important;font-weight:400!important;color:var(--planning-muted)!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel .travel-guidance-levels button{background:transparent!important;color:var(--planning-text)!important;border:1px solid transparent!important;min-height:40px!important;padding:8px 12px!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel .travel-guidance-levels button[aria-pressed="true"]{background:var(--planning-action-text)!important;color:var(--planning-paper)!important;border-color:var(--planning-action-text)!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel .travel-guidance-reset{background:transparent!important;color:var(--planning-action-text)!important;border:0!important;padding:4px 0!important}
+.travel-guidance-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px 16px;margin-top:8px}
+.travel-guidance-footer .travel-guidance-note{margin:0!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .travel-guidance-panel h2{height:auto!important;min-height:0!important}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .trip-comfort-controls .comfort-fields{width:100%!important;max-width:none!important;align-self:stretch!important;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .trip-comfort-controls .comfort-fields label{font:14px/1.5 Inter,Arial,sans-serif!important}
+@media(max-width:650px){html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .trip-comfort-controls .comfort-fields{grid-template-columns:1fr}}

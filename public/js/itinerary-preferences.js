@@ -7,7 +7,7 @@ window.PackSwiftItineraryPreferences={mount(form,getSelected){
  function write(p,notify=true){hidden.value=JSON.stringify(model.normalize(p,getSelected()));pace.value=p.tripPace;if(notify)hidden.dispatchEvent(new Event('input',{bubbles:true}));}
  const modes=el('fieldset',undefined,'preference-modes');modes.append(el('legend','How would you like to plan your itinerary?'));
  const modeInputs=[];
- for(const[value,title,copy]of [['auto','✦ Plan It For Me','Let PackSwift organize your selected places into a practical schedule.'],['collaborative','♡ Plan Together','Choose what matters to you and PackSwift will organize the rest.'],['manual',"☷ I’ll Plan It",'Choose the days and times yourself.']]){
+ for(const[value,title,copy]of [['auto','Arrange flexible places','Keep your chosen days and fit flexible places around them.'],['manual','Choose days myself','Places stay unscheduled until you choose a day.']]){
   const label=el('label',undefined,'preference-mode'),radio=el('input');radio.type='radio';radio.name='itinerary-mode-choice';radio.value=value;
   // Transient controls are omitted from saved fields; the hidden JSON is authoritative.
   radio.dataset.preferenceTransient='true';label.append(radio,el('strong',title));if(value==='collaborative')label.append(el('small','Recommended','preference-badge'));label.append(el('span',copy));modes.append(label);modeInputs.push(radio);
@@ -15,12 +15,13 @@ window.PackSwiftItineraryPreferences={mount(form,getSelected){
  }
  root.append(modes);const modeHelp=el('p',undefined,'studio-note');root.append(modeHelp);
  const paceLabel=el('label',"What’s your preferred pace?");paceLabel.htmlFor='pace';root.append(paceLabel,pace);
+ paceLabel.hidden=document.body.classList.contains('planner-sketch');
  pace.onchange=()=>{const p=read();p.tripPace=pace.value;write(p);};
  const heading=el('h4','Your Selected Places'),count=el('p',undefined,'studio-note'),list=el('div',undefined,'preference-places');root.append(heading,count,list);heading.hidden=true;count.hidden=true;list.hidden=true;
  const routine=el('details',undefined,'studio-detail');routine.append(el('summary','Typical Travel Day'),el('p','Optional — help PackSwift plan around your routine.','studio-note'));const pair=el('div',undefined,'studio-pair'),times={};
  for(const[key,title]of [['preferredDayStart','Start around'],['preferredDayEnd','Finish around']]){const label=el('label',title),input=el('input');input.type='time';input.id='preference-'+key;label.htmlFor=input.id;label.append(input);pair.append(label);times[key]=input;input.onchange=()=>{const p=read();p[key]=input.value;write(p);};}routine.append(pair);root.append(routine);
- function modeCopy(){const mode=read().planningMode;modeHelp.textContent=mode==='auto'?'PackSwift will arrange your trip for you. Customization is optional.':mode==='manual'?'Set the days and times you want. Your choices are stored as user-defined preferences.':'Customize only the places that matter to you; leave the rest flexible.';}
- function sync(raw){let p=raw?model.normalize(raw,getSelected()):read();if(!hidden.value&&!raw)p.tripPace=pace.value||'balanced';write(p,false);modeInputs.forEach(r=>r.checked=r.value===p.planningMode);for(const key of Object.keys(times))times[key].value=p[key];modeCopy();count.textContent=`${getSelected().length} places selected`;list.replaceChildren();
+ function modeCopy(){modeHelp.textContent=read().planningMode==='manual'?'Choose a day from your shortlist or use Day / Priority.':'Suggested order only. Check opening hours, journey times and bookings.';}
+ function sync(raw){let p=raw?model.normalize(raw,getSelected()):read();if(!hidden.value&&!raw)p.tripPace=pace.value||'balanced';write(p,false);modeInputs.forEach(r=>r.checked=r.value===(p.planningMode==='manual'?'manual':'auto'));for(const key of Object.keys(times))times[key].value=p[key];modeCopy();count.textContent=`${getSelected().length} places selected`;list.replaceChildren();
   if(!getSelected().length)list.append(el('p','No places selected yet. Add places in Activities, or continue with flexible preferences.','studio-note'));
   getSelected().forEach((place,index)=>{
    const id=model.activityKey(place),row=el('details',undefined,'preference-place'),summary=el('summary'),title=el('strong',place.title||place.name),description=el('span',undefined,'studio-note'),action=el('span','Customize','workspace-link');summary.append(title,description,action);row.append(summary);

@@ -15,6 +15,13 @@ test('all purposes and styles produce three distinct related discovery queries',
 test('invalid purposes, styles and variants are rejected',()=>{
  for(const args of [['Hanoi','unknown','Balanced'],['Hanoi','Nature & Outdoor','unknown'],['Hanoi','Nature & Outdoor','Balanced',3],['Hanoi','__proto__','Balanced']])assert.throws(()=>activitySearchQuery(...args),{status:422});
 });
+test('omitted preferences allow destination discovery without implying a price preference',()=>{
+ assert.match(activitySearchQuery('Bangkok'),/^popular visitor attractions.*in Bangkok$/);
+ assert.match(activitySearchQuery('Hanoi','Shopping & Fashion'),/^popular shopping markets.*in Hanoi$/);
+ assert.match(activitySearchQuery('Hanoi',undefined,'Ultimate Luxury'),/^premium private luxury visitor attractions/);
+ const places=[{ratingCount:20,priceLevel:'PRICE_LEVEL_FREE'},{ratingCount:200}];
+ assert.equal(rankActivities(places,undefined)[0],places[1]);
+});
 test('style ranking favors known affordable or premium options without inventing prices',()=>{
  const items=[{id:'premium',priceLevel:'PRICE_LEVEL_VERY_EXPENSIVE',rating:4.9,ratingCount:1000},{id:'free',priceLevel:'PRICE_LEVEL_FREE',rating:4.6,ratingCount:50},{id:'unknown',priceLevel:null,rating:4.7,ratingCount:100}];
  assert.equal(rankActivities(items,'Pocket Friendly')[0].id,'free');

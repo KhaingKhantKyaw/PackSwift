@@ -1,8 +1,7 @@
-import {readFileSync} from 'node:fs';
+import catalog from './search-destinations.js';
 import {activitySearchQuery,rankActivities} from './activity-discovery-plan.js';
 import '../../public/js/place-search-model.js';
 const model=globalThis.PackSwiftPlaceSearchModel;
-const catalog=JSON.parse(readFileSync(new URL('../../public/data/destinations.json',import.meta.url),'utf8'));
 export const placeReference=model.persist;
 export function destinationBase(destination){const city=catalog.find(c=>[c.name,c.slug,c.code].some(s=>s?.toLowerCase()===String(destination||'').split(',')[0].trim().toLowerCase()));return city?{latitude:Number(city.latitude),longitude:Number(city.longitude)}:null;}
 const endpoint='https://places.googleapis.com/v1';

@@ -1,6 +1,19 @@
 import {destinationCurrency} from './destination-currency.js';
 export const requirementKeys = ['passport','entry','arrival','onward','accommodation','insurance'];
 
+export function tripCostBreakdown(trip) {
+  const fields=Object.fromEntries((trip.preferences?.detailPlanning?.fields||[]).map(f=>[f.name,f.value]));
+  let support;try{support=JSON.parse(fields.planningSupport||'{}');}catch{return null;}
+  const context=['origin','destination','startDate','endDate','adults','children','childAges'].map(n=>fields[n]||'').join('|');
+  if(support.costCurrency!==fields.currency||support.costContext!==context)return null;
+  const costs={};
+  for(const key of ['flights','stay','daily']){
+    const value=support.costs?.[key];
+    costs[key]=value==null||value===''||!Number.isFinite(Number(value))||Number(value)<0?null:Number(value);
+  }
+  return costs;
+}
+
 // The captured form is the user's exact input; older trips fall back to stored columns.
 export function tripDetails(trip) {
   const fields = {};
@@ -14,7 +27,8 @@ export function tripDetails(trip) {
     country:fields.destination ? destinationCurrency(fields.destination).country || '' : trip.destination.countryName, nationality:fields.passportCountry || '', start,end,
     nights:Math.max(0,Math.round((Date.parse(end)-Date.parse(start))/86400000)||0),
     adults:Number(fields.adults ?? trip.travelerBreakdown.adults), children:Number(fields.children ?? trip.travelerBreakdown.children),
-    budget:Number(fields.budget ?? trip.budget.amount), currency:fields.currency || trip.budget.currency,
+    budget:trip.preferences?.budgetStatus==='unfinished'||(fields.budget??trip.budget.amount)==null||(fields.budget??trip.budget.amount)===''?null:Number(fields.budget??trip.budget.amount), currency:fields.currency || trip.budget.currency,
+    budgetBreakdown:tripCostBreakdown(trip),
     style:fields.accommodationStyle || trip.preferences.accommodationStyle || 'comfortable',
     purpose:fields.tripPurpose || trip.tripPurpose, notes:fields.notes || ''};
 }
@@ -38,6 +52,8 @@ export function validateWorkspaceChange(body) {
   if(!Number.isInteger(body.revision)||body.revision<0)throw new RangeError('Reload this trip before saving.');
   if(body.action==='requirement') {
     if(!requirementKeys.includes(body.key)||typeof body.reviewed!=='boolean')throw new RangeError('Invalid requirement update.');
+  } else if(body.action==='activity-choice') {
+    if(typeof body.id!=='string'||!body.id||body.id.length>160)throw new RangeError('Choose a saved activity.');
   } else if(body.action==='packing') {
     if(!Number.isInteger(body.itemId)||body.itemId<1||!['have','need','unchecked'].includes(body.state))throw new RangeError('Invalid packing update.');
   } else if(body.action==='itinerary') {

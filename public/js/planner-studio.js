@@ -4,9 +4,10 @@
  const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
  const state={step:0,selected:[],skipped:[],tripId:null,review:null,revision:0,saving:false,places:[]};
  const preferences=window.PackSwiftItineraryPreferences.mount(form,()=>state.selected);
- let timer,controller,placeController,draftReady=false,draftKey='';
- function stash(){if(!draftReady)return;try{sessionStorage.setItem(draftKey,JSON.stringify({expires:Date.now()+20*60*1000,fields:PackSwiftDraft.captureFields(form),selected:state.selected.map(PackSwiftPlaceSearchModel.persist),skipped:state.skipped,step:state.step}));}catch{}}
- function restoreTabDraft(){try{const saved=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(!saved||saved.expires<Date.now()){sessionStorage.removeItem(draftKey);return;}PackSwiftDraft.restoreFields(form,saved.fields);state.selected=saved.selected||[];state.skipped=saved.skipped||[];preferences.sync();renderPlaces();show(Math.min(6,Math.max(0,Number(saved.step)||0)));}catch{}}
+ let timer,controller,placeController,draftReady=false,draftKey='',guestSaveId=null,restoreTask;
+ function stash(){if(!draftReady)return;try{sessionStorage.setItem(draftKey,JSON.stringify({expires:Date.now()+20*60*1000,fields:PackSwiftDraft.captureFields(form),selected:state.selected.map(PackSwiftPlaceSearchModel.persist),skipped:state.skipped,step:state.step,guestSaveId}));}catch{}}
+ window.addEventListener('packswift:stash-draft',stash);
+ function restoreTabDraft(){try{const saved=JSON.parse(sessionStorage.getItem(draftKey)||'null');if(!saved||saved.expires<Date.now()){sessionStorage.removeItem(draftKey);return;}PackSwiftDraft.restoreFields(form,saved.fields);guestSaveId=saved.guestSaveId||null;state.selected=saved.selected||[];state.skipped=saved.skipped||[];preferences.sync();renderPlaces();show(Math.min(6,Math.max(0,Number(saved.step)||0)));}catch{}}
  const api=(url,data,method='POST')=>window.PackSwift.api(url,{method,body:JSON.stringify(data)});
  const key=p=>String(p.placeId||p.place_id||p.id||p.title||p.name);
  function input(){const d=Object.fromEntries(new FormData(form));return {...d,...PackSwiftTripContext.routeContext(d),currencyCode:d.currency,currencySymbol:window.PackSwiftCurrency.currencies[d.currency]?.symbol||d.currency,budgetAmount:Number(d.budget),adults:Number(d.adults),children:Number(d.children),travelers:Number(d.adults)+Number(d.children),budget:Number(d.budget),travelingWithPets:d.travelingWithPets==='true',petType:d.travelingWithPets?d.petType:'',preferredClimate:'any',foodStyle:'mixed',transportStyle:'mixed',activityStyle:'balanced',shoppingStyle:'light',travelerDemographic:Number(d.children)>0?'family-with-children':Number(d.adults)>1?'friends-group':'solo',selectedPlaces:state.selected,itineraryPreferences:preferences.get()};}
@@ -15,11 +16,12 @@
  const placeSearch=PackSwiftPlaceSearch.mount({root:searchRoot,getInput:input,getSelected:()=>state.selected,add:p=>{if(!state.selected.some(s=>PackSwiftPlaceSearchModel.identity(s)===PackSwiftPlaceSearchModel.identity(p)))state.selected.push(p);renderPlaces();refresh();},remove:p=>{state.selected=state.selected.filter(s=>key(s)!==key(p));renderPlaces();refresh();},preferences:()=>show(5)});
  window.addEventListener('packswift:place-details',e=>placeSearch.showDetails(String(e.detail)));
  window.addEventListener('packswift:place-preferences',e=>preferences.edit(String(e.detail)));
- window.addEventListener('packswift:add-itinerary-place',e=>{const p=e.detail;if(!p||!p.placeId)return;if(!state.selected.some(s=>PackSwiftPlaceSearchModel.identity(s)===PackSwiftPlaceSearchModel.identity(p)))state.selected.push(p);renderPlaces();refresh();});
+ window.addEventListener('packswift:add-itinerary-place',e=>{const p=e.detail;if(!p||!p.placeId)return;if(!state.selected.some(s=>PackSwiftPlaceSearchModel.identity(s)===PackSwiftPlaceSearchModel.identity(p)))state.selected.push(p);if(Number.isInteger(p.requestedDay)&&p.requestedDay>0){const next=preferences.get();next.activityPreferences=next.activityPreferences.filter(a=>a.activityId!==key(p));next.activityPreferences.push({activityId:key(p),preferredDay:p.requestedDay,preferredTimePeriod:'any',priority:'would_like'});preferences.sync(next);}window.PackSwiftItineraryEditor?.addPlace?.(p,p.requestedDay);renderPlaces();refresh();});
  window.addEventListener('packswift:remove-itinerary-place',e=>{state.selected=state.selected.filter(p=>PackSwiftPlaceSearchModel.identity(p)!==String(e.detail));renderPlaces();refresh();});
  function valid(step){const i=input();let message='';
   if(step===0&&(!i.origin.trim()||!i.destination.trim()||!i.startDate||!i.endDate||!(days(i)>0)||days(i)>90))message='Choose your route and dates for a trip of 1–90 nights.';
-  if(step===1&&(!Number.isInteger(i.adults)||i.adults<1||!Number.isInteger(i.children)||i.children<0||i.travelers>20||(i.isInternational!==false&&!i.passportCountry.trim())))message='Choose 1–20 travellers, including an adult, and add passport nationality.';
+  const needsNationality=!document.body.classList.contains('planner-horizontal')&&i.isInternational!==false;
+  if(step===1&&(!Number.isInteger(i.adults)||i.adults<1||i.adults>9||!Number.isInteger(i.children)||i.children<0||i.children>8||(needsNationality&&!i.passportCountry.trim())))message=needsNationality?'Choose 1–9 adults and up to 8 children, and add passport nationality.':'Choose 1–9 adults and up to 8 children.';
   if(step===2&&(!Number.isFinite(i.budget)||i.budget<=0))message='Enter a budget greater than zero.';
   if(step===5)message=preferences.validate().join(' ');$('planner-feedback').textContent=message;return !message;
  }
@@ -46,7 +48,8 @@
  function refresh(){stash();state.revision++;const rev=state.revision;clearTimeout(timer);controller?.abort();state.review=null;render();$('studio-dashboard-content').classList.remove('is-recalculating');if(!input().destination||!(days()>0)||days()>90){$('studio-state').textContent='Choose your route and dates';return;}
   $('studio-state').textContent='✦ Preparing your briefing…';$('studio-dashboard-content').classList.add('is-recalculating');timer=setTimeout(async()=>{controller=new AbortController();try{const response=await fetch('/api/v1/trips/live-review',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input()),signal:controller.signal});const r=await response.json();if(!response.ok)throw Error(r.message||'Briefing unavailable');if(rev!==state.revision)return;state.review=r;render();$('studio-state').textContent='Updated for you';}catch(e){if(e.name!=='AbortError'&&rev===state.revision)$('studio-state').textContent='Estimates unavailable · try adjusting a field';}finally{if(rev===state.revision)$('studio-dashboard-content').classList.remove('is-recalculating');}},350);
  }
- form.addEventListener('input',e=>{if(!e.target.closest('.place-search'))refresh();});form.addEventListener('change',()=>{$('studio-pet-field').hidden=!$('studio-pets').checked;refresh();});
+ // Guidance and checklist progress are presentation/preparation, not a new trip brief.
+ form.addEventListener('input',e=>{if(['travelGuidance','packingChecklist'].includes(e.target.name)){stash();return;}if(!e.target.closest('.place-search'))refresh();});form.addEventListener('change',e=>{if(['travelGuidance','packingChecklist'].includes(e.target.name)){stash();return;}$('studio-pet-field').hidden=!$('studio-pets').checked;refresh();});
  $('destination-search').addEventListener('change',()=>{const dest=input().destination;state.selected=[];state.skipped=[];state.places=[];renderPlaces();refresh();});
  function renderPlaces(syncPreferences=true){if(syncPreferences)preferences.sync();placeSearch.refresh();PackSwiftActivityDiscovery.render($('studio-places'),state,p=>{if(!state.selected.some(s=>key(s)===key(p)))state.selected.push(p);renderPlaces();refresh();},p=>{state.skipped.push(key(p));renderPlaces();stash();},p=>{state.selected=state.selected.filter(s=>key(s)!==key(p));renderPlaces();refresh();});$('studio-places-status').textContent=state.selected.length+' selected';}
  const activitySignature=()=>{const i=input();return JSON.stringify([i.destination,i.startDate,i.endDate,i.pace,i.notes,i.tripPurpose]);};
@@ -58,17 +61,52 @@
  const checks=['Passport','Entry requirements','Flights','Accommodation','Insurance','Airport transfer','SIM / eSIM','Packing','Money / cards','Emergency contacts'];
  checks.forEach((text,i)=>{const label=node('label');const check=node('input');check.type='checkbox';check.name=`readiness_${i}`;check.id=`readiness-${i}`;check.value='true';check.setAttribute('form','trip-planner-form');label.append(check,node('span',text));$('studio-checks').append(label);check.onchange=()=>{readiness();stash();};});
  function readiness(){const visible=[...$('studio-checks').querySelectorAll('input')].filter(c=>!c.closest('label').hidden),done=visible.filter(c=>c.checked).length;$('studio-progress').max=visible.length;$('studio-progress').value=done;$('studio-ready-count').textContent=`${done} / ${visible.length}`;}
- async function save(){if(state.saving)return;for(const x of [0,1,2,5])if(!valid(x)){show(x);valid(x);return;}state.saving=true;$('studio-save').disabled=true;try{if(!await window.PackSwiftDraft.gate('board',{places:state.selected.map(PackSwiftPlaceSearchModel.persist),skipped:state.skipped}))return;$('studio-save-status').textContent='Saving to your account…';if(!state.tripId){const result=await api('/api/trips/analyze',{...input(),selectedPlaces:state.selected.map(PackSwiftPlaceSearchModel.persist)});if(!result.persistence?.saved)throw Error('Trip could not be saved. Please try again.');state.tripId=result.persistence.tripId;}
-   await api(`/api/trips/${state.tripId}/details`,{fields:window.PackSwiftDraft.captureFields(form),selected:state.selected.map(PackSwiftPlaceSearchModel.persist),rejected:state.skipped,itineraryPreferences:preferences.get()},'PUT');$('studio-save-status').textContent='✓ Trip saved.';try{sessionStorage.removeItem(draftKey);}catch{}history.replaceState(null,'',`/trip-planner?trip_id=${encodeURIComponent(state.tripId)}&view=preview`);setPreviewMode(true);
-  }catch(e){$('studio-save-status').textContent=e.message||'Unable to save. Your choices are still here.';}finally{state.saving=false;$('studio-save').disabled=false;}}
+ async function save(restored){if(state.saving)return;for(const x of [0,1,5])if(!valid(x)){$('studio-save-status').textContent=$('planner-feedback').textContent;show(x);valid(x);return;}state.saving=true;$('studio-save').disabled=true;
+  try{const preview={places:state.selected.map(PackSwiftPlaceSearchModel.persist),skipped:state.skipped,itineraryPreferences:preferences.get()};
+   if(!await window.PackSwiftDraft.gate('save',preview))return;$('studio-save-status').textContent='Saving to your account…';
+   const exact=restored?.guestSaveId&&Array.isArray(restored.fields);
+   const body={fields:exact?restored.fields:window.PackSwiftDraft.captureFields(form),selected:exact?restored.preview.places:preview.places,rejected:exact?restored.preview.skipped:preview.skipped,itineraryPreferences:exact?restored.preview.itineraryPreferences:preview.itineraryPreferences,...(guestSaveId?{guestSaveId}:{})};
+   const result=state.tripId?await api('/api/trips/'+state.tripId+'/details',body,'PUT'):await api('/api/trips/draft',body);
+   state.tripId=result.tripId;guestSaveId=null;$('studio-save-status').textContent=result.budgetStatus==='unfinished'?'Draft saved to My Trips. You can finish your budget later.':'Trip saved to My Trips.';try{sessionStorage.removeItem(draftKey);draftKey='packswift:planner-preferences:'+window.PackSwift.currentUser.id+':'+state.tripId;if(exact){const guestScope=new URL(restored.returnPath,location.origin).searchParams.get('destination')||'new';sessionStorage.removeItem('packswift:planner-preferences:guest:'+guestScope);}localStorage.setItem('packswift:trips-changed',String(Date.now()));}catch{}
+   history.replaceState(null,'','/trip-planner?trip_id='+encodeURIComponent(state.tripId)+'&view=preview');
+   window.dispatchEvent(new CustomEvent('packswift:trip-saved',{detail:{tripId:state.tripId,resumed:Boolean(exact)}}));
+  }catch(e){$('studio-save-status').textContent=e.message||'Unable to save. Your choices are still here.';}finally{state.saving=false;$('studio-save').disabled=false;}
+ }
+
  $('studio-save').onclick=save;
  function setPreviewMode(active){document.body.classList.remove('planner-preview-mode');const dashboard=document.querySelector('.studio-dashboard');if(active){dashboard.setAttribute('tabindex','-1');dashboard.focus({preventScroll:true});dashboard.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});}}
- window.addEventListener('packswift:draft-restored',async e=>{state.selected=e.detail.preview?.places||[];state.skipped=e.detail.preview?.skipped||[];preferences.sync();draftReady=true;show(0);readiness();renderPlaces();refresh();await placeSearch.hydrate();refresh();$('studio-save-status').textContent='Your trip details are restored. Continue planning when you’re ready.';});
+ window.addEventListener('packswift:draft-restored',e=>{
+  const handoff=e.detail;guestSaveId=handoff.guestSaveId||null;state.selected=handoff.preview?.places||[];state.skipped=handoff.preview?.skipped||[];
+  preferences.sync(handoff.preview?.itineraryPreferences);draftReady=true;show(0);readiness();renderPlaces();refresh();
+  restoreTask=(async()=>{
+   // Let the other form components restore first. Saving must not wait on optional place-provider requests.
+   await Promise.resolve();
+   if(handoff.action==='save')await save(handoff);else $('studio-save-status').textContent='Your trip details are restored.';
+   await placeSearch.hydrate();await hydrateEditablePlan();refresh();
+  })();
+ });
+ async function hydrateEditablePlan(){
+  const field=$('itinerary-plan-state'),snapshot=field?.value;if(!snapshot)return;
+  try{const result=await api('/api/itinerary-plan/hydrate',{plan:JSON.parse(snapshot),input:input()});if(field.value===snapshot&&result.plan)window.PackSwiftItineraryEditor?.restorePlan?.(result.plan);}
+  catch{$('studio-save-status').textContent='Your itinerary is restored. Some place details could not be refreshed; check them before travel.';}
+ }
+ function importExistingTimeline(trip){
+  if($('itinerary-plan-state')?.value||trip.preferences?.workspace?.plannerDraft!==false||!trip.timeline?.length)return;
+  const i=input(),count=days(i)+1,model=window.PackSwiftItineraryPlanModel;if(!model||count<1||count>91)return;
+  const imported={version:1,contextKey:model.context(i),destination:i.destination,startDate:i.startDate,endDate:i.endDate,currency:i.currency,generatedAt:new Date().toISOString(),constraints:model.preferences(i),days:[],unscheduled:[],assumptions:['Imported from your saved itinerary. Existing stops are fixed; unlock them to edit. Missing times are provisional and need your review.']};
+  for(let day=1;day<=count;day++){
+   const rows=trip.timeline.filter(p=>p.day===day);let next=540;
+   const stops=rows.map(p=>{const known=model.minutes(p.startTime),start=known??next,duration=Number(p.estimatedDurationMinutes)||60;next=Math.min(1380,start+duration);return{id:'saved-'+p.id,name:p.title,kind:'custom',custom:true,locked:true,startTime:model.clock(start),durationMinutes:Math.min(1440,Math.max(5,duration)),costAmount:p.estimatedCost==null?null:Number(p.estimatedCost),currency:p.costCurrency||i.currency,notes:[p.description,known===null?'Time was not set in the previous plan; review this provisional time.':''].filter(Boolean).join(' '),userEditedName:true,userEditedNotes:true};});
+   imported.days.push({day,date:new Date(Date.parse(i.startDate)+86400000*(day-1)).toISOString().slice(0,10),title:'Day '+day,stops});
+  }
+  if(model.normalize(imported))window.PackSwiftItineraryEditor?.restorePlan(imported);
+ }
  async function init(){await window.PackSwift.authReady;const params=new URLSearchParams(location.search);draftKey='packswift:planner-preferences:'+String(window.PackSwift.currentUser?.id||'guest')+':'+(params.get('trip_id')||params.get('destination')||'new');if(params.has('destination'))$('destination-search').value=params.get('destination');
   try{const r=await fetch('/data/destinations.json');const cities=await r.json();cities.forEach(c=>{const o=node('option');o.value=c.name;o.label=c.country;$('studio-cities').append(o);});}catch{}
-  if(params.has('resume_draft')){await window.PackSwiftDraft.resume();return;}
-  if(params.has('trip_id'))try{const {trip}=await window.PackSwift.api(`/api/trips/${encodeURIComponent(params.get('trip_id'))}`);const d=trip.preferences?.detailPlanning;if(d?.fields){window.PackSwiftDraft.restoreFields(form,d.fields);state.selected=d.selected||[];state.skipped=d.rejected||[];preferences.sync(d.itineraryPreferences||{tripPace:form.elements.pace.value});}state.tripId=params.get('trip_id');readiness();renderPlaces();}catch(e){$('planner-feedback').textContent=e.message;}
-  restoreTabDraft();await placeSearch.hydrate();if(params.get('step')==='itinerary-preferences')show(5);draftReady=true;$('studio-pet-field').hidden=!$('studio-pets').checked;refresh();
+  if(params.has('resume_draft')&&await window.PackSwiftDraft.resume()!==false){await restoreTask;return;}
+  if(params.has('trip_id'))try{const {trip}=await window.PackSwift.api(`/api/trips/${encodeURIComponent(params.get('trip_id'))}`);const d=trip.preferences?.detailPlanning;if(d?.fields){window.PackSwiftDraft.restoreFields(form,d.fields);window.PackSwiftPackingPreview?.applySavedProgress(trip.packingProgress||[]);state.selected=d.selected||[];state.skipped=d.rejected||[];preferences.sync(d.itineraryPreferences||{tripPace:form.elements.pace.value});}state.tripId=params.get('trip_id');importExistingTimeline(trip);readiness();renderPlaces();}catch(e){$('planner-feedback').textContent=e.message;}
+  restoreTabDraft();await placeSearch.hydrate();await hydrateEditablePlan();if(params.get('step')==='itinerary-preferences')show(5);draftReady=true;$('studio-pet-field').hidden=!$('studio-pets').checked;refresh();
  }
- show(0);render();init().then(()=>{window.dispatchEvent(new Event('packswift:planner-loaded'));if(new URLSearchParams(location.search).get('view')==='preview'&&state.tripId)setPreviewMode(true);});
+ const openedSavedPreview=new URLSearchParams(location.search).get('view')==='preview';
+ show(0);render();init().then(()=>{window.dispatchEvent(new Event('packswift:planner-loaded'));if(openedSavedPreview&&state.tripId)setPreviewMode(true);});
 })();

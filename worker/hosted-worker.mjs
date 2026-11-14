@@ -1,3 +1,5 @@
+import {handleLiveSearch} from './live-search.mjs';
+
 const pageRoutes = new Map([
   ["/", "/index.html"],
   ["/trip-planner", "/trip-planner.html"],
@@ -1953,30 +1955,6 @@ function hostedRecommendation(activities, input) {
 }
 
 async function handleActivities(request, env, url, currentUser = null) {
-  const photoMatch = url.pathname.match(/^\/api\/activities\/photo\/([A-Za-z0-9_-]{10,255})$/);
-  if (photoMatch && request.method === "GET") {
-    if (!env.GOOGLE_PLACES_API_KEY) return errorResponse("Place photo unavailable.", 404);
-    const placeId = photoMatch[1];
-    const details = await fetch(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`, {
-      headers: {
-        "x-goog-api-key": env.GOOGLE_PLACES_API_KEY,
-        "x-goog-fieldmask": "photos",
-      },
-    });
-    if (!details.ok) return errorResponse("Place photo unavailable.", 404);
-    const place = await details.json();
-    const photoName = place.photos?.[0]?.name;
-    if (!photoName) return errorResponse("Place photo unavailable.", 404);
-    const photo = await fetch(`https://places.googleapis.com/v1/${photoName}/media?maxWidthPx=1200&maxHeightPx=800`, {
-      headers: { "x-goog-api-key": env.GOOGLE_PLACES_API_KEY },
-      redirect: "follow",
-    });
-    if (!photo.ok) return errorResponse("Place photo unavailable.", 404);
-    const headers = new Headers(photo.headers);
-    headers.set("cache-control", "private, no-store");
-    headers.set("x-content-type-options", "nosniff");
-    return new Response(photo.body, { status: 200, headers });
-  }
   if (url.pathname !== "/api/activities/recommend" || request.method !== "POST") return null;
   const body = await readBody(request);
   const input = hostedActivityInput(body);
@@ -2346,6 +2324,9 @@ async function handleEcosystem(request, env, url, user) {
 }
 
 async function handleApi(request, env, url) {
+  // Planning searches are public and do not depend on the account database.
+  const live=await handleLiveSearch(request,env,url);
+  if(live)return live;
   await ensureSchema(env);
   const current = await currentHostedUser(request, env);
 

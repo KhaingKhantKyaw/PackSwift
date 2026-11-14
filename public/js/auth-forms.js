@@ -2,6 +2,7 @@ const authForm = document.querySelector("[data-auth-form]");
 const authFeedback = document.querySelector("[data-auth-feedback]");
 const pendingPackswiftTripKey = "pending_packswift_trip";
 const authRedirectTargetKey = "auth_redirect_target";
+const plannerSaveIntentKey = "packswift.planner-save-intent.v1";
 const invalidLoginMessage = "Email or password is incorrect";
 
 function loginCredentialControls() {
@@ -41,7 +42,12 @@ function showInvalidLoginError() {
 }
 
 function safeRelativePath(value, fallback = "/profile") {
-  return value?.startsWith("/") && !value.startsWith("//") ? value : fallback;
+  if (!value?.startsWith("/") || value.startsWith("//") || value.includes("\\")) return fallback;
+  try {
+    const url = new URL(value, window.location.origin);
+    if (url.origin !== window.location.origin || url.pathname.startsWith("//")) return fallback;
+    return url.pathname + url.search + url.hash;
+  } catch { return fallback; }
 }
 
 function requestedRedirectPath() {
@@ -49,8 +55,33 @@ function requestedRedirectPath() {
   return safeRelativePath(params.get("redirect") || params.get("return"));
 }
 
+const requested = new URL(requestedRedirectPath(), window.location.origin);
+const resumeId = requested.pathname === "/trip-planner" && requested.searchParams.get("resume_draft");
+const isPlannerSave = typeof resumeId === "string" && /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(resumeId);
+function matchingIntent() {
+  if (!isPlannerSave) return null;
+  try {
+    const intent = JSON.parse(sessionStorage.getItem(plannerSaveIntentKey));
+    return intent?.id === resumeId && intent.action === "save" ? intent : null;
+  } catch { return null; }
+}
+
+function returnToPlanning() {
+  const path = safeRelativePath(matchingIntent()?.returnPath, "/trip-planner");
+  const url = new URL(path, window.location.origin);
+  if (url.pathname !== "/trip-planner") return "/trip-planner";
+  // Preserve the guest's starting destination without admitting a second save action.
+  const destination = url.searchParams.get("destination");
+  return destination ? "/trip-planner?" + new URLSearchParams({ destination }) : "/trip-planner";
+}
+
 function postAuthDestination() {
-  if(new URLSearchParams(window.location.search).get('redirect')==='/trip-planner?resume_draft=1')return '/trip-planner?resume_draft=1';
+  if (isPlannerSave) {
+    // The planner validates and consumes the tab-local snapshot; expired links
+    // return an explicit status instead of silently presenting an empty plan.
+    return "/trip-planner?resume_draft=" + resumeId;
+  }
+  if (requested.pathname === "/trip-planner" && resumeId === "1") return "/trip-planner?resume_draft=1";
   let hasPendingTrip = false;
   try {
     hasPendingTrip = Boolean(sessionStorage.getItem(pendingPackswiftTripKey));
@@ -67,8 +98,41 @@ if (authSwitchLink) {
   authSwitchLink.href = `${target}?redirect=${encodeURIComponent(postAuthDestination())}`;
 }
 
+let leavingPlannerAuth = false;
+if (isPlannerSave) {
+  const active = matchingIntent()?.expires > Date.now();
+  const login = authForm.dataset.authForm === "login";
+  authForm.querySelector(".panel-title").textContent = active
+    ? (login ? "Sign in to save your trip" : "Create an account to save your trip")
+    : (login ? "Sign in" : "Create your account");
+  authForm.querySelector(".panel-copy").textContent = active
+    ? "Finish within 20 minutes and we’ll save this plan to My Trips."
+    : "This save request is no longer active. Return to the planner to review your trip.";
+  if (authSwitchLink) authSwitchLink.textContent = login ? "Create an account" : "Sign in";
+  // The shared header has its own sign-in / sign-up links. Preserve the same
+  // handoff there too, so switching forms never drops the selected trip.
+  for (const link of document.querySelectorAll(".ps-header-auth a")) {
+    if (["/login", "/signup"].includes(link.pathname)) {
+      link.search = new URLSearchParams({ redirect: postAuthDestination() }).toString();
+    }
+  }
+  const back = document.createElement("a");
+  back.href = returnToPlanning();
+  back.textContent = "Back to planning";
+  back.className = "button button-secondary";
+  back.addEventListener("click", (event) => {
+    if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    event.preventDefault();
+    leavingPlannerAuth = true;
+    // Keep the guest draft; only the explicit request to save to an account is cancelled.
+    if (matchingIntent()) sessionStorage.removeItem(plannerSaveIntentKey);
+    window.location.replace(back.href);
+  });
+  authForm.querySelector(".form-actions").append(back);
+}
+
 window.PackSwift.authReady.then((user) => {
-  if (user) window.location.replace(postAuthDestination());
+  if (user && !leavingPlannerAuth) window.location.replace(postAuthDestination());
 });
 
 if (authForm.dataset.authForm === "login") {
@@ -96,7 +160,9 @@ authForm.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload),
     });
     window.PackSwift.setCurrentUser(result.user);
-    window.location.assign(postAuthDestination());
+    if (leavingPlannerAuth) return;
+    if (isPlannerSave || resumeId === "1") window.location.replace(postAuthDestination());
+    else window.location.assign(postAuthDestination());
   } catch (error) {
     if (mode === "login" && error.status === 401) {
       showInvalidLoginError();

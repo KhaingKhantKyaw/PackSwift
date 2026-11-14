@@ -30,11 +30,87 @@ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page
 html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .traveller-stepper button{color:var(--planning-action-text)!important;background:var(--planning-action)!important}
 html[data-theme="dark"] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"]{background:#0d1524!important}
 html[data-theme="dark"] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"]::before{background:linear-gradient(#0d1524ed,#111e32e8)!important}
-html[data-theme="dark"] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-field{--field-accent:#81d9c4!important}
-html[data-theme="dark"] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-field:nth-child(3n+2){--field-accent:#bcabf5!important}
-html[data-theme="dark"] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-field:nth-child(3n){--field-accent:#f0c27a!important}
 html[data-theme="dark"] body.planner-studio .ps-global-header{background:#101c2f!important;border-bottom:1px solid #40536b!important}
 html[data-theme="light"] body.planner-studio .ps-global-header{background:#073e43!important}
 html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] .sketch-fields .trip-type-control label:has(input:checked){background:var(--planning-action)!important;color:var(--planning-action-text)!important;border:2px solid var(--planning-focus)!important}
 html[data-theme="dark"] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"]::after{opacity:.08!important}
 @media print{html{--planning-paper:#fff;--planning-inset:#f3f3f3;--planning-text:#163b40;--planning-muted:#4c666b;--planning-line:#b4ccc8}}
+
+/* Pair the color of each interactive surface with its text. The form ID keeps
+   older planner skins from painting cream fields back into the night palette. */
+@media screen {
+  #trip-planner-form .sketch-field[data-field] {
+    background: var(--ps-surface) !important;
+    border-color: var(--ps-border) !important;
+    border-top-color: var(--field-accent, var(--ps-accent)) !important;
+  }
+  html[data-theme="dark"] #trip-planner-form .sketch-field { --field-accent: var(--ps-accent); }
+  html[data-theme="dark"] #trip-planner-form [data-field="Location"] { --field-accent: #c7b0fa; }
+  html[data-theme="dark"] #trip-planner-form [data-field="Dates"] { --field-accent: #edbf7c; }
+  html[data-theme="dark"] #trip-planner-form [data-field="Travelers"] { --field-accent: #93c4fe; }
+  html[data-theme="dark"] #trip-planner-form [data-field="Travel Purpose"] { --field-accent: #f7a9be; }
+  #trip-planner-form .sketch-field h2 > svg { color: var(--field-accent, var(--ps-accent)); }
+  #trip-planner-form .sketch-fields :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, .purpose-multiselect, .purpose-multiselect > summary, .trip-type-control label, .traveller-stepper, .travel-guidance-choice),
+  html[data-theme] body.planner-horizontal .final-trip-budget .support-fields :is(input, select) {
+    background-color: var(--ps-field) !important;
+    border-color: var(--ps-control-border) !important;
+    color: var(--ps-ink) !important;
+  }
+  #trip-planner-form .trip-type-control { background: transparent !important; }
+  #trip-planner-form .purpose-options,
+  #trip-planner-form .sketch-calendar-panel {
+    background-color: var(--ps-surface) !important;
+    border-color: var(--ps-control-border) !important;
+  }
+  #trip-planner-form .purpose-options input[type=checkbox] { accent-color: var(--ps-accent); }
+  #trip-planner-form :is(.purpose-options label:has(:checked), .trip-type-control label:has(:checked), .travel-guidance-choice[aria-checked=true]) {
+    background-color: var(--ps-selected-bg) !important;
+    border-color: var(--ps-accent) !important;
+    color: var(--ps-selected-ink) !important;
+  }
+  #trip-planner-form .travel-guidance-choice[aria-checked=true] {
+    box-shadow: inset 0 0 0 1px var(--ps-accent);
+  }
+  #trip-planner-form .travel-guidance-choice[aria-checked=true]::after { color: var(--ps-selected-ink); }
+  #trip-planner-form .travel-guidance-levels button[aria-pressed=true] {
+    background: var(--ps-accent) !important;
+    border-color: var(--ps-accent) !important;
+    color: var(--ps-on-accent) !important;
+  }
+  #trip-planner-form :is(.route-swap, .sketch-calendar-trigger, .traveller-stepper button, .calendar-month button, .calendar-clear, .calendar-done) {
+    background-color: var(--ps-selected-bg) !important;
+    color: var(--ps-selected-ink) !important;
+  }
+  #trip-planner-form .traveller-stepper button:disabled,
+  html[data-theme] body.planner-horizontal .final-trip-budget .support-fields input:disabled {
+    background-color: var(--ps-canvas) !important;
+    color: var(--ps-muted) !important;
+  }
+  #trip-planner-form :is(.trip-type-control label:has(:focus-visible), .purpose-options label:has(:focus-visible)) {
+    outline: 3px solid var(--ps-focus);
+    outline-offset: 2px;
+  }
+  /* The compact calendar has a legacy hard-coded daytime palette of its own. */
+  #trip-planner-form .sketch-calendar-panel .calendar-month strong { color: var(--planning-text) !important; }
+  #trip-planner-form .sketch-calendar-panel :is(p, small, .calendar-legend, .calendar-disclaimer) { color: var(--planning-muted) !important; }
+  html[data-theme="dark"] #trip-planner-form .calendar-day.low { background: #213e5d !important; color: #c7e3ff !important; }
+  html[data-theme="dark"] #trip-planner-form .calendar-day.moderate { background: #4a3926 !important; color: #ffdf9f !important; }
+  html[data-theme="dark"] #trip-planner-form .calendar-day.peak { background: #50323c !important; color: #ffd1d1 !important; }
+  #trip-planner-form .sketch-calendar-panel .calendar-day.in-range { box-shadow: inset 0 0 0 1px var(--ps-accent) !important; }
+  html[data-theme] #trip-planner-form .sketch-calendar-panel .calendar-day.endpoint {
+    background: var(--ps-accent) !important;
+    color: var(--ps-on-accent) !important;
+  }
+  /* Keep the final estimate and Save recognizable separately from secondary actions. */
+  html[data-theme] body.planner-horizontal .final-trip-budget .budget-result {
+    border-left-color: var(--ps-accent) !important;
+    background: var(--ps-selected-bg) !important;
+    color: var(--ps-selected-ink) !important;
+  }
+  html[data-theme] body.planner-horizontal .final-trip-budget .budget-result :is(p, small, strong) { color: var(--ps-selected-ink) !important; }
+  html[data-theme] body.planner-horizontal .final-trip-budget .preview-trip-actions button:has(+ #guest-trip-save-hint) {
+    background: var(--ps-accent) !important;
+    color: var(--ps-on-accent) !important;
+    border-color: var(--ps-accent) !important;
+  }
+}

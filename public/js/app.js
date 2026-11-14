@@ -35,7 +35,7 @@ function applyThemePreference(preference = themePreference, persist = false) {
   document.documentElement.dataset.themePreference = themePreference;
   document.documentElement.style.colorScheme = theme;
   const themeColor = document.querySelector('meta[name="theme-color"]');
-  if (themeColor) themeColor.content = theme === "dark" ? "#0D1B2A" : "#00A8B5";
+  if (themeColor) themeColor.content = theme === "dark" ? "#0C1C24" : "#17624A";
   syncHeaderThemeToggles(theme);
   if (persist) {
     try {
@@ -82,6 +82,7 @@ const planningThemeStyles=document.createElement('link');
 planningThemeStyles.rel='stylesheet';planningThemeStyles.href='/css/planning-theme.css';document.head.append(planningThemeStyles);
 const websiteThemeStyles=document.createElement('link');
 websiteThemeStyles.rel='stylesheet';websiteThemeStyles.href='/css/website-theme.css';document.head.append(websiteThemeStyles);
+if(page==='planner-studio'){const previewStyles=document.createElement('link');previewStyles.rel='stylesheet';previewStyles.href='/css/preview-destination.css';document.head.append(previewStyles);}
 const globalHeader=document.createElement('header');
 globalHeader.className='ps-global-header';
 globalHeader.dataset.variant=page==='planner-studio'?'solid':'overlay';
@@ -91,7 +92,7 @@ globalHeader.innerHTML=`<div class="ps-header-inner">
  <div class="ps-header-navigation" id="ps-header-navigation">
   <nav class="ps-header-links" aria-label="Primary navigation">${mainNavigation.replaceAll('class="nav-link"','class="ps-header-link"')}</nav>
   <div class="ps-header-auth">
-   <span data-auth="guest"><a class="ps-header-action" href="/login">Login</a><a class="ps-header-action ps-header-start" href="/signup">Get Started</a></span>
+   <span data-auth="guest"><a class="ps-header-action" href="/login">Log in</a></span>
    <span data-auth="user" hidden><a class="ps-header-action" href="/profile"><span data-profile-name>Profile</span></a><button class="ps-header-action" type="button" data-logout>Logout</button></span>
   </div>
  </div>
@@ -109,7 +110,6 @@ menuButton.addEventListener('click',()=>{const open=menuButton.getAttribute('ari
 globalHeader.addEventListener('click',event=>{if(event.target.closest('a'))closeHeaderMenu();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&globalHeader.hasAttribute('data-open')){closeHeaderMenu();menuButton.focus();}});
 document.addEventListener('click',event=>{if(!globalHeader.contains(event.target))closeHeaderMenu();});
-for (const signup of document.querySelectorAll('a[href="/signup"]')) signup.textContent = 'Get Started';
 const footer=document.querySelector('.site-footer .footer-inner, .slider-footer');
 if(footer){const links=document.createElement('nav');links.className='footer-help-links';links.setAttribute('aria-label','Information and support');for(const [label,url] of [['About PackSwift','/about'],['Contact & Feedback','/help#contact'],['Privacy','/help#privacy'],['Terms','/help#terms']]){const a=document.createElement('a');a.textContent=label;a.href=url;links.append(a);}footer.append(links);}
 document.addEventListener('click',event=>{if(event.target.closest('[data-open-concierge]'))window.PackSwift?.concierge?.open(true);});

@@ -1,0 +1,54 @@
+/* Packing views share the existing scroll container; no new page-height panels. */
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] #studio-dashboard-content>.reference-preview-card>summary{height:auto!important;min-height:68px!important;align-items:center;gap:8px}
+html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page="planner-studio"] #studio-dashboard-content>.reference-preview-card>summary>span:not(.preview-icon){min-width:0;white-space:normal;font-size:17px;line-height:1.35}
+html[data-theme] body.planner-horizontal .packing-essentials{min-width:0;color:var(--planning-text);font:14px/1.5 Inter,Arial,sans-serif;overflow-anchor:none}
+html[data-theme] body.planner-horizontal .packing-essentials :is(p,h3,span,label,summary,button,input,small){font-family:Inter,Arial,sans-serif!important;text-transform:none!important;letter-spacing:normal!important}
+.packing-essentials-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-progress-text{margin:0!important;font-size:14px!important;font-weight:700;color:var(--planning-text)!important}
+html[data-theme] body.planner-horizontal .packing-essentials button{min-height:44px;min-width:0;padding:8px 12px;border:1px solid var(--planning-line);border-radius:10px;background:var(--planning-action);color:var(--planning-action-text)!important;font-size:14px!important;font-weight:600;line-height:1.35;cursor:pointer}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-guidance-switch{padding:7px 10px;background:var(--planning-paper)!important;font-size:12px!important;white-space:normal}
+.packing-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;margin-bottom:16px;border-radius:12px;background:var(--planning-inset);border:1px solid var(--planning-line)}
+html[data-theme] body.planner-horizontal .packing-essentials .preparation-shortcut{background:transparent!important;border:0!important;padding:6px 0!important;font-size:12px!important;min-height:36px;text-align:left;text-decoration:underline;text-underline-offset:3px}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-tabs button{border:0!important;border-radius:8px;padding:9px 4px;background:transparent!important;color:var(--planning-text)!important;font-size:13px!important;font-weight:600;white-space:normal}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-tabs button[aria-selected="true"]{background:var(--planning-action-text)!important;color:var(--planning-paper)!important;box-shadow:0 1px 4px #0001}
+.packing-tabpanel{min-width:0;outline-offset:-3px}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-tabpanel>small{display:block;font-size:12px!important;line-height:1.6;color:var(--planning-muted)!important;margin-bottom:12px}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-tabpanel h3{font-size:17px!important;line-height:1.45;margin:0 0 14px;color:var(--planning-text)!important}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-tabpanel>[data-category]{margin:10px 0;padding:0 12px;border:1px solid var(--planning-line);border-radius:12px;background:var(--planning-paper)!important}
+html[data-theme] body.planner-horizontal .packing-essentials [data-category]>summary{display:flex;align-items:center;gap:8px;min-height:48px;padding:8px 0;cursor:pointer;list-style:none;color:var(--planning-text)!important;font-size:14px!important;font-weight:700;box-sizing:border-box}
+.packing-essentials [data-category]>summary::-webkit-details-marker{display:none}
+.packing-essentials [data-category]>summary::after{content:'+';font-size:19px;margin-left:3px}
+.packing-essentials [data-category][open]>summary::after{content:'−'}
+.packing-essentials [data-category]>summary>span:not(.packing-category-icon){flex:1;min-width:0}
+.packing-essentials [data-category]>summary>small{font-size:12px;font-weight:500;white-space:nowrap;color:var(--planning-muted)}
+.packing-essentials .packing-category-icon{display:grid;place-items:center;width:28px;height:28px;flex:none;border-radius:8px;background:var(--planning-action);color:var(--planning-action-text)}
+.packing-essentials .packing-category-icon svg{width:18px;height:18px}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-item{display:grid;grid-template-columns:22px minmax(0,1fr) 54px 36px;align-items:center;gap:6px;margin:8px 0 4px;padding:0;border:0}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-item input:not([type="checkbox"]){box-sizing:border-box;width:100%!important;min-width:0!important;max-width:100%;height:44px!important;padding:8px!important;border:1px solid var(--planning-line);border-radius:8px;font-size:13px!important;color:var(--planning-text)!important;background:var(--planning-paper)!important}
+.packing-essentials input[type="checkbox"]{width:20px;height:20px;margin:0;accent-color:var(--planning-action-text);cursor:pointer}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-item button{padding:0;width:36px;min-height:44px;font-size:22px!important;background:transparent!important;border:0}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-quantity-note{display:block;margin:0 0 12px;padding-left:28px;font-size:11px!important;line-height:1.5;color:var(--planning-muted)!important}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-add{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:8px 0 12px;margin:0}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-add input{width:100%;min-width:0;box-sizing:border-box;padding:10px;border:1px solid var(--planning-line);border-radius:8px;font-size:14px!important}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-help-note{padding:12px;margin:12px 0;font-size:13px!important;line-height:1.6;background:var(--planning-action);border-left:3px solid var(--planning-focus);border-radius:0 8px 8px 0;color:var(--planning-text)!important}
+.packing-tip{padding:12px 0;border-bottom:1px solid var(--planning-line)}
+.packing-tip>summary{display:flex;align-items:center;gap:10px;cursor:pointer;font-weight:650;list-style:none;font-size:14px}
+.packing-tip>summary::-webkit-details-marker{display:none}
+.packing-tip>summary::after{content:'+';margin-left:auto}
+.packing-tip[open]>summary::after{content:'−'}
+.packing-tip-icon{width:34px;height:34px;display:grid;place-items:center;flex:none;background:var(--planning-action);color:var(--planning-action-text);border-radius:10px}
+.packing-tip-icon svg{width:22px;height:22px}
+html[data-theme] body.planner-horizontal .packing-essentials .packing-tip p{margin:8px 0 2px 44px;font-size:13px!important;line-height:1.65;color:var(--planning-muted)!important}
+.packing-essentials progress{width:100%;height:7px;accent-color:var(--planning-focus);margin:0 0 12px}
+html[data-theme] body.planner-horizontal .packing-essentials .preparation-progress{font-size:15px!important;font-weight:700;margin:0 0 8px;color:var(--planning-text)!important}
+.preparation-item{padding:14px 0;border-bottom:1px solid var(--planning-line)}
+.preparation-item>label{display:flex;align-items:flex-start;gap:10px;margin:0;cursor:pointer;min-height:24px;font-weight:650;font-size:14px}
+.preparation-item>label>input{flex:none;margin-top:2px}
+.preparation-item>details{margin:6px 0 0 30px}
+.preparation-item summary{font-size:12px;cursor:pointer;color:var(--planning-action-text)}
+html[data-theme] body.planner-horizontal .packing-essentials .preparation-item p{margin:6px 0;font-size:13px!important;line-height:1.65;color:var(--planning-muted)!important}
+html[data-theme] body.planner-horizontal .trip-guidance-tip{grid-column:1/-1;padding:12px 0;margin-top:8px;border-top:1px solid var(--planning-line);font:14px/1.6 Inter,Arial,sans-serif;background:transparent!important;color:var(--planning-text)!important}
+.trip-guidance-tip summary{font:600 14px/1.5 Inter,Arial,sans-serif;cursor:pointer}
+html[data-theme] body.planner-horizontal .trip-guidance-tip p{font:13px/1.65 Inter,Arial,sans-serif!important;color:var(--planning-muted)!important;margin:8px 0 0!important}
+html[data-theme] body.planner-horizontal .packing-essentials :is(button,input,summary):focus-visible{outline:3px solid var(--planning-focus)!important;outline-offset:3px}
+@media(max-width:380px){.packing-essentials .packing-item{grid-template-columns:20px minmax(0,1fr) 48px 28px!important;gap:4px!important}.packing-essentials .packing-item button{width:28px!important}.packing-essentials-top{flex-wrap:wrap}}

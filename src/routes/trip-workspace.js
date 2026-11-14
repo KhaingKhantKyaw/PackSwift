@@ -25,7 +25,7 @@ tripWorkspaceRouter.get('/',...guard,async(req,res,next)=>{
   }catch(e){next(e);}
 });
 tripWorkspaceRouter.get('/:tripId/workspace',...guard,async(req,res,next)=>{
-  try {if(!validId(req.params.tripId))return res.status(400).json({error:'Invalid trip ID.'});const result=await snapshot(req.auth.userId,req.params.tripId,true);if(!result)return res.status(404).json({error:'Trip not found.'});res.set('Cache-Control','no-store').json(result);}catch(e){next(e);}
+  try {if(!validId(req.params.tripId))return res.status(400).json({error:'Invalid trip ID.'});const result=await snapshot(req.auth.userId,req.params.tripId,true,req.query.hydrate!=='0');if(!result)return res.status(404).json({error:'Trip not found.'});res.set('Cache-Control','no-store').json(result);}catch(e){next(e);}
 });
 tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
   let connection;
@@ -38,6 +38,15 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
     const state=preferences.workspace || {revision:0,requirements:{},needs:[]};
     if((state.revision||0)!==change.revision){await connection.rollback();return res.status(409).json({error:'This trip changed in another tab. Reload before saving.'});}
     if(change.action==='requirement'){state.requirements||={};state.requirements[change.key]=change.reviewed?new Date().toISOString():null;}
+    if(change.action==='activity-choice'){
+      const field=preferences.detailPlanning?.fields?.find(f=>f.name==='activityChoices');
+      if(!field){await connection.rollback();return res.status(404).json({error:'Saved activity not found.'});}
+      const trip=await getOwnedTrip(req.auth.userId,req.params.tripId),destination=tripDetails(trip).destination,model=globalThis.PackSwiftActivityChoicesModel;
+      const choices=model.parse(field.value),entry=choices.destinations.find(d=>model.destinationKey(d.destination)===model.destinationKey(destination)),item=entry?.choices.find(c=>c.id===change.id&&c.vote==='up');
+      if(!item){await connection.rollback();return res.status(404).json({error:'Saved activity not found.'});}
+      field.value=JSON.stringify(model.setVote(choices,destination,item,null));
+      await connection.execute('UPDATE trip_sessions SET preferences_json=? WHERE id=? AND user_id=?',[JSON.stringify(preferences),rows[0].id,req.auth.userId]);
+    }
     if(change.action==='packing'){
       const [items]=await connection.execute('SELECT id FROM packing_lists WHERE id=? AND trip_session_id=?',[change.itemId,rows[0].id]);
       if(!items.length){await connection.rollback();return res.status(404).json({error:'Packing item not found.'});}
@@ -45,6 +54,10 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
       state.needs=(state.needs||[]).filter(id=>id!==change.itemId);if(change.state==='need')state.needs.push(change.itemId);
     }
     if(change.action==='itinerary'||change.action==='regenerate'){
+      if(preferences.detailPlanning?.fields?.some(f=>f.name==='itineraryPlan'&&f.value)){
+        await connection.rollback();return res.status(409).json({error:'Open Edit Trip to change this itinerary while preserving its fixed stops.'});
+      }
+      state.plannerDraft=false;
       const trip=await getOwnedTrip(req.auth.userId,req.params.tripId),details=tripDetails(trip);
       const [existing]=await connection.execute('SELECT * FROM itinerary_timeline_items WHERE trip_session_id=?',[rows[0].id]);
       if(change.action==='regenerate'){
@@ -68,6 +81,6 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
     if(change.action==='review-itinerary')state.itineraryReviewedAt=new Date().toISOString();
     state.revision=(state.revision||0)+1;state.updatedAt=new Date().toISOString();
     await connection.execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.workspace',JSON_EXTRACT(?, '$')), updated_at=CURRENT_TIMESTAMP WHERE id=? AND user_id=?",[JSON.stringify(state),rows[0].id,req.auth.userId]);
-    await connection.commit();res.json(await snapshot(req.auth.userId,req.params.tripId,true));
+    await connection.commit();res.json(await snapshot(req.auth.userId,req.params.tripId,true,req.query.hydrate!=='0'));
   }catch(e){if(connection)await connection.rollback();if(e instanceof RangeError)return res.status(422).json({error:e.message});next(e);}finally{connection?.release();}
 });

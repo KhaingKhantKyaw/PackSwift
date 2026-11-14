@@ -29,13 +29,13 @@
 <nav class="slider-menu" aria-label="Main navigation"></nav>
 <div class="slider-account">
 <button type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><span class="theme-toggle-thumb" aria-hidden="true">☀</span></button>
-<span data-auth="guest"><a href="/signup">Get Started</a><a href="/login">Login</a></span>
+<span data-auth="guest"><a href="/login">Log in</a></span>
 <span data-auth="user" hidden><a href="/profile" data-profile-name>Profile</a><button type="button" data-logout>Logout</button></span>
 </div>
 <div class="slider-search-wrap">
 <label for="destination-slider-search">Find your next escape</label>
 <div class="slider-search"><span aria-hidden="true">⌕</span>
-<input id="destination-slider-search" type="search" placeholder="Search tourist spots or cities..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="slider-search-results" aria-expanded="false">
+<input id="destination-slider-search" type="search" placeholder="Search destinations" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="slider-search-results" aria-expanded="false">
 <span aria-hidden="true">↗</span></div>
 <div id="slider-search-results" class="slider-search-results" role="listbox" aria-label="Destinations" hidden></div>
 <span id="slider-search-status" class="slider-search-status" role="status"></span>
@@ -43,30 +43,30 @@
 </header>
 <div class="destination-stage">
 <section class="destination-story" aria-labelledby="slider-title">
-<p class="slider-eyebrow">LESS PLANNING. MORE LIVING.</p>
+<p class="slider-eyebrow"><span data-auth="guest">No account needed to plan</span><span data-auth="user" hidden>Discover your next trip</span></p>
 <span id="slider-location" class="slider-location">📍 Singapore, Singapore</span>
 <h1 id="slider-title">SINGAPORE</h1>
-<p id="slider-description">Garden paths above the city. Hawker flavours around the corner. A small island with a world of possibilities.</p>
+<p id="slider-description">Gardens, city walks and hawker food.</p>
 <div class="slider-actions">
-<a id="slider-plan" class="slider-plan" href="/trip-planner?destination=Singapore">Plan Trip <span aria-hidden="true">↗</span></a>
+<a id="slider-plan" class="slider-plan" href="/trip-planner?destination=Singapore">Plan a trip <span aria-hidden="true">↗</span></a>
 <button id="slider-save" class="slider-save" type="button" aria-pressed="false" aria-label="Save Singapore as an idea on this device">♡</button>
 </div>
 <p id="slider-feedback" role="status" class="slider-feedback"></p>
 </section>
 <section id="discover" class="destination-discovery" aria-label="Explore destinations">
-<div class="slider-discovery-heading"><span>WHERE WILL YOU GO NEXT?</span><span id="slider-position">01 / 09</span></div>
+<div class="slider-discovery-heading"><span>Destinations</span><span id="slider-position">01 / 09</span></div>
 <div id="destination-thumbnails" class="destination-thumbnails"></div>
 <div class="slider-controls">
 <button type="button" id="slider-previous" aria-label="Previous destination">←</button>
 <button type="button" id="slider-next" aria-label="Next destination">→</button>
-<span class="slider-line"></span><span>YOUR NEXT CHAPTER</span>
+<span class="slider-line"></span><span>Explore</span>
 </div>
 </section>
 </div>
 <a class="home-explore-link" href="/explore">Explore the world <span aria-hidden="true">↗</span></a>
 </div>
 </main>
-<footer id="support" class="site-footer home-explore-footer"><div class="footer-inner"><span>PackSwift · Less planning. More discovery.</span><a href="/help">Need a hand?</a></div></footer>
+<footer id="support" class="site-footer home-explore-footer"><div class="footer-inner"><span>PackSwift</span><a href="/help">Help</a></div></footer>
 <nav class="mobile-nav" aria-label="Mobile navigation"></nav>
 </body>
 </html>

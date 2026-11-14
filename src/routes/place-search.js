@@ -22,7 +22,7 @@ placeSearchRouter.get('/transport-autocomplete',[query('q').isString().trim().is
 placeSearchRouter.get('/search',[query('q').isString().trim().isLength({min:2,max:200}),...context],validateRequest,handle('textSearch'));
 placeSearchRouter.get('/popular-activities',[
  query('destination').isString().trim().isLength({min:2,max:150}),
- query('purpose').isIn(Object.keys(activityTopics)),query('style').isIn(Object.keys(activityStyles)),
+ query('purpose').optional().isIn(Object.keys(activityTopics)),query('style').optional().isIn(Object.keys(activityStyles)),
  query('variant').optional().isInt({min:0,max:2}),query('pageToken').optional().isString().isLength({min:1,max:8192})
 ],validateRequest,handle('popularActivities'));
 placeSearchRouter.get('/:id',[param('id').matches(/^[A-Za-z0-9_-]{10,255}$/),...context],validateRequest,handle('details'));

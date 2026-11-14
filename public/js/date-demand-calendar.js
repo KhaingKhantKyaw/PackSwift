@@ -35,6 +35,6 @@
  currency.addEventListener('change',()=>currencyChange(currency.value));
  function mode(){const local=form.elements.tripType.value==='local';$('origin-search').hidden=false;$('origin-label').hidden=false;$('origin-search').required=true;$('origin-label').textContent=local?'Local City':'Origin City';$('destination-search').hidden=local;$('destination-search').required=!local;form.querySelector('label[for="destination-search"]').hidden=local;$('trip-scope').value=local?'local':'anywhere';}
  form.addEventListener('change',e=>{if(e.target.name==='tripType'){mode();notify();}});
- function restored(){mode();previous=currency.value;const params=new URLSearchParams(location.search);if(!params.has('trip_id')&&!params.has('resume_draft')&&!$('budget').value&&$('destination-search').value)currencyChange(PackSwiftCurrency.resolve($('destination-search').value).code);if(start.value)month=new Date(start.value.slice(0,7)+'-01T00:00:00Z');draw();}
+ function restored(){mode();previous=currency.value;const params=new URLSearchParams(location.search);if(!form.dataset.restoredCurrency&&!params.has('trip_id')&&!params.has('resume_draft')&&!$('budget').value&&$('destination-search').value)currencyChange(PackSwiftCurrency.resolve($('destination-search').value).code);if(start.value)month=new Date(start.value.slice(0,7)+'-01T00:00:00Z');draw();}
  window.addEventListener('packswift:planner-loaded',restored);window.addEventListener('packswift:draft-restored',restored);restored();
 })();

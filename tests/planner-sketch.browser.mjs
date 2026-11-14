@@ -78,10 +78,10 @@ try{
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`overflow at ${width}`);
   await page.screenshot({path:`/tmp/packswift-reference-${width}.png`,fullPage:true});
  }
- const draftResponse=page.waitForResponse(r=>r.url().endsWith('/api/trip-drafts')&&r.request().method()==='POST');
- await page.getByRole('button',{name:'Let’s see planning →',exact:true}).click();
- const draft=await draftResponse;assert.equal(draft.status(),201);
- const payload=draft.request().postDataJSON().payload;
+ await page.route('**/login?redirect=*',route=>route.fulfill({status:204}));
+ await page.evaluate(()=>document.getElementById('studio-save').click());
+ await page.getByRole('dialog').getByRole('link',{name:'Log in',exact:true}).click();
+ const payload=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('packswift.planner-save-intent.v1')).payload);
  assert.equal(payload.fields.find(f=>f.name==='startDate').value,'2026-12-16');
  assert.equal(payload.fields.find(f=>f.name==='passportCountry').value,'Myanmar (Burma)');
  assert.equal(payload.fields.find(f=>f.name==='budget').value,'30000');

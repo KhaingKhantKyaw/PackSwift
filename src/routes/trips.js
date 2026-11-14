@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { savePlannerDraft } from "../services/planner-draft.js";
 import {placeReference} from '../services/place-search-service.js';
 import { getDatabasePool } from "../config/database.js";
 import { randomUUID } from "node:crypto";
@@ -35,37 +36,22 @@ import {
 import { buildDetailedTimeline } from "../services/itinerary-timeline-service.js";
 import { cleanTripEntity, normalizeTripRecommendation } from "../services/ai-concierge-service.js";
 import '../../public/js/itinerary-preferences-model.js';
+import '../../public/js/activity-choices-model.js';
 
 export const tripsRouter = Router();
+import {dashboardCurrencyRate} from '../services/dashboard-currency.js';
 tripsRouter.get('/currency-rate', requireAuth, async(req,res)=>{
  const base=String(req.query.base||'USD').toUpperCase(),target=String(req.query.target||'THB').toUpperCase();
  if(!/^[A-Z]{3}$/.test(base)||!/^[A-Z]{3}$/.test(target))return res.status(400).json({message:'Choose valid currencies.'});
- if(base===target)return res.json({rate:1,base,target});
- if(!process.env.EXCHANGERATE_API_KEY)return res.status(503).json({message:'Live exchange rates are not configured.'});
- try{const response=await fetch(`https://v6.exchangerate-api.com/v6/${encodeURIComponent(process.env.EXCHANGERATE_API_KEY)}/pair/${base}/${target}`,{signal:AbortSignal.timeout(8000)});const data=await response.json();if(!response.ok||data.result!=='success')throw Error();res.json({rate:data.conversion_rate,base,target,updated:data.time_last_update_utc});}catch{res.status(503).json({message:'Exchange rates are temporarily unavailable.'});}
+ try{res.set('Cache-Control','no-store').json(await dashboardCurrencyRate(base,target));}catch{res.status(503).json({message:'Exchange rates are temporarily unavailable. Original amounts are unchanged.'});}
 });
 
-// Durable, owner-scoped second-step state; preserves the original trip preferences.
-tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async (req,res,next)=>{
-  try {
-    if(!/^[a-f0-9-]{36}$/i.test(req.params.tripId)||!req.body||JSON.stringify(req.body).length>80000)return res.status(400).json({message:'Trip details are incomplete or too large.'});
-    const details={fields:Array.isArray(req.body.fields)?req.body.fields:[],selected:Array.isArray(req.body.selected)?req.body.selected:[],rejected:Array.isArray(req.body.rejected)?req.body.rejected:[]};
-    if(details.selected.some(p=>!p||typeof p!=='object'||typeof(p.title||p.name)!=='string')||details.fields.some(f=>!f||typeof f.name!=='string'))return res.status(400).json({message:'Invalid selected places or form fields.'});
-    let raw=req.body.itineraryPreferences;
-    if(raw===undefined){const field=details.fields.find(f=>f.name==='itineraryPreferences');try{raw=field?JSON.parse(field.value):{};}catch{return res.status(400).json({message:'Invalid itinerary preferences.'});}}
-    if(!raw||typeof raw!=='object'||Array.isArray(raw))return res.status(400).json({message:'Invalid itinerary preferences.'});
-    const preferences=globalThis.PackSwiftItineraryPreferenceModel.normalize(raw,details.selected);
-    const values=Object.fromEntries(details.fields.map(f=>[f.name,f.value]));
-    const days=Math.round((Date.parse(values.endDate)-Date.parse(values.startDate))/86400000)+1;
-    const errors=globalThis.PackSwiftItineraryPreferenceModel.validate(preferences,days);
-    if(errors.length)return res.status(400).json({message:errors.join(' ')});
-    details.itineraryPreferences=preferences;
-    details.selected=details.selected.map(placeReference);
-    details.fields=details.fields.filter(f=>!['itineraryPreferences','itinerary-mode-choice'].includes(f.name));
-    const [result]=await getDatabasePool().execute("UPDATE trip_sessions SET preferences_json=JSON_SET(COALESCE(preferences_json,JSON_OBJECT()), '$.detailPlanning', JSON_EXTRACT(?, '$'), '$.workspace.itineraryReviewedAt', NULL, '$.workspace.requirements', JSON_OBJECT(), '$.workspace.revision', COALESCE(JSON_EXTRACT(preferences_json,'$.workspace.revision'),0)+1), updated_at=CURRENT_TIMESTAMP WHERE public_id=? AND user_id=?",[JSON.stringify(details),req.params.tripId,req.auth.userId]);
-    if(!result.affectedRows)return res.status(404).json({message:'Trip not found.'});
-    res.json({success:true});
-  }catch(error){next(error);}
+// Saving a draft does not require a made-up budget or generate fake bookings.
+tripsRouter.post('/draft', requireAuth, requireDatabase, async(req,res,next)=>{
+ try{res.status(201).json(await savePlannerDraft(req.auth.userId,null,req.body));}catch(error){next(error);}
+});
+tripsRouter.put('/:tripId/details', requireAuth, requireDatabase, async(req,res,next)=>{
+ try{if(!/^[a-f0-9-]{36}$/i.test(req.params.tripId))return res.status(400).json({message:'Choose a valid trip.'});res.json(await savePlannerDraft(req.auth.userId,req.params.tripId,req.body));}catch(error){next(error);}
 });
 
 function validateTripId() {
@@ -434,7 +420,8 @@ tripsRouter.get(
         request.auth.userId,
         request.params.tripId,
       );
-      response.json({ trip: { ...trip, timeline } });
+      const packingProgress=await listPackingItems(request.auth.userId,request.params.tripId);
+      response.json({ trip: { ...trip, timeline, packingProgress } });
     } catch (error) {
       next(error);
     }
