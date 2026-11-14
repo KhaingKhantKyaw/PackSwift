@@ -11,6 +11,11 @@ const make=()=>({elements:[
  {id:'domestic-destination',tagName:'INPUT',name:'destination',type:'hidden',value:'Yangon',disabled:true,dataset:{}},
  {id:'budget',tagName:'INPUT',name:'budget',type:'text',value:'1,898',disabled:false,dataset:{}}
 ]});
+test('legacy scalar values survive input-type changes without guessing duplicate destinations',()=>{
+ const target={elements:[{id:'start-date',name:'startDate',type:'hidden',value:''},{id:'currency',name:'currency',type:'select-one',value:'USD'},{id:'visible-destination',name:'destination',type:'search',value:'Hanoi',dataset:{}},{id:'hidden-destination',name:'destination',type:'hidden',value:'Yangon'}]};
+ restoreFields(target,[{name:'startDate',type:'text',value:'2027-12-12'},{name:'currency',type:'text',value:'THB'},{name:'destination',type:'text',value:'Wrong city'}]);
+ assert.equal(target.elements[0].value,'2027-12-12');assert.equal(target.elements[1].value,'THB');assert.equal(target.elements[2].value,'Hanoi');assert.equal(target.elements[3].value,'Yangon');
+});
 for(const legacy of [false,true])test(`Hanoi is not overwritten by hidden Yangon (${legacy?'legacy':'new'} draft)`,()=>{
  const source=make();const saved=captureFields(source);if(legacy)saved.forEach(s=>{delete s.id;delete s.disabled;});
  const target=make();target.elements[1].value='';target.elements[1].dataset.internationalValue='Tokyo';

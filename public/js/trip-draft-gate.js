@@ -17,10 +17,11 @@
       const saved={...record};
       if(saved.name==='tripType'&&saved.value==='worldwide')saved.value='anywhere';
       const matches=controls.filter(el=>el.name===saved.name&&(!saved.type||el.type===saved.type));
-      // Old drafts have no IDs. Match by input type and occurrence, never by name alone.
+      // Prefer IDs/type/occurrence. A renamed scalar control type is safe only when its name is unique.
       const key=`${saved.name}:${saved.type}`;const index=used.get(key)||0;
+      const scalar=controls.filter(el=>el.name===saved.name&&!['radio','checkbox'].includes(el.type));
       const target=saved.id?controls.find(el=>el.id===saved.id&&el.name===saved.name):
-        ['radio','checkbox'].includes(saved.type)?matches.find(el=>el.value===saved.value):matches[index];
+        ['radio','checkbox'].includes(saved.type)?matches.find(el=>el.value===saved.value):matches[index]||(!matches.length&&scalar.length===1?scalar[0]:null);
       used.set(key,index+1);if(!target)continue;
       if(target.type==='radio'||target.type==='checkbox')target.checked=Boolean(saved.checked);else target.value=saved.value;
       if(typeof saved.disabled==='boolean')target.disabled=saved.disabled;

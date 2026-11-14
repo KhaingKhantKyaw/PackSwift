@@ -86,11 +86,7 @@ async function setTrip(page) {
   await item.fill('Film camera');
   await item.press('Enter');
   await packing.getByRole('checkbox', { name: 'Packed Film camera' }).check();
-  for (const [label, value] of [['Round-trip flights', '300'], ['Stay · all rooms', '220'], ['Daily spending', '50']]) {
-    const input = page.getByRole('spinbutton', { name: new RegExp(label) });
-    await input.fill(value);
-    await input.press('Tab');
-  }
+  await page.locator('.compact-trip-estimate').getByText('Budget optional · add later',{exact:true}).waitFor();
 }
 const saveButton = page => page.getByRole('button', { name: 'Save to My Trips', exact: true });
 async function openGate(page) {
@@ -117,7 +113,7 @@ function checkSave(s) {
   for (const [name, value] of Object.entries(details)) assert.equal(fields.find(f => f.name === name)?.value, value, name + ' preserved');
   const packed = JSON.parse(fields.find(f => f.name === 'packingSnapshot').value);
   assert.ok(packed.some(item => item.name === 'Film camera' && item.packed), 'custom checked packing item retained');
-  assert.equal(Number(fields.find(f => f.name === 'budget')?.value), 720, 'whole-group budget retained (4 days × 50 + 300 + 220)');
+  assert.equal(fields.find(f => f.name === 'budget')?.value, '', 'unknown budget remains blank and can be completed after saving');
   assert.deepEqual(s.temporaryRequests, [], 'no server draft is needed before authentication');
   assert.deepEqual(s.errors, [], 'no uncaught browser errors');
 }
@@ -147,7 +143,7 @@ try {
         await page.getByRole('link', { name: 'Back to planning' }).click();
         await page.waitForFunction(() => window.plannerTestReady);
         assert.equal(await page.locator('#origin-search').inputValue(), details.origin);
-        assert.equal(await page.getByRole('spinbutton', { name: /Daily spending/ }).inputValue(), '50');
+        assert.deepEqual(JSON.parse((await page.locator('#planning-support-state').inputValue())||'{}'), {});
         assert.equal(s.writes.length, 0);
         gate = await openGate(page);
       }

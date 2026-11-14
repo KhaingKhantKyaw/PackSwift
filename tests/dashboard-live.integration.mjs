@@ -17,6 +17,17 @@ try {
  assert.equal(created.status(),201,'Local test signup must succeed');
  id=(await created.json()).user.id;
  const initial=await call(context,'/api/profile/dashboard');assert.equal(initial.status(),200);
+ const guide={displayName:'Local Test Creator',area:'Bangkok',languages:'English',specialties:'Markets',bio:'Disposable profile for privacy verification.',published:false};
+ assert.equal((await call(context,'/api/profile/guide','PUT',guide)).status(),200);
+ const publicGuest=await browser.newContext();
+ assert.equal((await call(publicGuest,'/api/profile/guides/'+username)).status(),404);
+ assert.equal((await call(publicGuest,'/api/profile/guide','PUT',{...guide,published:true})).status(),401);
+ assert.equal((await call(context,'/api/profile/guide','PUT',{...guide,published:true})).status(),200);
+ const publicData=await (await call(publicGuest,'/api/profile/guides/'+username)).json();
+ assert.equal(publicData.guide.displayName,guide.displayName);assert.equal(publicData.guide.email,undefined);assert.equal(publicData.guide.dashboard,undefined);
+ assert.equal((await call(context,'/api/profile/guide','PUT',{...guide,published:false})).status(),200);
+ assert.equal((await call(publicGuest,'/api/profile/guides/'+username)).status(),404);
+ await publicGuest.close();
  const body=(await initial.json()).dashboard;
  const response=await call(context,'/api/profile/dashboard','PUT',{...body,currency:'JPY',experience:'first'});assert.equal(response.status(),200);
  const independent=await browser.newContext();
@@ -40,6 +51,9 @@ try {
  const addPacking=await call(context,workspacePath,'PATCH',{action:'packing-add',name:'Personal charger',category:'Electronics',quantity:1,revision:trip.workspace.revision});assert.equal(addPacking.status(),200);trip=await addPacking.json();const charger=trip.packing.find(p=>p.itemName==='Personal charger');assert.ok(charger);
  const editPacking=await call(context,workspacePath,'PATCH',{action:'packing-edit',itemId:charger.id,name:'Personal charger',category:'Electronics',quantity:2,revision:trip.workspace.revision});assert.equal(editPacking.status(),200);trip=await editPacking.json();assert.equal(trip.packing.find(p=>p.id===charger.id).quantity,2);
  const removePacking=await call(context,workspacePath,'PATCH',{action:'packing-remove',itemId:charger.id,revision:trip.workspace.revision});assert.equal(removePacking.status(),200);assert.ok(!(await removePacking.json()).packing.some(p=>p.id===charger.id));
+ await page.goto(base+'/trip-planner?trip_id='+tripId);await page.locator('.compact-trip-estimate').getByText('Estimated total: THB 4,500',{exact:true}).waitFor();
+ await page.locator('.compact-cost-details>summary').click();await page.getByRole('link',{name:'Open trip budget',exact:false}).click();await page.getByText('THB 4,500.00',{exact:true}).waitFor();
+ await page.getByRole('link',{name:'Search flights & stays',exact:true}).click();await page.locator('.planner-section-nav button[data-section="bookings"][aria-pressed="true"]').waitFor();
  await page.goto(base+'/trips/'+tripId+'?tab=itinerary');await page.getByText('Custom museum visit',{exact:true}).waitFor();await page.locator('#trip-hub-nav').getByRole('link',{name:'Budget',exact:true}).click();await page.getByText('THB 4,500.00',{exact:true}).waitFor();
  const guest=await browser.newContext();assert.equal((await call(guest,'/api/profile/dashboard')).status(),401);
  const [rows]=await db.execute('SELECT preferences FROM user_profile_preferences WHERE user_id=?',[id]);

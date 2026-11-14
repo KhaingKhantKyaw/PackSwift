@@ -10,7 +10,16 @@
  html[data-theme] body.planner-horizontal #studio-dashboard-content :is(.booking-results-scroll,.booking-option-panel,.booking-card-summary,.packing-checklist,.itinerary-plan,.itinerary-days){height:auto!important;max-height:none!important;overflow:visible!important;overscroll-behavior:auto!important;scrollbar-gutter:auto}
  html[data-theme] body.planner-horizontal #studio-dashboard-content :is([data-preview-section="Flight & Stay"],[data-preview-section="Packing List"]){grid-column:1/-1!important}
  html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Itinerary"]{grid-column:1!important;grid-row:1!important}
- html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"]{grid-column:2!important;grid-row:1!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"]{grid-column:1/-1!important;grid-row:auto!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Itinerary"]{grid-column:1/-1!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"] .activities-card-list{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;align-items:stretch}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"] .activity-preview-photo{height:180px;max-height:180px;aspect-ratio:auto;flex:none}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"] .activity-preview-photo img{height:100%;width:100%;object-fit:cover}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"] .activity-preview-body{padding:16px;gap:8px}
+ html[data-theme] body.planner-horizontal .planner-section-nav button{background:transparent!important;border:0!important;border-bottom:3px solid transparent!important;border-radius:0!important;box-shadow:none!important;color:var(--ps-muted)!important}
+ html[data-theme] body.planner-horizontal .planner-section-nav button[aria-pressed=true]{color:var(--ps-accent)!important;border-bottom-color:var(--ps-accent)!important;background:var(--ps-inset)!important}
+ @media(max-width:1050px){html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"] .activities-card-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+ @media(max-width:650px){html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"] .activities-card-list{grid-template-columns:minmax(0,1fr)!important}.planner-section-nav button{flex-basis:45%!important}}
  html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Flight & Stay"]>.reference-preview-content{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:start!important}
  .planner-section-nav{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--ps-border);margin:8px 0 20px}
  .planner-section-nav button{font:600 16px/1.4 var(--ps-font);background:transparent;color:var(--ps-muted);border:0;border-bottom:3px solid transparent;border-radius:0;padding:13px 20px;min-height:48px;cursor:pointer}
@@ -22,3 +31,19 @@
  @media(max-width:650px){html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Flight & Stay"]>.reference-preview-content{grid-template-columns:minmax(0,1fr)!important}.planner-section-nav button{flex:1;padding:12px 8px;font-size:14px}}
 }
 @media print{.planner-section-nav,.planner-section-hint{display:none!important}[data-flow-hidden=true]:not([hidden]){display:block!important}}
+
+/* Compact, non-sticky estimate/save row. Detailed budget editing lives in My Trips. */
+html[data-theme] body.planner-horizontal .compact-trip-finish{display:grid!important;grid-template-columns:minmax(0,1fr) auto auto;gap:12px 20px;align-items:center;position:static!important;padding:16px!important;margin:24px 0 0!important;border:0!important;border-top:1px solid var(--ps-border)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+html[data-theme] body.planner-horizontal .compact-trip-finish .compact-trip-estimate{min-width:0;font-size:16px;line-height:1.5}
+.compact-trip-estimate small{display:block;color:var(--ps-muted);font-size:13px}
+.compact-cost-details{min-width:0}.compact-cost-details>summary,.compact-trip-options>summary{cursor:pointer;color:var(--ps-ocean);font-size:14px;padding:8px 0}
+.compact-cost-body{padding:14px 0;max-width:600px}.compact-cost-body dl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 20px;margin:0}.compact-cost-body dt{font-weight:500}.compact-cost-body dd{margin:0;text-align:right}.compact-cost-body p{font-size:13px!important;color:var(--ps-muted)}
+html[data-theme] body.planner-horizontal .compact-trip-finish:has(.compact-cost-details[open]){grid-template-columns:minmax(0,1fr) auto}
+html[data-theme] body.planner-horizontal .compact-cost-details[open]{grid-column:1/-1;grid-row:2}
+html[data-theme] body.planner-horizontal .compact-trip-finish .compact-save-trip{background:var(--ps-accent)!important;color:var(--ps-on-accent)!important;border-color:var(--ps-accent)!important;min-height:46px;border-radius:7px}
+.compact-trip-finish>#guest-trip-save-hint,.compact-trip-finish>p,.compact-trip-finish>a,.compact-trip-options{grid-column:1/-1}
+.compact-trip-options>div{display:flex;flex-wrap:wrap;gap:10px;padding:10px 0}
+.compact-trip-options:not([open])>div{display:none}
+html[data-theme] body.planner-horizontal #studio-dashboard-content :is(.itinerary-discovery,.neutral-preview){background:var(--ps-inset)!important;color:var(--ps-ink)!important;border-color:var(--ps-border)!important}
+html[data-theme] body.planner-horizontal #studio-dashboard-content .itinerary-discovery :is(label,h3,p,small,.interested-places-label){color:var(--ps-ink)!important}
+@media(max-width:650px){html[data-theme] body.planner-horizontal .compact-trip-finish{grid-template-columns:minmax(0,1fr)!important;gap:8px}.compact-trip-estimate{grid-row:1}.compact-cost-details{grid-column:1!important;grid-row:auto!important}html[data-theme] body.planner-horizontal .compact-trip-finish .compact-save-trip{width:100%;grid-column:1;grid-row:auto}.compact-cost-body dl{grid-template-columns:minmax(0,1fr)}.compact-cost-body dd{text-align:left;margin-bottom:10px}}

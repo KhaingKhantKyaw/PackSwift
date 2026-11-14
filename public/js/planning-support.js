@@ -7,27 +7,33 @@
  const bar=el('section');bar.className='planning-card planning-toolbar preview-trip-actions';bar.setAttribute('aria-label','Trip actions');
  const apply=el('button','Use my saved preferences'),print=el('button','Print / save trip summary');[apply,print].forEach(b=>b.type='button');
  const message=el('p');message.setAttribute('role','status');bar.append(apply,print,message);document.querySelector('.studio-dashboard').append(bar);
- const saveTrip=el('button','Save to My Trips');saveTrip.type='button';bar.insertBefore(saveTrip,message);
- saveTrip.onclick=()=>{const r=total();form.elements.budget.value=r.complete?String(r.value):'';$('studio-save').click();};
+ const saveTrip=el('button','Save to My Trips');saveTrip.type='button';saveTrip.className='compact-save-trip';bar.insertBefore(saveTrip,message);
+ saveTrip.onclick=()=>{const r=total();if(r.complete){const s=read();s.costContext=context();s.costCurrency=$('currency').value;write(s);}form.elements.budget.value=r.complete?String(r.value):'';$('studio-save').click();};
  const saveHint=el('small','Sign in to save this trip.');saveHint.id='guest-trip-save-hint';saveHint.hidden=true;bar.insertBefore(saveHint,message);
  PackSwift.authReady.then(user=>{saveHint.hidden=Boolean(user);if(!user)saveTrip.setAttribute('aria-describedby',saveHint.id);});
  const savedLink=el('a','View saved trip →');savedLink.hidden=true;bar.append(savedLink);
  window.addEventListener('packswift:trip-saved',e=>{savedLink.href='/trips/'+encodeURIComponent(e.detail.tripId);savedLink.hidden=false;if(e.detail.resumed)savedLink.focus();});
  new MutationObserver(()=>{const status=$('studio-save-status').textContent;if(status)message.textContent=status;}).observe($('studio-save-status'),{childList:true,subtree:true,characterData:true});
- const money=el('section');money.className='planning-card budget-support final-trip-budget';money.append(el('h2','Finish your plan'));
- money.append(el('p','Flight + stay + daily spending · everyone · trip currency'));
- const grid=el('div');grid.className='support-fields';const labels={flights:'Round-trip flights · total',stay:'Stay · all rooms and nights',daily:'Daily spending · everyone per day'};
- const controls={};for(const [name,label]of Object.entries(labels)){const l=el('label',label),input=el('input');input.type='number';input.min=0;input.step='.01';input.placeholder='Enter amount';input.setAttribute('aria-label',label);controls[name]=input;input.onchange=()=>{if(!input.checkValidity())return input.reportValidity();const s=read();s.costs={...s.costs,[name]:input.value};s.costCurrency=$('currency').value;s.costContext=context();write(s);render();};l.append(input);grid.append(l);}money.append(grid);const currencyLabel=el('label','Trip currency'),currencySelect=el('select');currencySelect.setAttribute('aria-label','Trip currency');for(const option of $('currency').options)currencySelect.append(new Option(option.textContent,option.value));currencySelect.value=$('currency').value;currencySelect.onchange=()=>set('currency',currencySelect.value);currencyLabel.append(currencySelect);grid.prepend(currencyLabel);
- const result=el('div');result.className='budget-result';result.setAttribute('aria-live','polite');money.append(result);bar.before(money);money.append(bar);
+ const labels={flights:'Flights · all travellers',stay:'Stay · all rooms and nights',daily:'Daily spending · whole group'};
+ bar.classList.add('compact-trip-finish');
+ const result=el('div');result.className='compact-trip-estimate';result.setAttribute('aria-live','polite');bar.prepend(result);
+ const breakdown=el('details');breakdown.className='compact-cost-details';breakdown.append(el('summary','View breakdown'));const breakdownBody=el('div');breakdownBody.className='compact-cost-body';breakdown.append(breakdownBody);bar.insertBefore(breakdown,saveTrip);
+ const budgetLink=el('a','Open trip budget →');budgetLink.hidden=true;
+ const options=el('details');options.className='compact-trip-options';options.append(el('summary','More options'));const optionsBody=el('div');optionsBody.append(apply,print);options.append(optionsBody);bar.append(options);
+ window.addEventListener('packswift:trip-saved',e=>{budgetLink.href='/trips/'+encodeURIComponent(e.detail.tripId)+'?tab=budget';budgetLink.hidden=false;});
+ const existingTrip=new URLSearchParams(location.search).get('trip_id');if(existingTrip){budgetLink.href='/trips/'+encodeURIComponent(existingTrip)+'?tab=budget';budgetLink.hidden=false;}
  function context(){return ['origin','destination','startDate','endDate','adults','children','childAges'].map(n=>form.elements[n]?.value||'').join('|');}
- function total(){const s=read(),c=s.costs||{},start=Date.parse(form.elements.startDate.value),end=Date.parse(form.elements.endDate.value),days=Number.isFinite(start)&&Number.isFinite(end)&&end>=start?Math.round((end-start)/86400000)+1:0;const missing=Object.keys(labels).filter(k=>c[k]==null||c[k]===''||!Number.isFinite(Number(c[k]))||Number(c[k])<0);const stale=Boolean(s.costContext&&s.costContext!==context()||s.costCurrency&&s.costCurrency!==$('currency').value);return {days,missing,stale,complete:days>0&&!missing.length&&!stale,value:Number(c.flights||0)+Number(c.stay||0)+Number(c.daily||0)*days};}
- function render(){currencySelect.value=$('currency').value;const s=read(),r=total();result.replaceChildren();for(const [n,input]of Object.entries(controls)){if(document.activeElement!==input)input.value=s.costs?.[n]??'';input.disabled=r.stale;}
- if(r.stale){result.append(el('strong','Trip details changed — update your amounts.'));const reset=el('button','Clear old amounts');reset.type='button';reset.onclick=()=>{const next=read();delete next.costs;delete next.costContext;delete next.costCurrency;write(next);render();};result.append(reset);return;}
- result.append(el('strong',r.complete?'Estimated trip total: '+$('currency').value+' '+r.value.toLocaleString():'Budget incomplete · draft can be saved'));
- result.append(el('p',r.days?'Daily spending × '+r.days+' days (including arrival and departure).':'Choose your travel dates first.'));
- result.append(el('small','Estimate only. Confirm prices before booking.'));
+ function comparableContext(value){const parts=String(value).split('|');if(parts.length===7&&Number(parts[5])===0&&(!parts[6]||parts[6]==='[]'))parts[6]='';return parts.join('|');}
+ function total(){const s=read(),c=s.costs||{},start=Date.parse(form.elements.startDate.value),end=Date.parse(form.elements.endDate.value),days=Number.isFinite(start)&&Number.isFinite(end)&&end>=start?Math.round((end-start)/86400000)+1:0;const missing=Object.keys(labels).filter(k=>c[k]==null||c[k]===''||!Number.isFinite(Number(c[k]))||Number(c[k])<0);const stale=Boolean(s.costContext&&comparableContext(s.costContext)!==comparableContext(context())||s.costCurrency&&s.costCurrency!==$('currency').value);return {days,missing,stale,complete:days>0&&!missing.length&&!stale,value:Number(c.flights||0)+Number(c.stay||0)+Number(c.daily||0)*days};}
+ function render(){const s=read(),r=total(),currency=$('currency').value,known=Object.keys(labels).filter(k=>!r.missing.includes(k)),priced=known.filter(k=>k!=='daily'||r.days>0);result.replaceChildren();breakdownBody.replaceChildren();
+ const money=value=>currency+' '+Number(value).toLocaleString(undefined,{maximumFractionDigits:2});
+ result.append(el('strong',r.stale?'Estimate needs review':r.complete?'Estimated total: '+money(r.value):priced.length?'Partial estimate: '+money(priced.reduce((sum,k)=>sum+Number(s.costs[k])*(k==='daily'?r.days:1),0)):known.length?'Add dates to estimate costs':'Budget optional · add later'));
+ if(!r.stale&&(r.complete||priced.length))result.append(el('small','Whole group · planning estimate'));
+ const list=el('dl');for(const [key,label]of Object.entries(labels)){list.append(el('dt',label));list.append(el('dd',r.stale?'Needs review':r.missing.includes(key)?'Not added':key==='daily'?(r.days?money(Number(s.costs[key])*r.days)+' · '+money(s.costs[key])+'/day × '+r.days+' days':money(s.costs[key])+'/day · dates needed'):money(s.costs[key])));}breakdownBody.append(list);
+ breakdownBody.append(el('p',r.stale?'Trip details or currency changed. Review costs in your saved trip before relying on the estimate.':r.complete?'Estimate only. Confirm prices before booking. Check included fees.':'Unknown costs are not zero. Save now and finish the budget in My Trips → Open trip → Budget.'));
+ breakdownBody.append(budgetLink);
  }
- form.addEventListener('change',render);window.addEventListener('packswift:planner-loaded',render);window.addEventListener('packswift:draft-restored',render);render();
+ form.addEventListener('change',render);form.addEventListener('input',render);window.addEventListener('packswift:planner-loaded',render);window.addEventListener('packswift:draft-restored',render);render();
  window.addEventListener('packswift:budget-quote',event=>{
   const quote=event.detail;if(!quote)return;
   const d=el('dialog');d.className='profile-edit-dialog guide-dialog';d.setAttribute('aria-label','Add quoted cost to budget');
@@ -37,7 +43,7 @@
   f.onsubmit=e=>{e.preventDefault();if(quote.currency!==$('currency').value){feedback.textContent='Currency changed. Search again before adding a price.';return;}
    if(Object.entries(quote.context||{}).some(([k,v])=>form.elements[k]&&String(form.elements[k].value)!==String(v))){feedback.textContent='Trip details changed. Search again before adding this estimate.';return;}
    const s=read(),key=quote.kind==='flights'?'flights':'stay';
-   if(s.costContext&&s.costContext!==context()||s.costCurrency&&s.costCurrency!==quote.currency){feedback.textContent='Clear the old budget costs before adding a new estimate.';return;}
+   if(s.costContext&&comparableContext(s.costContext)!==comparableContext(context())||s.costCurrency&&s.costCurrency!==quote.currency){feedback.textContent='Review the old budget costs in your saved trip before adding a new estimate.';return;}
    s.costs={...s.costs,[key]:amount.value};s.quoteNotes={...s.quoteNotes,[key]:{source:quote.title,checkedAt:quote.searchedAt,label:'User-entered total from search option'}};s.costCurrency=quote.currency;s.costContext=context();write(s);render();d.close();d.remove();
   };d.append(f);document.body.append(d);d.showModal();
  });
@@ -58,7 +64,7 @@
   message.textContent='Applied: '+[p.homeCity&&'home city',p.currency&&'currency',p.travelStyle&&'spending style',p.interests?.length&&'interests',p.dailyPace&&'pace',p.walking&&'walking comfort',p.restBreaks&&'rest breaks',(p.dayStart||p.dayEnd)&&'day hours',p.packingItems?.length&&'packing essentials',guidance&&'guidance view'].filter(Boolean).join(', ')+'. Other profile preferences do not yet filter provider results.';
  }
  apply.onclick=()=>{if(confirm('Apply saved preferences to this trip? This may replace its origin, currency, interests and pace.'))applyPrefs(preferences);};
- const presetButton=el('button','Use a packing preset');presetButton.type='button';presetButton.hidden=true;bar.insertBefore(presetButton,message);
+ const presetButton=el('button','Use a packing preset');presetButton.type='button';presetButton.hidden=true;optionsBody.append(presetButton);
  PackSwift.authReady.then(user=>{presetButton.hidden=!user;});
  presetButton.onclick=()=>{
   const d=el('dialog');d.className='profile-edit-dialog guide-dialog';d.setAttribute('aria-label','Choose packing preset');d.append(el('h2','Packing presets'));

@@ -162,3 +162,6 @@ public/css/planner-page-flow.css
 public/js/planner-scroll-layout.js
 tests/planner-page-flow.browser.mjs
 docs/planner-page-flow-github.md
+docs/activities-section-layout-github.md
+tests/compact-trip-budget.browser.mjs
+docs/compact-trip-budget-github.md
