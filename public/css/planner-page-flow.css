@@ -1,0 +1,24 @@
+/* The document is the vertical scroller; dialogs and suggestion popovers keep theirs. */
+@media screen{
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page=planner-studio] #studio-dashboard-content{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(280px,1fr)!important;overflow:visible!important;height:auto!important;max-height:none!important;contain:none!important;scroll-snap-type:none!important;scrollbar-gutter:auto;align-items:start!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page=planner-studio] #studio-dashboard-content .reference-preview-card[data-preview-section]{grid-row:auto!important;height:auto!important;max-height:none!important;min-height:0!important;overflow:visible!important;overscroll-behavior:auto!important;scroll-snap-align:none!important;scrollbar-gutter:auto;position:relative!important;inset:auto!important;width:auto!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page=planner-studio] #studio-dashboard-content .reference-preview-card[data-flow-hidden=true]{display:none!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page=planner-studio] #studio-dashboard-content .reference-preview-card[hidden]{display:none!important}
+ html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page=planner-studio] #studio-dashboard-content .reference-preview-card>.reference-preview-content{height:auto!important;max-height:none!important;overflow:visible!important;overscroll-behavior:auto!important;padding-right:0!important;scrollbar-gutter:auto}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content .reference-preview-card>summary{position:static!important;top:auto!important;height:auto!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content .preview-expand{display:none!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content :is(.booking-results-scroll,.booking-option-panel,.booking-card-summary,.packing-checklist,.itinerary-plan,.itinerary-days){height:auto!important;max-height:none!important;overflow:visible!important;overscroll-behavior:auto!important;scrollbar-gutter:auto}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content :is([data-preview-section="Flight & Stay"],[data-preview-section="Packing List"]){grid-column:1/-1!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Itinerary"]{grid-column:1!important;grid-row:1!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"]{grid-column:2!important;grid-row:1!important}
+ html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Flight & Stay"]>.reference-preview-content{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:start!important}
+ .planner-section-nav{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--ps-border);margin:8px 0 20px}
+ .planner-section-nav button{font:600 16px/1.4 var(--ps-font);background:transparent;color:var(--ps-muted);border:0;border-bottom:3px solid transparent;border-radius:0;padding:13px 20px;min-height:48px;cursor:pointer}
+ .planner-section-nav button[aria-pressed=true]{color:var(--ps-accent);border-bottom-color:var(--ps-accent)}
+ .planner-section-nav[hidden],.planner-section-hint[hidden]{display:none!important}
+ .planner-section-hint{color:var(--ps-muted);padding:12px 0;font-size:15px}
+ body[data-page=planner-studio] :is(.planner-trip-setup,.studio-dashboard,#studio-dashboard-content){scroll-margin-top:calc(var(--header-height,88px) + 16px)}
+ @media(max-width:900px){html[data-theme] body.planner-studio.planner-sketch.planner-horizontal[data-page=planner-studio] #studio-dashboard-content{grid-template-columns:minmax(0,1fr)!important}html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Activities"]{grid-column:1!important;grid-row:auto!important}}
+ @media(max-width:650px){html[data-theme] body.planner-horizontal #studio-dashboard-content [data-preview-section="Flight & Stay"]>.reference-preview-content{grid-template-columns:minmax(0,1fr)!important}.planner-section-nav button{flex:1;padding:12px 8px;font-size:14px}}
+}
+@media print{.planner-section-nav,.planner-section-hint{display:none!important}[data-flow-hidden=true]:not([hidden]){display:block!important}}

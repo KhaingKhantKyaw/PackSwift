@@ -40,7 +40,8 @@
     const results=el('div');results.className='booking-results-scroll';results.tabIndex=0;results.setAttribute('role','region');results.setAttribute('aria-label',kind==='flights'?'Flight search results':'Stay search results');group.append(results);
     const status=el('p',record?.loading?'Looking for options…':record?.error||'');status.setAttribute('role','status');results.append(status);
     if(record?.data){const data=record.data;group.append(el('small',`${data.source} · ${new Date(data.searchedAt).toLocaleTimeString()}${data.cached?' · cached':''}`));if(!data.items.length)group.append(el('p','No options found. Try other dates or the external search.'));
-     for(const item of data.items){
+     const visibleCount=record.visibleCount||4;
+     for(const item of data.items.slice(0,visibleCount)){
       const card=el('article');card.className='booking-result';card.append(el('strong',item.title||'Travel option'),el('p',item.detail),el('strong',item.price),el('small',item.priceLabel));
       if(item.estimated&&item.originalPrice)card.append(el('small','Provider quote: '+item.originalPrice));
       let url;try{const candidate=new URL(item.url);if(candidate.protocol==='https:'&&!candidate.username&&!candidate.password)url=candidate;}catch{}
@@ -56,6 +57,7 @@
       if(url){const a=el('a',label);a.className='booking-result-action';a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label',label+' (opens in a new tab)');card.append(a);}
       group.append(card);
      }
+     if(data.items.length>visibleCount){const more=el('button','Show more '+(kind==='flights'?'flights':'stays'));more.type='button';more.className='booking-show-more';more.onclick=()=>{record.visibleCount=visibleCount+4;draw();};group.append(more);}
      if(data.conversion){const rateDate=new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}).format(new Date(data.conversion.updatedAt));const note=el('small',`Estimated conversion · rate updated ${rateDate} (UTC). Payment rates may differ. `),attribution=el('a','Rates By Exchange Rate API');attribution.href='https://www.exchangerate-api.com';attribution.target='_blank';attribution.rel='noopener noreferrer';note.append(attribution);group.append(note);}
     }
     for(const child of [...group.children])if(child!==controls&&child!==results&&child!==header)results.append(child);

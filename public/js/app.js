@@ -83,12 +83,14 @@ planningThemeStyles.rel='stylesheet';planningThemeStyles.href='/css/planning-the
 const websiteThemeStyles=document.createElement('link');
 websiteThemeStyles.rel='stylesheet';websiteThemeStyles.href='/css/website-theme.css';document.head.append(websiteThemeStyles);
 if(page==='planner-studio'){const previewStyles=document.createElement('link');previewStyles.rel='stylesheet';previewStyles.href='/css/preview-destination.css';document.head.append(previewStyles);}
+const productStyles=document.createElement('link');productStyles.rel='stylesheet';productStyles.href='/css/product-refinement.css';document.head.append(productStyles);
+if(page==='planner-studio'){const scrollStyles=document.createElement('link');scrollStyles.rel='stylesheet';scrollStyles.href='/css/planner-page-flow.css';document.head.append(scrollStyles);}
 const globalHeader=document.createElement('header');
 globalHeader.className='ps-global-header';
 globalHeader.dataset.variant=page==='planner-studio'?'solid':'overlay';
 globalHeader.innerHTML=`<div class="ps-header-inner">
  <a class="ps-header-brand" href="/" aria-label="PackSwift home"><span aria-hidden="true">◇</span> PackSwift</a>
- <button class="ps-header-menu" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="ps-header-navigation">☰</button>
+ <button class="ps-header-menu" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="ps-header-navigation"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
  <div class="ps-header-navigation" id="ps-header-navigation">
   <nav class="ps-header-links" aria-label="Primary navigation">${mainNavigation.replaceAll('class="nav-link"','class="ps-header-link"')}</nav>
   <div class="ps-header-auth">
@@ -96,7 +98,7 @@ globalHeader.innerHTML=`<div class="ps-header-inner">
    <span data-auth="user" hidden><a class="ps-header-action" href="/profile"><span data-profile-name>Profile</span></a><button class="ps-header-action" type="button" data-logout>Logout</button></span>
   </div>
  </div>
- <button class="ps-header-theme" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><span aria-hidden="true">☀</span></button>
+ <button class="ps-header-theme" type="button" data-theme-toggle aria-pressed="false" aria-label="Switch theme"><span aria-hidden="true"><svg class="theme-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.4 1.4m11.2 11.2L19 19M5 19l1.4-1.4M17.6 6.4 19 5"/></svg><svg class="theme-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z"/></svg></span></button>
 </div>`;
 const oldHomeHeader=document.querySelector('.slider-header');
 const homeSearch=oldHomeHeader?.querySelector('.slider-search-wrap');

@@ -79,6 +79,7 @@ async function setTrip(page) {
       field.dispatchEvent(new Event('change', { bubbles: true }));
     }
   }, details);
+  await page.locator('.planner-section-nav').getByRole('button',{name:'Packing & tips',exact:true}).click();
   const packing = page.locator('[data-preview-section="Packing List"] details[data-category="My Items"]');
   if (!await packing.evaluate(section => section.open)) await packing.locator('summary').click();
   const item = packing.getByRole('textbox', { name: 'New item in My Items' });
