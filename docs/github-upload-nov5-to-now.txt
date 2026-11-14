@@ -141,3 +141,9 @@ tests/user-dashboard.browser.mjs
 tests/website-qa-journey.browser.mjs
 worker/hosted-worker.mjs
 worker/live-search.mjs
+public/trip-hub.html
+public/css/trip-hub.css
+src/services/trip-hub-edits.js
+tests/trip-hub-edits.test.mjs
+tests/simple-trip-workflow.browser.mjs
+docs/simple-trip-workflow-github.md

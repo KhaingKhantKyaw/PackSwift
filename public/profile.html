@@ -3,7 +3,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex"><title>Your Dashboard — PackSwift</title>
 <link rel="stylesheet" href="/css/styles.css"><link rel="stylesheet" href="/css/profile-dashboard.css">
-<link rel="stylesheet" href="/css/planning-support.css"><link rel="stylesheet" href="/css/user-dashboard.css">
+<link rel="stylesheet" href="/css/planning-support.css"><link rel="stylesheet" href="/css/user-dashboard.css"><link rel="stylesheet" href="/css/trip-hub.css">
 <script src="/js/app.js" defer></script><script src="/js/profile.js" defer></script>
 <script src="/js/planning-model.js" defer></script><script src="/js/profile-personality.js" defer></script>
 <script src="/js/destination-currency.js" defer></script><script src="/js/emergency-directory.js" defer></script><script src="/js/dashboard-tools.js" defer></script><script src="/js/user-dashboard.js" defer></script>
@@ -14,8 +14,8 @@
 <div class="profile-heading"><div><p class="dashboard-eyebrow"></p><h1>Your dashboard</h1></div><a class="button button-primary" href="/trip-planner">＋ Plan a trip</a></div>
 <p id="profile-status" role="status">Loading profile…</p><section id="profile-guest" hidden><h2>Your trips, together.</h2><a href="/login?redirect=%2Fprofile">Log in to open your dashboard</a></section>
 <div id="profile-content" hidden>
-<section class="identity-bar"><div class="profile-avatar" id="profile-initials"></div><div><h2 id="profile-name"></h2></div><div class="identity-actions"><button id="edit-profile" type="button">✎ Edit profile</button><a class="profile-trips-button" href="/trips">My Trips →</a></div></section>
-<nav class="dashboard-nav" aria-label="Dashboard sections"><a href="#dashboard-trip">My trip</a><a href="#dashboard-budget">Expenses & currency</a><a href="#dashboard-itinerary">Itinerary</a><a href="#dashboard-guide">Guides & safety</a><a href="#dashboard-experiences">Experiences</a><a href="#dashboard-preferences">Travel profile</a></nav>
+<section class="identity-bar"><div class="profile-avatar" id="profile-initials"></div><div><h2 id="profile-name"></h2></div><div class="identity-actions"><button id="edit-profile" type="button">✎ Edit profile</button><a class="profile-trips-button" href="#dashboard-trips">My Trips →</a></div></section>
+<nav class="dashboard-nav" aria-label="Dashboard sections"><a href="#dashboard-trips">My Trips</a><a href="#dashboard-preferences">Profile & preferences</a></nav>
 <p id="dashboard-status" role="status" aria-live="polite">Loading your trips…</p>
 <div id="user-dashboard" hidden></div>
 <details id="dashboard-preferences" class="dashboard-preferences"><summary>⚙ Travel profile & preferences <span>Defaults, wishlist and packing presets</span></summary>

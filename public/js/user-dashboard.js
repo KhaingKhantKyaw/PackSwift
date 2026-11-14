@@ -1,6 +1,13 @@
 (() => {
   'use strict';
   const $=s=>document.querySelector(s),root=$('#user-dashboard'),status=$('#dashboard-status');
+  const tripMode=document.body.dataset.page==='trip-hub';
+  let notesOpen=false;
+  const openDays=new Set([1]);
+  const tabs=['overview','itinerary','budget','packing','help'];
+  let activeTab=new URLSearchParams(location.search).get('tab')||'overview';
+  if(!tabs.includes(activeTab))activeTab='overview';
+  const requestedTrip=tripMode?location.pathname.split('/').filter(Boolean)[1]:'';
   const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;};
   const link=(text,href,primary=false)=>{const a=el('a',text,'dashboard-link'+(primary?' dashboard-primary':''));a.href=href;return a;};
   const external=(text,url)=>{const a=link(text+' ↗',url);a.target='_blank';a.rel='noopener noreferrer';return a;};
@@ -32,7 +39,7 @@
     }
   }
   const current=()=>trips.find(t=>t.tripId===selected);
-  const path=(tab='')=>'/trips/'+encodeURIComponent(selected)+(tab?'/'+tab:'');
+  const path=(tab='')=>'/trips/'+encodeURIComponent(selected)+(tab?'?tab='+({requirements:'help'}[tab]||tab):'');
   const planner=()=>'/trip-planner?trip_id='+encodeURIComponent(selected);
   const journey=()=>{const d=current()?.details||{};return JSON.stringify([d.origin,d.destination,d.start,d.end,d.tripType]);};
   function feedback(text){status.textContent=text;}
@@ -87,8 +94,8 @@
   }
   async function mutateTrip(change){
     if(busy||!workspace)return;busy=true;root.querySelectorAll('button').forEach(b=>b.disabled=true);feedback('Saving trip changes…');
-    try{workspace=await PackSwift.api('/api/trips/'+encodeURIComponent(selected)+'/workspace?hydrate=0',{method:'PATCH',body:JSON.stringify({...change,revision:workspace.workspace?.revision||0})});render();feedback('Trip updated.');}
-    catch(e){render();feedback('Trip changes were not saved: '+e.message);}
+    try{workspace=await PackSwift.api('/api/trips/'+encodeURIComponent(selected)+'/workspace?hydrate=0',{method:'PATCH',body:JSON.stringify({...change,revision:workspace.workspace?.revision||0})});if(workspace.details)current().details=workspace.details;const drafts=captureForms(submitting);if(submitting)submitting.removeAttribute('data-dirty');render(drafts);feedback('Saved.');return true;}
+    catch(e){render();feedback('Trip changes were not saved: '+e.message);if(e.status===409)status.append(button('Load latest trip',async()=>{if(await loadWorkspace())feedback('Latest trip loaded. Review your unsaved changes before saving.');}));return false;}
     finally{busy=false;root.querySelectorAll('button').forEach(b=>b.disabled=false);}
   }
   function destinationResource(){const d=current()?.details||{},r=PackSwiftCurrency.resolve({name:d.destination,country:d.country});return {country:r.country||d.country||'',resource:resources[(r.country||d.country||'').toLowerCase()]};}
@@ -98,21 +105,22 @@
     const d=t.details,pick=el('div'),chooser=select(pick,'trip','Viewing trip',trips.map(v=>v.tripId),selected);
     [...chooser.options].forEach((o,i)=>o.textContent=trips[i].details.destination+' · '+date(trips[i].details.start));
     chooser.onchange=()=>{if(busy||(root.querySelector('[data-dirty]')&&!confirm('Switch trips and discard the unsaved form changes?'))){chooser.value=selected;return;}selected=chooser.value;workspace=null;render();loadWorkspace();};
-    s.replaceChildren(pick);const hero=el('div',null,'dashboard-hero'),intro=el('div'),next=el('div');
+    if(tripMode)s.replaceChildren();else s.replaceChildren(pick);const hero=el('div',null,'dashboard-hero'),intro=el('div'),next=el('div');
     const phase=d.end&&d.end<today()?'Past trip':d.start&&d.start<=today()?'Traveling now':'Upcoming trip';
-    intro.append(el('span',phase,'dashboard-chip'),el('h2',d.destination),el('p',date(d.start)+' – '+date(d.end)),el('p',[d.origin&&'From '+d.origin,(d.adults||1)+' adults',d.children?d.children+' children':'',d.nights+' nights'].filter(Boolean).join(' · ')));
+    intro.append(el('span',phase,'dashboard-chip'),el('h2',tripMode?'Overview':d.destination),...(!tripMode?[el('p',date(d.start)+' – '+date(d.end))]:[]),el('p',[d.origin&&'From '+d.origin,(d.adults||1)+' adults',d.children?d.children+' children':'',d.nights+' nights'].filter(Boolean).join(' · ')));
     if(d.start&&d.start>today())intro.append(el('p',Math.round((Date.parse(d.start)-Date.parse(today()))/86400000)+' days to go'));
-    intro.append(actions(link('Continue planning →',planner(),true),link('Open saved trip',path()),button('Save offline trip',()=>{
+    intro.append(actions(link('Edit trip details',planner()),button('Save offline trip',async()=>{
       if(!workspace){feedback('Wait for the saved itinerary and packing list to load, then try again.');return;}
+      if(!emergencyResults.has(journey()))try{const data=await PackSwiftEmergencyDirectory.load();emergencyResults.set(journey(),PackSwiftEmergencyDirectory.lookup(data,destinationResource().country));}catch{}
       const r=emergencyResults.get(journey()),contacts=[...(r?.contacts||[]).map(c=>({name:r.name+' · '+c.service,phone:c.number,source:c.source+' · reviewed '+c.verifiedAt+' · '+r.status+' · '+c.dialing})),...state.contacts.filter(c=>c.tripId===selected)];
       if(!r?.contacts.length&&!confirm('Verified emergency numbers are not loaded for this trip. Download the itinerary and personal contacts anyway?'))return;
       download('packswift-private-trip.txt',PackSwiftDashboardTools.summary({trip:current(),workspace,expenses:state.expenses.filter(e=>e.tripId===selected),contacts}));
     })));
     next.append(el('h3','Your next steps'));
     const tasks=[];
-    if(d.budget==null)tasks.push(['Add flight, stay and daily spending estimates',planner()]);
+    if(d.budget==null)tasks.push(['Add your planned costs',path('budget')]);
     const reviewed=state.entryChecks.some(v=>v.tripId===selected&&v.reviewed&&v.journey===journey());
-    if(!reviewed&&d.tripType!=='local')tasks.push(['Review entry requirements','#dashboard-entry']);
+    if(!reviewed&&d.tripType!=='local')tasks.push(['Review entry requirements',path('help')+'#dashboard-entry']);
     if(!(workspace?.workspace?.itineraryReviewedAt))tasks.push(['Review your day-by-day itinerary',path('itinerary')]);
     if(tasks.length<3)tasks.push(['Check packing and departure essentials',path('packing')]);
     for(const [label,url]of tasks.slice(0,3))next.append(actions(link(label+' →',url)));
@@ -128,8 +136,8 @@
     const filter=select(filters,'filter','Show trips',['All trips','Upcoming','Past']);s.append(filters);
     const list=el('div');s.append(list);
     const draw=()=>{list.replaceChildren();const values=trips.filter(t=>filter.value==='All trips'||(filter.value==='Past'?t.details.end&&t.details.end<today():!t.details.end||t.details.end>=today()));
-      rows(list,values,(row,t)=>{const info=el('div');info.append(el('strong',t.details.destination),el('small',date(t.details.start)+' – '+date(t.details.end)));row.append(info,link('Open trip','/trips/'+encodeURIComponent(t.tripId)));},'No trips in this view.');};
-    filter.onchange=draw;draw();s.append(actions(link('Manage, edit or delete trips','/trips'),link('Plan another trip','/trip-planner')));root.append(s);
+      rows(list,values,(row,t)=>{const info=el('div');info.append(el('strong',t.details.destination),el('small',date(t.details.start)+' – '+date(t.details.end)));row.append(info,actions(link('Open trip','/trips/'+encodeURIComponent(t.tripId)),button('Delete',async()=>{if(!confirm('Delete your '+t.details.destination+' trip? This cannot be undone.'))return;try{await PackSwift.api('/api/trips/'+encodeURIComponent(t.tripId),{method:'DELETE'});trips=trips.filter(v=>v.tripId!==t.tripId);selected=(trips.find(v=>!v.details.end||v.details.end>=today())||trips.at(-1))?.tripId||'';render();feedback('Trip deleted.');}catch(e){feedback('Trip was not deleted: '+e.message);}})));},'No trips in this view.');};
+    filter.onchange=draw;draw();root.append(s);
   }
   function renderBudget(){
     const group=el('div',null,'dashboard-split'),s=section('◈ Budget & expenses','dashboard-budget'),d=current().details,c=state.currency;
@@ -138,7 +146,13 @@
     for(const [key,label]of [['flights','Flights · trip total'],['stay','Stay · trip total'],['daily','Daily spending × '+(d.nights+1)+' days']]){
       note(s,label+': '+(parts[key]==null?'Not added':money(parts[key]*(key==='daily'?d.nights+1:1),d.currency)));
     }
-    if(d.budget==null)s.append(link('Add flight + stay + daily spending',planner()));
+    if(tripMode){
+      const costs=formSection(s,'Edit planned costs'),fields=el('div',null,'dashboard-fields');costs.append(fields);
+      for(const [key,label]of [['flights','Flights · total'],['stay','Stay · total'],['daily','Daily spending · everyone per day']]){const i=field(fields,key,label,'number',parts[key]??'');i.min='0';i.max='1000000000';i.step='.01';if(parts[key]===0)i.value='0';}
+      note(costs,'Trip currency: '+d.currency+'. Leave unknown costs blank.');
+      submit(costs,'Save planned costs',v=>mutateTrip({action:'costs',costs:Object.fromEntries(Object.entries(v).map(([k,value])=>[k,value===''?null:Number(value)]))}));
+      s.append(actions(link('Search flights & stays',planner()+'#preview-flight-stay')));
+    }
     const entries=state.expenses.filter(v=>v.tripId===selected),totals=new Map();
     for(const e of entries)totals.set(e.currency,(totals.get(e.currency)||0)+e.amount);
     note(s,'Actual spending · recorded amounts, not booking confirmations');
@@ -249,9 +263,62 @@
     const s=section('≡ Your itinerary','dashboard-itinerary');
     if(!workspace){note(s,'Loading the saved itinerary…');root.append(s);return;}
     const days=workspace.editablePlan?.days;
-    if(days)for(const day of days){const block=el('details');block.open=day.day===1;block.append(el('summary','Day '+day.day+' · '+date(day.date)));rows(block,day.stops,(row,stop)=>{const info=el('div');info.append(el('strong',stop.name),el('small',(stop.startTime||'Flexible time')+(stop.durationMinutes?' · '+stop.durationMinutes+' min':'')));if(stop.notes)info.append(el('p',stop.notes));row.append(info);},'No stops planned for this day.');s.append(block);}
-    else rows(s,workspace.timeline||[],(row,stop)=>{row.append(el('strong',stop.title),el('small','Day '+stop.day+' · '+(stop.startTime||'Flexible time')));},'No saved itinerary stops yet.');
-    s.append(actions(link('Edit itinerary inside PackSwift',planner())));root.append(s);
+    const warnings=workspace.editablePlan?.warnings||[];
+    if(warnings.length){const checks=el('details');checks.append(el('summary','Planning checks ('+warnings.length+')'));for(const warning of warnings)note(checks,warning);s.append(checks);}
+    if(days)for(const day of days){const block=el('details');block.open=openDays.has(day.day);block.ontoggle=()=>{if(block.isConnected)block.open?openDays.add(day.day):openDays.delete(day.day);};block.append(el('summary','Day '+day.day+' · '+date(day.date)));rows(block,day.stops,(row,stop)=>{const info=el('div');info.append(el('strong',stop.name),el('small',(stop.startTime||'Flexible time')+(stop.durationMinutes?' · '+stop.durationMinutes+' min':'')));if(stop.notes)info.append(el('p',stop.notes));row.append(info);stopForm(row,stop,day.day,true);},'No stops planned for this day.');s.append(block);}
+    else rows(s,workspace.timeline||[],(row,stop)=>{row.append(el('strong',stop.title),el('small','Day '+stop.day+' · '+(stop.startTime||'Flexible time')));stopForm(row,stop,stop.day,false);},'No saved itinerary stops yet.');
+    const add=formSection(s,'Add activity'),fields=el('div',null,'dashboard-fields');add.append(fields);
+    field(fields,'name','Activity','text','',180).required=true;field(fields,'startTime','Time','time',days?'09:00':'').required=Boolean(days);
+    select(fields,'day','Day',Array.from({length:current().details.nights+1},(_,i)=>String(i+1)),'1');
+    if(days){const duration=field(fields,'durationMinutes','Duration (minutes)','number','60');duration.min='5';duration.max='1440';duration.required=true;}
+    submit(add,'Add activity',v=>days?mutateTrip({action:'edit-stop',change:{type:'add',day:Number(v.day),stop:{id:crypto.randomUUID(),name:v.name,startTime:v.startTime,durationMinutes:Number(v.durationMinutes)}}}):mutateTrip({action:'itinerary',items:[...(workspace.timeline||[]).map(t=>({id:t.id,title:t.title,day:t.day,startTime:(t.startTime||'').slice(0,5)})),{title:v.name,day:Number(v.day),startTime:v.startTime}]}));
+    s.append(actions(link('Advanced planning & activities',planner()+'#preview-itinerary')));root.append(s);
+    if(workspace.editablePlan?.unscheduled?.length){const list=el('details');list.append(el('summary','Unscheduled places'));for(const stop of workspace.editablePlan.unscheduled)note(list,stop.name+' · '+stop.reason);s.append(list);}
+  }
+  function stopForm(parent,stop,day,editable){
+    for(const warning of stop.warnings||[])note(parent,warning);
+    if(stop.needsRefresh)note(parent,'Place details need refreshing before travel.');
+    if(editable&&stop.locked){parent.append(actions(button('Unlock stop',()=>mutateTrip({action:'edit-stop',change:{type:'lock',id:stop.id,locked:false}}))));return;}
+    const f=formSection(parent,'Edit stop');f.dataset.formKey='stop-'+stop.id;f.setAttribute('aria-label','Edit '+(stop.name||stop.title));
+    const fields=el('div',null,'dashboard-fields');f.append(fields);field(fields,'name','Activity','text',stop.name||stop.title,180).required=true;field(fields,'startTime','Time','time',(stop.startTime||'').slice(0,5)).required=editable;
+    select(fields,'day','Day',Array.from({length:current().details.nights+1},(_,i)=>String(i+1)),String(day));
+    if(editable){const duration=field(fields,'durationMinutes','Duration (minutes)','number',stop.durationMinutes);duration.min='5';duration.max='1440';duration.required=true;field(f,'notes','Notes','textarea',stop.notes||'',600);}
+    submit(f,'Save changes',v=>editable?mutateTrip({action:'edit-stop',change:{type:'update',id:stop.id,day:Number(v.day),values:{name:v.name,startTime:v.startTime,durationMinutes:Number(v.durationMinutes),notes:v.notes}}}):mutateTrip({action:'itinerary',items:(workspace.timeline||[]).map(t=>({id:t.id,day:t.id===stop.id?Number(v.day):t.day,title:t.id===stop.id?v.name:t.title,startTime:t.id===stop.id?v.startTime:(t.startTime||'').slice(0,5)}))}));
+    f.append(actions(button('Cancel',()=>{f.removeAttribute('data-dirty');render(captureForms(f));}),button('Remove activity',()=>{if(confirm('Remove this activity from your itinerary?'))editable?mutateTrip({action:'edit-stop',change:{type:'remove',id:stop.id}}):mutateTrip({action:'itinerary',items:(workspace.timeline||[]).filter(t=>t.id!==stop.id).map(t=>({id:t.id,day:t.day,title:t.title,startTime:(t.startTime||'').slice(0,5)}))});})));
+  }
+  function renderLanding(){
+    root.classList.add('dashboard-landing');
+    if(!trips.length){const empty=section('No trips yet','dashboard-trips');empty.append(link('Plan my first trip','/trip-planner',true));root.append(empty);return;}
+    renderTrips();
+    const first=root.querySelector('.dashboard-row');if(first)first.classList.add('next-trip-row');
+  }
+  function renderPacking(){
+    const s=section('Packing','dashboard-packing');
+    if(!workspace){note(s,'Loading packing list…');root.append(s);return;}
+    const items=workspace.packing||[],count=items.filter(p=>p.completed).length;
+    s.append(el('strong',count+' / '+items.length+' packed','dashboard-metric'));
+    rows(s,items,(row,p)=>{const label=el('label',null,'dashboard-check'),check=el('input');check.type='checkbox';check.checked=Boolean(p.completed);check.setAttribute('aria-label','Packed '+p.itemName);check.onchange=async()=>{if(busy){check.checked=Boolean(p.completed);return;}check.disabled=true;await mutateTrip({action:'packing',itemId:p.id,state:check.checked?'have':'unchecked'});};label.append(check,el('span',p.itemName+' × '+(p.quantity||1)));row.append(label,el('small',p.category||''));packingForm(row,p);},'No packing items saved.');
+    packingForm(s);root.append(s);
+  }
+  function packingForm(parent,item){
+    const f=formSection(parent,item?'Edit item':'Add packing item');f.dataset.formKey='packing-'+(item?.id||'new');
+    const fields=el('div',null,'dashboard-fields');f.append(fields);field(fields,'name','Item','text',item?.itemName||'',100).required=true;field(fields,'category','Category','text',item?.category||'Personal',80).required=true;
+    const quantity=field(fields,'quantity','Quantity','number',item?.quantity||1);quantity.required=true;quantity.min='1';quantity.max='99';quantity.step='1';
+    submit(f,item?'Save item':'Add item',v=>mutateTrip({action:item?'packing-edit':'packing-add',...(item?{itemId:item.id}:{}),name:v.name,category:v.category,quantity:Number(v.quantity)}));
+    f.append(actions(button('Cancel',()=>{f.removeAttribute('data-dirty');render(captureForms(f));})));
+    if(item)f.append(button('Remove item',()=>{if(confirm('Remove '+item.itemName+' from this trip?'))mutateTrip({action:'packing-remove',itemId:item.id});}));
+  }
+  function renderInterests(){
+    const s=section('Saved places','dashboard-interests');
+    rows(s,workspace?.likedActivities||[],(row,v)=>{row.append(el('strong',v.title),button('Remove interest',()=>{if(confirm('Remove this interest? Existing itinerary stops are kept.'))mutateTrip({action:'activity-choice',id:v.id});}));},'No liked activities yet.');
+    const wishes=(prefs.wishlist||[]).filter(v=>String(v.detail).toLowerCase().includes(current().details.destination.toLowerCase()));
+    if(wishes.length)rows(s,wishes,(row,v)=>row.append(el('strong',v.name),link('Add to plan',planner()+'&wish='+encodeURIComponent(v.name))),'Wishlist');
+    s.append(link('Find activities',planner()+'#preview-activities'));root.append(s);
+  }
+  function renderHubNav(){
+    const d=current().details;$('#trip-hub-title').textContent=d.destination;$('#trip-hub-dates').textContent=date(d.start)+' – '+date(d.end);
+    const nav=$('#trip-hub-nav');nav.replaceChildren();
+    for(const tab of tabs){const a=link(tab[0].toUpperCase()+tab.slice(1),path(tab));if(tab===activeTab)a.setAttribute('aria-current','page');nav.append(a);}
   }
   function renderStories(){
     const s=section('✎ My travel experiences','dashboard-experiences');note(s,'Private until shared. Only the previewed text is shared.');
@@ -263,28 +330,45 @@
     note(s,'Share through your device or download the text. No public feed.');root.append(s);
   }
   function render(drafts=captureForms()){
-    root.replaceChildren();renderHero();renderTrips();if(current()){renderBudget();renderPreparation();renderItinerary();renderGuides();renderEntry();renderStories();}root.hidden=false;
-    const personality=$('.personality-card');if(personality&&!$('#dashboard-preferences').contains(personality))$('#dashboard-preferences').insertBefore(personality,$('#profile-form'));
+    root.replaceChildren();
+    if(!tripMode)renderLanding();
+    else if(!current()){const s=section('Trip not found');s.append(link('Back to My Trips','/profile#dashboard-trips'));root.append(s);}
+    else{
+      renderHubNav();
+      if(activeTab==='overview'){renderHero();renderStories();const stories=root.lastElementChild,details=el('details');details.open=notesOpen;details.ontoggle=()=>{if(details.isConnected)notesOpen=details.open;};details.append(el('summary','Trip notes & experiences'));stories.before(details);details.append(stories);}
+      if(activeTab==='itinerary'){renderItinerary();renderInterests();}
+      if(activeTab==='budget')renderBudget();
+      if(activeTab==='packing')renderPacking();
+      if(activeTab==='help'){const s=section('Weather');const weather=el('div');s.append(weather);root.append(s);loadWeather(weather);renderGuides();renderEntry();}
+    }
+    root.hidden=false;
+    const personality=$('.personality-card');if(personality&&$('#dashboard-preferences')&&!$('#dashboard-preferences').contains(personality))$('#dashboard-preferences').insertBefore(personality,$('#profile-form'));
     restoreForms(drafts);
   }
   async function loadWorkspace(){
     const seq=++workspaceSeq,id=selected;if(!id)return;
     try{const value=await PackSwift.api('/api/trips/'+encodeURIComponent(id)+'/workspace?hydrate=0');if(seq!==workspaceSeq||id!==selected)return;workspace=value;
       // Do not destroy a form the user has already begun editing.
-      render();
-    }catch(e){if(seq===workspaceSeq)feedback('Trip loaded. Preparation details unavailable: '+e.message);}
+      render();return true;
+    }catch(e){if(seq===workspaceSeq)feedback('Trip details unavailable: '+e.message);return false;}
   }
   root.addEventListener('input',e=>{const form=e.target.closest('form');if(form&&form.dataset.formKey!=='converter')form.setAttribute('data-dirty','true');});
+  if(tripMode)document.addEventListener('click',e=>{
+    const a=e.target.closest('a');if(!a||a.target==='_blank')return;const url=new URL(a.href,location.href),tab=url.searchParams.get('tab');
+    if(url.origin!==location.origin||url.pathname!==location.pathname||!tabs.includes(tab))return;e.preventDefault();if(busy)return;
+    if(root.querySelector('[data-dirty]')&&!confirm('Discard unsaved changes and switch sections?'))return;
+    activeTab=tab;history.replaceState(null,'',url.pathname+url.search+url.hash);render([]);$('#trip-hub-nav [aria-current]')?.focus({preventScroll:true});if(url.hash)requestAnimationFrame(()=>document.getElementById(url.hash.slice(1))?.scrollIntoView());
+  });
   window.addEventListener('beforeunload',e=>{if(root.querySelector('[data-dirty]')){e.preventDefault();e.returnValue='';}});
   async function load(){
-    try{const user=await PackSwift.authReady;if(!user)return;
+    try{const user=await PackSwift.authReady;if(!user){if(tripMode){root.hidden=false;root.append(link('Sign in to open this trip','/login?redirect='+encodeURIComponent(location.pathname+location.search)));feedback('Sign in required.');}return;}
       const [data,list,preferences]=await Promise.all([PackSwift.api('/api/profile/dashboard'),PackSwift.api('/api/trips'),PackSwift.api('/api/profile/preferences')]);
       state=data.dashboard;prefs=preferences.preferences||{};trips=list.trips||[];
       trips.sort((a,b)=>String(a.details.start||'9999').localeCompare(b.details.start||'9999'));
-      selected=(trips.find(v=>!v.details.end||v.details.end>=today())||trips.at(-1))?.tripId||'';
-      render();feedback('');await loadWorkspace();
+      selected=tripMode?requestedTrip:(trips.find(v=>!v.details.end||v.details.end>=today())||trips.at(-1))?.tripId||'';
+      render();feedback('');if(tripMode&&current())await loadWorkspace();
     }catch(e){feedback('Could not load your dashboard: '+e.message);status.append(button('Try again',load));}
   }
   load();
-  new MutationObserver(()=>{const p=$('.personality-card');if(p&&!$('#dashboard-preferences').contains(p))$('#dashboard-preferences').insertBefore(p,$('#profile-form'));}).observe($('#profile-content'),{childList:true});
+  if($('#profile-content'))new MutationObserver(()=>{const p=$('.personality-card');if(p&&!$('#dashboard-preferences').contains(p))$('#dashboard-preferences').insertBefore(p,$('#profile-form'));}).observe($('#profile-content'),{childList:true});
 })();

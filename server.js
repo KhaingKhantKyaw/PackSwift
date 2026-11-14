@@ -47,10 +47,11 @@ app.use(express.urlencoded({ extended: false, limit: "128kb" }));
 app.use(requireSameOrigin);
 // Run before static serving so .html URLs cannot bypass the account gate.
 app.use((request, response, next) => {
-  if (!/^\/(?:trips(?:\/|$)|my-trips(?:\.html)?\/?$|saved-trip-workspace(?:\.html)?\/?$|profile(?:\.html)?\/?$)/i.test(request.path)) return next();
+  if (!/^\/(?:trips(?:\/|$)|my-trips(?:\.html)?\/?$|saved-trip-workspace(?:\.html)?\/?$|trip-hub(?:\.html)?\/?$|profile(?:\.html)?\/?$)/i.test(request.path)) return next();
   response.set("Cache-Control", "no-store");
   optionalAuth(request, response, () => {
     if (!request.auth) return response.redirect(302, "/login?redirect=" + encodeURIComponent(request.originalUrl));
+    if (/^\/saved-trip-workspace(?:\.html)?\/?$/i.test(request.path)) return response.redirect(302,"/profile#dashboard-trips");
     next();
   });
 });

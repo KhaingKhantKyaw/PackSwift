@@ -5,6 +5,7 @@ import {getDatabasePool} from '../config/database.js';
 import {getOwnedTrip} from '../repositories/trip-repository.js';
 import {tripDetails,validateWorkspaceChange} from '../services/trip-workspace.js';
 import {destinationCatalog} from '../services/travel-planner.js';
+import {updateTripCosts,editTripStop} from '../services/trip-hub-edits.js';
 import {getTripWorkspace as snapshot,getTripsForUser} from '../repositories/trip-workspace-repository.js';
 
 export const tripWorkspaceRouter=Router();
@@ -38,6 +39,16 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
     const state=preferences.workspace || {revision:0,requirements:{},needs:[]};
     if((state.revision||0)!==change.revision){await connection.rollback();return res.status(409).json({error:'This trip changed in another tab. Reload before saving.'});}
     if(change.action==='requirement'){state.requirements||={};state.requirements[change.key]=change.reviewed?new Date().toISOString():null;}
+    if(change.action==='costs'||change.action==='edit-stop'){
+      const trip=await getOwnedTrip(req.auth.userId,req.params.tripId),details=tripDetails(trip);
+      if(change.action==='costs'){
+        const amount=updateTripCosts(preferences,details,change.costs);
+        await connection.execute('UPDATE trip_sessions SET preferences_json=?, budget_amount=?, budget_currency=? WHERE id=? AND user_id=?',[JSON.stringify(preferences),amount,details.currency,rows[0].id,req.auth.userId]);
+      }else{
+        editTripStop(preferences,details,change.change);state.itineraryReviewedAt=null;
+        await connection.execute('UPDATE trip_sessions SET preferences_json=? WHERE id=? AND user_id=?',[JSON.stringify(preferences),rows[0].id,req.auth.userId]);
+      }
+    }
     if(change.action==='activity-choice'){
       const field=preferences.detailPlanning?.fields?.find(f=>f.name==='activityChoices');
       if(!field){await connection.rollback();return res.status(404).json({error:'Saved activity not found.'});}
@@ -52,6 +63,22 @@ tripWorkspaceRouter.patch('/:tripId/workspace',...guard,async(req,res,next)=>{
       if(!items.length){await connection.rollback();return res.status(404).json({error:'Packing item not found.'});}
       await connection.execute('UPDATE packing_lists SET is_completed=? WHERE id=? AND trip_session_id=?',[change.state==='have',change.itemId,rows[0].id]);
       state.needs=(state.needs||[]).filter(id=>id!==change.itemId);if(change.state==='need')state.needs.push(change.itemId);
+    }
+    if(['packing-add','packing-edit','packing-remove'].includes(change.action)){
+      const [items]=await connection.execute('SELECT id FROM packing_lists WHERE trip_session_id=?',[rows[0].id]);
+      if(change.action!=='packing-add'&&!items.some(p=>p.id===change.itemId)){await connection.rollback();return res.status(404).json({error:'Packing item not found.'});}
+      if(change.action==='packing-add'){
+        if(items.length>=300)throw new RangeError('Keep up to 300 packing items.');
+        await connection.execute("INSERT INTO packing_lists (trip_session_id,traveler_group,category,item_name,quantity,is_completed,reason_text) VALUES (?,'general',?,?,?,FALSE,'Personal item')",[rows[0].id,change.category.trim(),change.name.trim(),change.quantity]);
+      }
+      if(change.action==='packing-edit')await connection.execute('UPDATE packing_lists SET category=?,item_name=?,quantity=? WHERE id=? AND trip_session_id=?',[change.category.trim(),change.name.trim(),change.quantity,change.itemId,rows[0].id]);
+      if(change.action==='packing-remove'){await connection.execute('DELETE FROM packing_lists WHERE id=? AND trip_session_id=?',[change.itemId,rows[0].id]);state.needs=(state.needs||[]).filter(id=>id!==change.itemId);}
+      const [savedItems]=await connection.execute('SELECT id,category,item_name,quantity,is_completed FROM packing_lists WHERE trip_session_id=? ORDER BY id',[rows[0].id]);
+      preferences.detailPlanning||={fields:[]};preferences.detailPlanning.fields||=[];
+      let f=preferences.detailPlanning.fields.find(f=>f.name==='packingSnapshot');if(!f){f={name:'packingSnapshot',type:'hidden'};preferences.detailPlanning.fields.push(f);}
+      let old;try{old=JSON.parse(f.value||'[]');}catch{old=[];}if(!Array.isArray(old))old=[];
+      f.value=JSON.stringify(savedItems.map(p=>({id:old.find(v=>v.name===p.item_name&&v.category===p.category)?.id||'saved-'+p.id,name:p.item_name,category:p.category,quantity:p.quantity,packed:Boolean(p.is_completed)})));
+      await connection.execute('UPDATE trip_sessions SET preferences_json=? WHERE id=? AND user_id=?',[JSON.stringify(preferences),rows[0].id,req.auth.userId]);
     }
     if(change.action==='itinerary'||change.action==='regenerate'){
       if(preferences.detailPlanning?.fields?.some(f=>f.name==='itineraryPlan'&&f.value)){

@@ -1,0 +1,36 @@
+.trip-hub-shell {max-width:1200px;margin:auto;padding:28px clamp(20px,4vw,48px) 64px;font:15px/1.6 Arial,sans-serif;color:var(--ps-ink)}
+.trip-hub-back {color:var(--ps-ocean);font-size:14px;text-decoration:none}
+.trip-hub-heading {margin:18px 0}
+html body[data-page="trip-hub"] #trip-hub-title {font:600 clamp(28px,4vw,38px)/1.2 Arial,sans-serif;color:var(--ps-ink);margin:0 0 8px}
+#trip-hub-dates {color:var(--ps-muted);margin:0}
+#trip-hub-nav {display:flex;gap:8px 22px;overflow-x:auto;border-bottom:1px solid var(--ps-border);padding:0;margin-bottom:16px}
+#trip-hub-nav a {white-space:nowrap;min-height:44px;display:inline-flex;align-items:center;padding:8px 2px;box-sizing:border-box;border-bottom:3px solid transparent;color:var(--ps-muted);text-decoration:none;font-weight:600}
+#trip-hub-nav a[aria-current="page"] {color:var(--ps-accent);border-bottom-color:var(--ps-accent)}
+#trip-hub-nav a:hover {color:var(--ps-ocean)}
+.trip-hub-shell .dashboard-section {padding-top:18px}
+html body[data-page="trip-hub"] :is(.ps-header-brand,.ps-header-link,.ps-header-action,.ps-header-theme),
+html body[data-page="trip-hub"] .trip-hub-shell :is(h1,h2,h3,p,label,small,strong,span,summary,button,a,input,select,textarea) {font-family:Arial,sans-serif!important}
+html body[data-page="trip-hub"] #trip-hub-title {font:600 clamp(28px,4vw,38px)/1.2 Arial,sans-serif!important}
+html body[data-page="trip-hub"] #user-dashboard :is(h2,h3,label,legend) {color:var(--ps-ink)!important}
+html body[data-page="trip-hub"] #user-dashboard h2 {font:600 20px/1.4 Arial,sans-serif!important}
+html body[data-page="trip-hub"] #user-dashboard label {font-size:13px!important;font-weight:600!important}
+html body[data-page="trip-hub"] #user-dashboard :is(input,select,textarea) {font-size:15px!important}
+.trip-hub-shell .dashboard-hero {margin:0}
+.trip-hub-shell .dashboard-row>details {width:100%;margin:0}
+.trip-hub-shell .dashboard-form {max-width:680px}
+.trip-hub-shell .dashboard-check {font:400 15px/1.5 Arial,sans-serif}
+.trip-hub-shell .trip-hub-stops {max-height:none}
+.trip-hub-shell #dashboard-itinerary .dashboard-row {display:block}
+.trip-hub-shell #dashboard-packing .dashboard-row {flex-wrap:wrap}
+.trip-hub-shell #dashboard-packing .dashboard-row>label {flex:1}
+.trip-hub-shell #dashboard-itinerary .dashboard-list {max-height:540px}
+.trip-hub-shell>details,.trip-hub-shell #user-dashboard>details {padding:16px 0;border-top:1px solid var(--ps-border)}
+.trip-hub-shell #user-dashboard>details>summary {cursor:pointer;font-weight:600;color:var(--ps-ocean)}
+.trip-hub-shell #dashboard-trip>label {display:none}
+.trip-hub-shell .dashboard-split {gap:30px}
+.trip-hub-shell .dashboard-section .dashboard-form .dashboard-fields {grid-template-columns:repeat(2,minmax(0,1fr))}
+.dashboard-landing .dashboard-hero {grid-template-columns:1fr}
+.dashboard-landing .dashboard-hero h2 {margin:8px 0}
+.dashboard-landing .dashboard-row {padding:18px 0}
+.dashboard-landing .dashboard-section {padding-top:18px}
+@media(max-width:700px){.trip-hub-shell{padding:22px 20px 48px}#trip-hub-nav{gap:18px}.trip-hub-shell .dashboard-section .dashboard-form .dashboard-fields{grid-template-columns:1fr}}

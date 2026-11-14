@@ -6,7 +6,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDirectory = path.resolve(__dirname, "../../public");
 
 export const pageRouter = Router();
-pageRouter.get(['/trips','/trips/:tripId','/trips/:tripId/requirements','/trips/:tripId/itinerary','/trips/:tripId/packing'],(req,res)=>res.sendFile(path.join(publicDirectory,'saved-trip-workspace.html')));
+pageRouter.get('/trips',(req,res)=>res.redirect(302,'/profile#dashboard-trips'));
+pageRouter.get('/trips/:tripId',(req,res)=>res.sendFile(path.join(publicDirectory,'trip-hub.html')));
+pageRouter.get('/trips/:tripId/:section',(req,res)=>{
+  const tabs={overview:'overview',requirements:'help',itinerary:'itinerary',packing:'packing',budget:'budget',help:'help'};
+  const tab=tabs[req.params.section];if(!tab)return res.status(404).sendFile(path.join(publicDirectory,'404.html'));
+  res.redirect(302,'/trips/'+encodeURIComponent(req.params.tripId)+'?tab='+tab+(req.params.section==='requirements'?'#dashboard-entry':''));
+});
 
 const pages = new Map([
   ["/", "index.html"],

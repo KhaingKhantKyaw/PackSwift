@@ -52,8 +52,16 @@ export function validateWorkspaceChange(body) {
   if(!Number.isInteger(body.revision)||body.revision<0)throw new RangeError('Reload this trip before saving.');
   if(body.action==='requirement') {
     if(!requirementKeys.includes(body.key)||typeof body.reviewed!=='boolean')throw new RangeError('Invalid requirement update.');
+  } else if(body.action==='costs') {
+    if(!body.costs||typeof body.costs!=='object'||Array.isArray(body.costs))throw new RangeError('Enter your planned costs.');
+    for(const k of ['flights','stay','daily'])if(body.costs[k]!==null&&(typeof body.costs[k]!=='number'||!Number.isFinite(body.costs[k])||body.costs[k]<0||body.costs[k]>1e9))throw new RangeError('Use valid costs or leave them blank.');
+  } else if(body.action==='edit-stop') {
+    if(!body.change||typeof body.change!=='object'||!['add','update','remove','reorder','move','lock'].includes(body.change.type)||JSON.stringify(body.change).length>10000)throw new RangeError('Invalid itinerary change.');
   } else if(body.action==='activity-choice') {
     if(typeof body.id!=='string'||!body.id||body.id.length>160)throw new RangeError('Choose a saved activity.');
+  } else if(['packing-add','packing-edit','packing-remove'].includes(body.action)) {
+    if(body.action!=='packing-add'&&(!Number.isInteger(body.itemId)||body.itemId<1))throw new RangeError('Choose a packing item.');
+    if(body.action!=='packing-remove'&&(typeof body.name!=='string'||!body.name.trim()||body.name.length>100||typeof body.category!=='string'||!body.category.trim()||body.category.length>80||!Number.isInteger(body.quantity)||body.quantity<1||body.quantity>99))throw new RangeError('Check the packing item and quantity.');
   } else if(body.action==='packing') {
     if(!Number.isInteger(body.itemId)||body.itemId<1||!['have','need','unchecked'].includes(body.state))throw new RangeError('Invalid packing update.');
   } else if(body.action==='itinerary') {
