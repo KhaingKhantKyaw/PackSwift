@@ -198,7 +198,7 @@
       catalog = [...merged.values()];
       if (document.activeElement === search) renderSearch();
     }).catch(() => { /* Regional suggestions remain usable if the catalog cannot load. */ });
-  const explore=document.createElement('button');explore.type='button';explore.id='slider-explore';explore.className='slider-explore';explore.textContent='Explore destination';explore.addEventListener('click',()=>window.PackSwiftDestinationGuide.open(destinations[active]));el('slider-plan').before(explore);
+  const explore=document.createElement('a');explore.href='/explore';explore.id='slider-explore';explore.className='slider-explore';explore.textContent='Explore the world';el('slider-plan').after(explore);
   cards(); updateSave();
   el('slider-position').textContent=`01 / ${String(destinations.length).padStart(2,'0')}`;
   // Rotate only while the visitor is not interacting. Respect reduced motion.
